@@ -41,8 +41,12 @@ tmp/
 # =======================================
 # CONFIG (jangan dipush ke repo)
 # =======================================
-config/
-*.config.php
+# Ignore file di folder config
+config/config.php
+config/database.php
+
+# Ignore file di luar folder config
+functions.php
 
 # =======================================
 # IDE & EDITOR
