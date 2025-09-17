@@ -38,7 +38,7 @@ if (!defined('EPIC_INIT')) {
                         <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                             <i class="fas fa-rocket text-white text-sm"></i>
                         </div>
-                        <span class="text-xl font-bold text-gray-900">EPIC Hub</span>
+                        <span class="text-xl font-bold text-gray-900">EPIC Hub - Bisnis Emas Perak Indonesia</span>
                     </a>
                 </div>
                 
