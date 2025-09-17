@@ -48,10 +48,10 @@ if (!defined('EPIC_INIT')) {
                     <a href="<?= epic_url('articles') ?>" class="text-gray-700 hover:text-blue-600 transition-colors">Articles</a>
                     
                     <?php if (epic_is_logged_in()): ?>
-                        <a href="<?= epic_url('dashboard') ?>" class="text-gray-700 hover:text-blue-600 transition-colors">Dashboard</a>
+                        <a href="<?= epic_url('dashboard') ?>" class="text-gray-700 hover:text-blue-600 transition-colors">DASHBOARD</a>
                         <a href="<?= epic_url('logout') ?>" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">Logout</a>
                     <?php else: ?>
-                        <a href="<?= epic_url('login') ?>" class="text-gray-700 hover:text-blue-600 transition-colors">Login</a>
+                        <a href="<?= epic_url('login') ?>" class="text-gray-700 hover:text-blue-600 transition-colors">LOGIN</a>
                         <a href="<?= epic_url('register') ?>" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Register</a>
                     <?php endif; ?>
                 </div>
