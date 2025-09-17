@@ -1,32 +1,20 @@
-name: Deploy dev-test via FTPS
-on:
+name: 🚀 Deploy website on push
+on: 
   push:
-    branches: ["main"]
-  workflow_dispatch: {}
-
+    branches:
+      - main
 jobs:
-  deploy:
+  web-deploy:
+    name: 🎉 Deploy website
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Deploy to cPanel (FTPS explicit)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}        # <-- isi dengan HOSTNAME SERVER ASLI, bukan domain web
-          username: ${{ secrets.FTP_USERNAME_DEV }}
-          password: ${{ secrets.FTP_PASSWORD_DEV }}
-          protocol: ftps                           # explicit FTPS
-          port: 21
-          server-dir: /home/bisnisem/dev-test.bisnisemasperak.com/
-          exclude: |
-            **/.git*
-            **/.github/**
-            .cpanel.yml
-            .env
-            *.log
-            node_modules/**
-            vendor/**
-            storage/**
-            uploads/**
-          # optional: aktifkan debug kalau masih error
-          log-level: verbose
+    # Checkout the repository
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
+    # sync files via FTP
+    - name: 📂 Sync files via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USER }}
+        password: ${{ secrets.FTP_PASS }}
