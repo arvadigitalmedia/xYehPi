@@ -1,0 +1,741 @@
+<?php
+/**
+ * EPIC Hub - Login Page
+ * Modern login interface with affiliate integration
+ */
+
+if (!defined('EPIC_INIT')) {
+    die('Direct access not allowed');
+}
+
+// Redirect if already logged in
+if (epic_is_logged_in()) {
+    epic_redirect(epic_get_user_redirect_url());
+}
+
+$error = $data['error'] ?? null;
+$success = $data['success'] ?? null;
+$redirect = $_GET['redirect'] ?? 'dashboard';
+
+// Handle account restriction message
+if (isset($_GET['message']) && $_GET['message'] === 'account_restricted') {
+    $error = 'Your account has been suspended or restricted. Please contact support for assistance.';
+}
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $data['page_title'] ?? 'Login - EPIC Hub' ?></title>
+    
+    <!-- Favicon -->
+    <?php 
+    $site_favicon = epic_setting('site_favicon');
+    if ($site_favicon && file_exists(EPIC_ROOT . '/uploads/logos/' . $site_favicon)): 
+    ?>
+        <link rel="icon" type="image/x-icon" href="<?= epic_url('uploads/logos/' . $site_favicon) ?>">
+    <?php else: ?>
+        <link rel="icon" type="image/png" href="<?= epic_url('themes/modern/assets/favicon.png') ?>">
+    <?php endif; ?>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            /* Gold Palette - Admin Consistent */
+            --gold-500: #CFA84E;
+            --gold-400: #DDB966;
+            --gold-300: #E6CD8B;
+            --gold-200: #F0D9A8;
+            --gold-100: #F8EDD0;
+            
+            /* Ink/Dark Palette */
+            --ink-900: #0B0B0F;
+            --ink-800: #141419;
+            --ink-700: #1D1D25;
+            --ink-600: #262732;
+            --ink-500: #3A3B47;
+            --ink-400: #52535F;
+            --ink-300: #6B6C78;
+            --ink-200: #9B9CA8;
+            --ink-100: #D1D2D9;
+            
+            /* Surface Layers */
+            --surface-1: #0F0F14;
+            --surface-2: #15161C;
+            --surface-3: #1C1D24;
+            --surface-4: #23242C;
+            
+            /* Status Colors */
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            
+            /* Gold Gradient */
+            --gradient-gold: linear-gradient(135deg, #F3E5BE 0%, #D7B965 50%, #B88A2C 100%);
+            --gradient-gold-subtle: linear-gradient(135deg, rgba(243, 229, 190, 0.1) 0%, rgba(215, 185, 101, 0.1) 50%, rgba(184, 138, 44, 0.1) 100%);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--ink-900) 0%, var(--ink-800) 30%, var(--ink-700) 70%, var(--surface-2) 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Elegant Gold Shimmer Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(207, 168, 78, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(221, 185, 102, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(230, 205, 139, 0.04) 0%, transparent 50%);
+            animation: shimmer 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -2;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        .glass-effect {
+            background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--ink-600);
+            box-shadow: 
+                0 8px 32px rgba(11, 11, 15, 0.3),
+                inset 0 1px 0 rgba(207, 168, 78, 0.1);
+        }
+        
+        .input-focus:focus {
+            border-color: var(--gold-400);
+            box-shadow: 0 0 0 3px rgba(207, 168, 78, 0.15);
+            background: var(--surface-3);
+        }
+        
+        /* Loading Animation Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--ink-900) 0%, var(--ink-800) 30%, var(--ink-700) 70%, var(--surface-2) 100%);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .loading-container {
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .loading-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            animation: floatLogo 3s ease-in-out infinite;
+            filter: drop-shadow(0 10px 30px rgba(207, 168, 78, 0.3));
+        }
+        
+        .loading-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .loading-logo-fallback {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--gradient-gold));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: floatLogo 3s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(207, 168, 78, 0.3);
+        }
+        
+        .loading-logo-fallback svg {
+            width: 60px;
+            height: 60px;
+            color: var(--ink-900);
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(207, 168, 78, 0.3);
+            border-top: 3px solid var(--gold-400);
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gold-400);
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes floatLogo {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+            }
+            50% {
+                transform: translateY(-15px) scale(1.05);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .loading-logo,
+            .loading-logo-fallback {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .loading-logo-fallback svg {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .loading-text {
+                font-size: 16px;
+            }
+            
+            .loading-spinner {
+                width: 35px;
+                height: 35px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .loading-logo,
+            .loading-logo-fallback {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .loading-logo-fallback svg {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .loading-text {
+                font-size: 14px;
+            }
+            
+            .loading-spinner {
+                width: 30px;
+                height: 30px;
+            }
+        }
+        
+        /* Ensure input text is white */
+        input[type="email"],
+        input[type="password"] {
+            color: #ffffff !important;
+        }
+        
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            color: #ffffff !important;
+        }
+        
+        /* Placeholder styling */
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-gold);
+            color: var(--ink-900);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(207, 168, 78, 0.4);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(207, 168, 78, 0.1), rgba(221, 185, 102, 0.05));
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+            backdrop-filter: blur(2px);
+        }
+        
+        .shape:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 15%;
+            left: 8%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 55%;
+            right: 8%;
+            animation-delay: 2s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 15%;
+            left: 15%;
+            animation-delay: 4s;
+        }
+        
+        .shape:nth-child(4) {
+            width: 60px;
+            height: 60px;
+            top: 30%;
+            right: 25%;
+            animation-delay: 1s;
+        }
+        
+        .shape:nth-child(5) {
+            width: 120px;
+            height: 120px;
+            bottom: 40%;
+            right: 40%;
+            animation-delay: 3s;
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg) scale(1); 
+                opacity: 0.6;
+            }
+            33% { 
+                transform: translateY(-30px) rotate(120deg) scale(1.1); 
+                opacity: 0.8;
+            }
+            66% { 
+                transform: translateY(-15px) rotate(240deg) scale(0.9); 
+                opacity: 0.4;
+            }
+        }
+        
+        .error-shake {
+            animation: shake 0.6s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
+        }
+        
+        .brand-logo {
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), var(--surface-3));
+            border: 1px solid var(--success);
+            backdrop-filter: blur(10px);
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), var(--surface-3));
+            border: 1px solid var(--danger);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 relative">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <!-- Login Container -->
+    <div class="w-full max-w-md">
+
+        
+        <!-- Login Form -->
+        <div class="glass-effect rounded-2xl p-8 shadow-2xl">
+            <!-- Logo Website -->
+            <div class="text-center mb-6">
+                <?php 
+                $site_logo = epic_setting('site_logo');
+                if (!empty($site_logo) && file_exists(EPIC_ROOT . '/uploads/logos/' . $site_logo)): 
+                ?>
+                    <div class="mb-4">
+                        <img src="<?= epic_url('uploads/logos/' . $site_logo) ?>" 
+                             alt="<?= htmlspecialchars(epic_setting('site_name', 'EPIC Hub')) ?>" 
+                             class="mx-auto" 
+                             style="max-height: 80px; max-width: 200px; object-fit: contain;">
+                    </div>
+                <?php else: ?>
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-white bg-opacity-20 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                <?php endif; ?>
+                <h2 class="text-2xl font-semibold text-white mb-2">Selamat Datang Kembali</h2>
+                <p class="text-white text-opacity-70">Masuk Akun EPI Partner Network</p>
+            </div>
+            
+            <!-- Error Message -->
+            <?php if ($error): ?>
+                <div class="error-message rounded-lg p-4 mb-6 error-shake">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-red-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-red-300 text-sm font-medium"><?= htmlspecialchars($error) ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
+            
+            <!-- Success Message -->
+            <?php if ($success): ?>
+                <div class="success-message rounded-lg p-4 mb-6">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-green-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-green-300 text-sm font-medium"><?= htmlspecialchars($success) ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
+            
+            <!-- Login Form -->
+            <form method="POST" action="<?= epic_url('login') ?>" class="space-y-6" id="loginForm">
+                <input type="hidden" name="redirect" value="<?= htmlspecialchars($redirect) ?>">
+                
+                <!-- Email Field -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-white text-opacity-90 mb-2">
+                        Alamat Email
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-white text-opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+                            </svg>
+                        </div>
+                        <input type="email" 
+                               id="email" 
+                               name="email" 
+                               required 
+                               class="w-full pl-10 pr-4 py-3 bg-surface-2 border border-ink-600 rounded-lg text-ink-100 placeholder-ink-400 input-focus transition-all duration-300"
+                               placeholder="Masukkan email terdaftar"
+                               value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
+                    </div>
+                </div>
+                
+                <!-- Password Field -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-white text-opacity-90 mb-2">
+                        Password
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-white text-opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               required 
+                               class="w-full pl-10 pr-12 py-3 bg-surface-2 border border-ink-600 rounded-lg text-ink-100 placeholder-ink-400 input-focus transition-all duration-300"
+                               placeholder="Masukkan password">
+                        <button type="button" 
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                onclick="togglePassword()">
+                            <svg id="eyeIcon" class="w-5 h-5 text-white text-opacity-50 hover:text-opacity-80 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               id="remember" 
+                               name="remember" 
+                               class="w-4 h-4 text-gold-500 bg-surface-2 border-ink-600 rounded focus:ring-gold-400 focus:ring-2">
+                        <label for="remember" class="ml-2 text-sm text-white">
+                            Ingatkan Saya
+                        </label>
+                    </div>
+                    
+                    <a href="<?= epic_url('forgot-password') ?>" 
+                       class="text-sm text-white hover:text-gray-300 transition-colors">
+                        Lupa Password?
+                    </a>
+                </div>
+                
+                <!-- Login Button -->
+                <button type="submit" 
+                        class="w-full btn-primary text-white font-semibold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent"
+                        id="loginBtn">
+                    <span id="loginBtnText">LOGIN AKUN</span>
+                    <svg id="loginSpinner" class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </form>
+            
+            <!-- Divider -->
+            <div class="mt-8 mb-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-white border-opacity-20"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Belum Punya Akun Text -->
+            <div class="text-center" style="margin-top: 60px; margin-bottom: 20px;">
+                <span class="text-sm text-white text-opacity-60">Belum Punya Akun?</span>
+            </div>
+            
+            <!-- Register Link -->
+            <div class="text-center">
+                <a href="<?= epic_url('register') ?>" 
+                   class="inline-flex items-center justify-center w-full py-3 px-4 border border-gray-400 rounded-lg text-white bg-gray-500 hover:bg-gray-400 hover:border-gray-300 transition-all duration-300">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                    </svg>
+                    DAFTAR AKUN BARU
+                </a>
+                
+                <!-- Warning Text -->
+                <p class="mt-3 text-xs text-yellow-300 text-opacity-80">
+                    Sebelum mendaftar pastikan bahwa Anda benar-benar belum mempunyai akun
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer Links -->
+        <div class="text-center mt-8">
+            <div class="flex justify-center space-x-6 text-sm text-white">
+                <a href="<?= epic_url() ?>" class="hover:text-gray-300 transition-colors">Home</a>
+                <a href="<?= epic_url('about') ?>" class="hover:text-gray-300 transition-colors">About</a>
+                <a href="<?= epic_url('contact') ?>" class="hover:text-gray-300 transition-colors">Contact</a>
+                <a href="<?= epic_url('privacy') ?>" class="hover:text-gray-300 transition-colors">Privacy</a>
+            </div>
+            <p class="mt-4 text-xs text-white">
+                © <?= date('Y') ?> EPIC Hub. All rights reserved.
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                `;
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                `;
+            }
+        }
+        
+        // Form submission with loading state
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            // Show loading overlay
+            showLoadingAnimation();
+            
+            // Update button state
+            const btn = document.getElementById('loginBtn');
+            const btnText = document.getElementById('loginBtnText');
+            const spinner = document.getElementById('loginSpinner');
+            
+            btn.disabled = true;
+            btnText.textContent = 'Signing In...';
+            spinner.classList.remove('hidden');
+        });
+        
+        // Loading animation functions
+        function showLoadingAnimation() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function hideLoadingAnimation() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Auto-focus email field
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('email').focus();
+        });
+        
+        // Enter key handling
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').submit();
+            }
+        });
+    </script>
+    
+    <!-- Loading Animation Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-container">
+            <!-- Logo -->
+            <?php 
+            $site_logo = epic_setting('site_logo');
+            if ($site_logo && file_exists(EPIC_ROOT . '/uploads/logos/' . $site_logo)): 
+            ?>
+                <div class="loading-logo">
+                    <img src="<?= epic_url('uploads/logos/' . $site_logo) ?>" 
+                         alt="<?= htmlspecialchars(epic_setting('site_name', 'EPIC Hub')) ?>">
+                </div>
+            <?php else: ?>
+                <div class="loading-logo-fallback">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+            <?php endif; ?>
+            
+            <!-- Loading Text -->
+            <div class="loading-text">Memproses Login...</div>
+            
+            <!-- Spinner -->
+            <div class="loading-spinner"></div>
+            
+            <!-- Animated Dots -->
+            <div class="loading-dots">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

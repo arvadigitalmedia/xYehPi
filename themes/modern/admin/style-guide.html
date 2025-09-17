@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPIC Hub Admin - Style Guide</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.css">
+    
+    <!-- Admin Styles -->
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <style>
+        .style-guide {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-8);
+            background: var(--ink-900);
+            min-height: 100vh;
+        }
+        
+        .guide-header {
+            text-align: center;
+            margin-bottom: var(--spacing-12);
+            padding-bottom: var(--spacing-8);
+            border-bottom: 1px solid var(--ink-700);
+        }
+        
+        .guide-title {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--gold-400);
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .guide-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--ink-300);
+            margin-bottom: var(--spacing-6);
+        }
+        
+        .guide-section {
+            margin-bottom: var(--spacing-12);
+        }
+        
+        .section-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--ink-100);
+            margin-bottom: var(--spacing-6);
+            padding-bottom: var(--spacing-3);
+            border-bottom: 2px solid var(--gold-400);
+        }
+        
+        .subsection-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--ink-200);
+            margin: var(--spacing-8) 0 var(--spacing-4) 0;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-6);
+        }
+        
+        .color-swatch {
+            background: var(--surface-2);
+            border: 1px solid var(--ink-700);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .color-preview {
+            height: 80px;
+            width: 100%;
+        }
+        
+        .color-info {
+            padding: var(--spacing-4);
+        }
+        
+        .color-name {
+            font-weight: var(--font-weight-semibold);
+            color: var(--ink-100);
+            margin-bottom: var(--spacing-1);
+        }
+        
+        .color-value {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: var(--font-size-sm);
+            color: var(--ink-400);
+        }
+        
+        .typography-sample {
+            margin-bottom: var(--spacing-6);
+            padding: var(--spacing-6);
+            background: var(--surface-2);
+            border: 1px solid var(--ink-700);
+            border-radius: var(--radius-lg);
+        }
+        
+        .component-showcase {
+            display: grid;
+            gap: var(--spacing-6);
+            margin-bottom: var(--spacing-8);
+        }
+        
+        .component-demo {
+            padding: var(--spacing-6);
+            background: var(--surface-2);
+            border: 1px solid var(--ink-700);
+            border-radius: var(--radius-lg);
+        }
+        
+        .component-title {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            color: var(--ink-200);
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .badge-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .code-block {
+            background: var(--ink-800);
+            border: 1px solid var(--ink-600);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-4);
+            margin: var(--spacing-4) 0;
+            overflow-x: auto;
+        }
+        
+        .code-block code {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: var(--font-size-sm);
+            color: var(--ink-200);
+            white-space: pre;
+        }
+        
+        .spacing-demo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-3);
+        }
+        
+        .spacing-box {
+            background: var(--gold-400);
+            color: var(--ink-900);
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+        }
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--spacing-4);
+        }
+        
+        .icon-demo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-2);
+            padding: var(--spacing-4);
+            background: var(--surface-3);
+            border-radius: var(--radius-lg);
+            text-align: center;
+        }
+        
+        .icon-name {
+            font-size: var(--font-size-xs);
+            color: var(--ink-400);
+        }
+    </style>
+</head>
+<body>
+    <div class="style-guide">
+        <!-- Header -->
+        <div class="guide-header">
+            <h1 class="guide-title">EPIC Hub Admin Style Guide</h1>
+            <p class="guide-subtitle">Premium Dark Gold Theme - Design System & Components</p>
+            <div class="badge badge-gold">Version 2.0.0</div>
+        </div>
+        
+        <!-- Color Palette -->
+        <section class="guide-section">
+            <h2 class="section-title">Color Palette</h2>
+            
+            <h3 class="subsection-title">Gold Palette</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #CFA84E;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Gold 500 (Primary)</div>
+                        <div class="color-value">#CFA84E</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #DDB966;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Gold 400</div>
+                        <div class="color-value">#DDB966</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #E6CD8B;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Gold 300</div>
+                        <div class="color-value">#E6CD8B</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #F0D9A8;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Gold 200</div>
+                        <div class="color-value">#F0D9A8</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="subsection-title">Ink/Dark Palette</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #0B0B0F;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Ink 900 (Background)</div>
+                        <div class="color-value">#0B0B0F</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #141419;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Ink 800</div>
+                        <div class="color-value">#141419</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #1D1D25;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Ink 700</div>
+                        <div class="color-value">#1D1D25</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #D1D2D9;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Ink 100 (Text)</div>
+                        <div class="color-value">#D1D2D9</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="subsection-title">Surface Layers</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #0F0F14;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Surface 1</div>
+                        <div class="color-value">#0F0F14</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #15161C;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Surface 2</div>
+                        <div class="color-value">#15161C</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #1C1D24;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Surface 3</div>
+                        <div class="color-value">#1C1D24</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #23242C;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Surface 4</div>
+                        <div class="color-value">#23242C</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="subsection-title">Status Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #10B981;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Success</div>
+                        <div class="color-value">#10B981</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #F59E0B;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Warning</div>
+                        <div class="color-value">#F59E0B</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #EF4444;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Danger</div>
+                        <div class="color-value">#EF4444</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background-color: #3B82F6;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Info</div>
+                        <div class="color-value">#3B82F6</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Typography -->
+        <section class="guide-section">
+            <h2 class="section-title">Typography</h2>
+            
+            <div class="typography-sample">
+                <h1 style="font-size: var(--font-size-3xl); margin-bottom: var(--spacing-4);">Heading 1 - 40px (2.5rem)</h1>
+                <h2 style="font-size: var(--font-size-2xl); margin-bottom: var(--spacing-4);">Heading 2 - 32px (2rem)</h2>
+                <h3 style="font-size: var(--font-size-xl); margin-bottom: var(--spacing-4);">Heading 3 - 28px (1.75rem)</h3>
+                <h4 style="font-size: var(--font-size-lg); margin-bottom: var(--spacing-4);">Heading 4 - 20px (1.25rem)</h4>
+                <p style="font-size: var(--font-size-base); margin-bottom: var(--spacing-4);">Body Text - 16px (1rem) - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                <p style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-4);">Small Text - 14px (0.875rem) - Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                <p style="font-size: var(--font-size-xs);">Extra Small - 12px (0.75rem) - Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.</p>
+            </div>
+            
+            <div class="code-block">
+                <code>Font Family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif
+Font Weights: 400 (Normal), 500 (Medium), 600 (Semibold), 700 (Bold)
+Line Height: 1.5 (Default)</code>
+            </div>
+        </section>
+        
+        <!-- Spacing -->
+        <section class="guide-section">
+            <h2 class="section-title">Spacing Scale</h2>
+            
+            <div class="spacing-demo">
+                <div class="spacing-box" style="width: 4px; height: 20px;">1</div>
+                <span>4px (0.25rem) - spacing-1</span>
+            </div>
+            <div class="spacing-demo">
+                <div class="spacing-box" style="width: 8px; height: 20px;">2</div>
+                <span>8px (0.5rem) - spacing-2</span>
+            </div>
+            <div class="spacing-demo">
+                <div class="spacing-box" style="width: 12px; height: 20px;">3</div>
+                <span>12px (0.75rem) - spacing-3</span>
+            </div>
+            <div class="spacing-demo">
+                <div class="spacing-box" style="width: 16px; height: 20px;">4</div>
+                <span>16px (1rem) - spacing-4</span>
+            </div>
+            <div class="spacing-demo">
+                <div class="spacing-box" style="width: 24px; height: 20px;">6</div>
+                <span>24px (1.5rem) - spacing-6</span>
+            </div>
+            <div class="spacing-demo">
+                <div class="spacing-box" style="width: 32px; height: 20px;">8</div>
+                <span>32px (2rem) - spacing-8</span>
+            </div>
+            <div class="spacing-demo">
+                <div class="spacing-box" style="width: 48px; height: 20px;">12</div>
+                <span>48px (3rem) - spacing-12</span>
+            </div>
+        </section>
+        
+        <!-- Buttons -->
+        <section class="guide-section">
+            <h2 class="section-title">Buttons</h2>
+            
+            <div class="component-showcase">
+                <div class="component-demo">
+                    <div class="component-title">Primary Buttons</div>
+                    <div class="button-grid">
+                        <button class="btn btn-primary">Primary</button>
+                        <button class="btn btn-primary btn-sm">Small</button>
+                        <button class="btn btn-primary btn-lg">Large</button>
+                        <button class="btn btn-primary" disabled>Disabled</button>
+                    </div>
+                </div>
+                
+                <div class="component-demo">
+                    <div class="component-title">Secondary Buttons</div>
+                    <div class="button-grid">
+                        <button class="btn btn-secondary">Secondary</button>
+                        <button class="btn btn-outline">Outline</button>
+                        <button class="btn btn-success">Success</button>
+                        <button class="btn btn-warning">Warning</button>
+                        <button class="btn btn-danger">Danger</button>
+                    </div>
+                </div>
+                
+                <div class="component-demo">
+                    <div class="component-title">Icon Buttons</div>
+                    <div class="button-grid">
+                        <button class="btn btn-primary">
+                            <i data-feather="plus" width="16" height="16"></i>
+                            <span>With Icon</span>
+                        </button>
+                        <button class="btn btn-icon btn-secondary">
+                            <i data-feather="settings" width="20" height="20"></i>
+                        </button>
+                        <button class="btn btn-icon btn-sm btn-outline">
+                            <i data-feather="edit" width="16" height="16"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Badges -->
+        <section class="guide-section">
+            <h2 class="section-title">Badges</h2>
+            
+            <div class="component-demo">
+                <div class="component-title">Status Badges</div>
+                <div class="badge-grid">
+                    <span class="badge badge-success">Active</span>
+                    <span class="badge badge-warning">Pending</span>
+                    <span class="badge badge-danger">Suspended</span>
+                    <span class="badge badge-info">Draft</span>
+                    <span class="badge badge-gold">Premium</span>
+                    <span class="badge badge-inactive">Inactive</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Forms -->
+        <section class="guide-section">
+            <h2 class="section-title">Form Elements</h2>
+            
+            <div class="component-demo">
+                <div class="component-title">Input Fields</div>
+                <div style="max-width: 400px;">
+                    <div class="form-group">
+                        <label class="form-label">Text Input</label>
+                        <input type="text" class="form-input" placeholder="Enter text...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Select Dropdown</label>
+                        <select class="form-select">
+                            <option>Choose option...</option>
+                            <option>Option 1</option>
+                            <option>Option 2</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Textarea</label>
+                        <textarea class="form-textarea" placeholder="Enter message..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Input with Error</label>
+                        <input type="text" class="form-input error" value="Invalid input">
+                        <div class="form-error">This field is required.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Icons -->
+        <section class="guide-section">
+            <h2 class="section-title">Icons</h2>
+            
+            <div class="component-demo">
+                <div class="component-title">Common Icons (Feather Icons 18-22px)</div>
+                <div class="icon-grid">
+                    <div class="icon-demo">
+                        <i data-feather="home" width="20" height="20" style="color: var(--gold-400);"></i>
+                        <span class="icon-name">home</span>
+                    </div>
+                    <div class="icon-demo">
+                        <i data-feather="users" width="20" height="20" style="color: var(--gold-400);"></i>
+                        <span class="icon-name">users</span>
+                    </div>
+                    <div class="icon-demo">
+                        <i data-feather="target" width="20" height="20" style="color: var(--gold-400);"></i>
+                        <span class="icon-name">target</span>
+                    </div>
+                    <div class="icon-demo">
+                        <i data-feather="trending-up" width="20" height="20" style="color: var(--gold-400);"></i>
+                        <span class="icon-name">trending-up</span>
+                    </div>
+                    <div class="icon-demo">
+                        <i data-feather="dollar-sign" width="20" height="20" style="color: var(--gold-400);"></i>
+                        <span class="icon-name">dollar-sign</span>
+                    </div>
+                    <div class="icon-demo">
+                        <i data-feather="credit-card" width="20" height="20" style="color: var(--gold-400);"></i>
+                        <span class="icon-name">credit-card</span>
+                    </div>
+                    <div class="icon-demo">
+                        <i data-feather="bar-chart-2" width="20" height="20" style="color: var(--gold-400);"></i>
+                        <span class="icon-name">bar-chart-2</span>
+                    </div>
+                    <div class="icon-demo">
+                        <i data-feather="settings" width="20" height="20" style="color: var(--gold-400);"></i>
+                        <span class="icon-name">settings</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- KPI Cards -->
+        <section class="guide-section">
+            <h2 class="section-title">KPI Cards</h2>
+            
+            <div class="component-demo">
+                <div class="component-title">Standard KPI Card</div>
+                <div style="max-width: 320px;">
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <h3 class="kpi-card-title">Total Revenue</h3>
+                            <i data-feather="dollar-sign" class="kpi-card-icon"></i>
+                        </div>
+                        <div class="kpi-card-value">Rp 24.381.000</div>
+                        <div class="kpi-card-change positive">
+                            <i data-feather="trending-up" width="16" height="16"></i>
+                            <span>+12.5% dari bulan lalu</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="component-demo">
+                <div class="component-title">Glass Matte Variant</div>
+                <div style="max-width: 320px;">
+                    <div class="kpi-card glass">
+                        <div class="kpi-card-header">
+                            <h3 class="kpi-card-title">Active Users</h3>
+                            <i data-feather="users" class="kpi-card-icon"></i>
+                        </div>
+                        <div class="kpi-card-value">1,247</div>
+                        <div class="kpi-card-change negative">
+                            <i data-feather="trending-down" width="16" height="16"></i>
+                            <span>-2.1% dari bulan lalu</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Usage Guidelines -->
+        <section class="guide-section">
+            <h2 class="section-title">Usage Guidelines</h2>
+            
+            <div class="component-demo">
+                <div class="component-title">Accessibility</div>
+                <ul style="color: var(--ink-200); line-height: 1.6;">
+                    <li>Minimum touch target size: 44px × 44px</li>
+                    <li>Text contrast ratio: ≥7:1 for normal text, ≥4.5:1 for large text</li>
+                    <li>Focus ring: 2px solid gold-400 with 2px offset</li>
+                    <li>All interactive elements must have proper ARIA labels</li>
+                    <li>Keyboard navigation support for all components</li>
+                </ul>
+            </div>
+            
+            <div class="component-demo">
+                <div class="component-title">Responsive Breakpoints</div>
+                <ul style="color: var(--ink-200); line-height: 1.6;">
+                    <li><strong>Desktop:</strong> 1440px (primary design target)</li>
+                    <li><strong>Laptop:</strong> 1280px</li>
+                    <li><strong>Tablet:</strong> 1024px</li>
+                    <li><strong>Mobile:</strong> 768px</li>
+                    <li><strong>Small Mobile:</strong> 390px</li>
+                </ul>
+            </div>
+            
+            <div class="component-demo">
+                <div class="component-title">Animation & Transitions</div>
+                <ul style="color: var(--ink-200); line-height: 1.6;">
+                    <li><strong>Fast:</strong> 150ms ease-in-out (hover states)</li>
+                    <li><strong>Normal:</strong> 200ms ease-in-out (general transitions)</li>
+                    <li><strong>Slow:</strong> 300ms ease-in-out (complex animations)</li>
+                    <li><strong>Active state:</strong> scale(0.99) for button press feedback</li>
+                    <li><strong>Hover elevation:</strong> translateY(-2px) for cards</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+    
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>

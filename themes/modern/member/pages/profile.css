@@ -1,0 +1,674 @@
+/**
+ * EPIC Hub Profile Cards Styling
+ * Consistent dengan aurora-dark-gold-theme design system
+ * 
+ * @version 2.0.0
+ * @author EPIC Hub Team
+ */
+
+/* Menggunakan design tokens dari aurora-dark-gold-theme.css */
+/* Variables sudah didefinisikan di aurora-dark-gold-theme.css */
+
+/* ===== PROFILE EDIT SECTION - WELCOME STYLE ===== */
+
+.profile-edit-section {
+  margin-bottom: var(--epic-space-2xl) !important;
+}
+
+.profile-edit-card-with-photo {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  transition: var(--transition-normal);
+}
+
+.profile-edit-card-with-photo:hover {
+  box-shadow: var(--epic-shadow-md) !important;
+  transform: translateY(-2px) !important;
+}
+
+.profile-photo-container {
+  flex-shrink: 0 !important;
+}
+
+.profile-photo {
+  width: 120px !important;
+  height: 120px !important;
+  border-radius: var(--epic-radius-xl) !important;
+  overflow: hidden !important;
+  border: 3px solid var(--border) !important;
+  background: var(--bg-2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: var(--epic-transition-normal) !important;
+}
+
+.profile-photo:hover {
+  border-color: var(--gold-600) !important;
+  transform: scale(1.02) !important;
+}
+
+.profile-photo .user-photo {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.profile-photo .user-photo-placeholder {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--epic-space-sm) !important;
+  color: var(--tx-3) !important;
+  font-size: var(--epic-text-xs) !important;
+  text-align: center !important;
+}
+
+.profile-main-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.profile-header-new {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: var(--epic-space-xl) !important;
+  margin-bottom: var(--epic-space-lg) !important;
+}
+
+.profile-text-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.profile-title-new {
+  font-size: var(--epic-text-2xl) !important;
+  font-weight: var(--epic-font-bold) !important;
+  color: var(--tx) !important;
+  margin: 0 0 var(--epic-space-sm) 0 !important;
+  line-height: 1.2 !important;
+}
+
+.profile-badge-new {
+  margin-bottom: var(--epic-space-sm) !important;
+}
+
+.profile-description-new {
+  font-size: var(--epic-text-base) !important;
+  color: var(--tx-2) !important;
+  margin: 0 !important;
+  line-height: 1.5 !important;
+}
+
+.profile-actions-new {
+  flex-shrink: 0 !important;
+}
+
+/* Progress Circle Small */
+.completion-circle-small {
+  position: relative !important;
+  width: 60px !important;
+  height: 60px !important;
+}
+
+.progress-ring-small {
+  transform: rotate(-90deg) !important;
+}
+
+.progress-ring-small .progress-ring-bg {
+  fill: none !important;
+  stroke: var(--bg-2) !important;
+  stroke-width: 4 !important;
+}
+
+.progress-ring-small .progress-ring-fill {
+  fill: none !important;
+  stroke: var(--gold-600) !important;
+  stroke-width: 4 !important;
+  stroke-linecap: round !important;
+  transition: stroke-dashoffset 0.5s ease-in-out !important;
+}
+
+.progress-text-small {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  text-align: center !important;
+}
+
+.progress-percentage-small {
+  font-size: var(--epic-text-sm) !important;
+  font-weight: var(--epic-font-bold) !important;
+  color: var(--tx) !important;
+}
+
+/* Profile Completion Tips */
+.profile-completion-tips {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  border-radius: var(--epic-radius-lg) !important;
+  padding: var(--epic-space-md) !important;
+}
+
+.tips-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--epic-space-sm) !important;
+  margin-bottom: var(--epic-space-sm) !important;
+  font-size: var(--epic-text-sm) !important;
+  font-weight: var(--epic-font-medium) !important;
+  color: var(--info) !important;
+}
+
+.tips-list-inline {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: var(--epic-space-md) !important;
+}
+
+.tip-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--epic-space-xs) !important;
+  font-size: var(--epic-text-xs) !important;
+  color: var(--info) !important;
+  background: rgba(59, 130, 246, 0.1) !important;
+  padding: var(--epic-space-xs) var(--epic-space-sm) !important;
+  border-radius: var(--epic-radius-sm) !important;
+}
+
+.profile-completion-success {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--epic-space-sm) !important;
+  color: var(--success) !important;
+  font-size: var(--epic-text-sm) !important;
+  font-weight: var(--epic-font-medium) !important;
+  background: rgba(34, 197, 94, 0.1) !important;
+  border: 1px solid rgba(34, 197, 94, 0.2) !important;
+  border-radius: var(--epic-radius-lg) !important;
+  padding: var(--epic-space-md) !important;
+}
+
+/* ===== PROFILE OPTIONS GRID - FULL WIDTH STYLE ===== */
+
+.profile-form-cards {
+  margin-top: var(--epic-space-xl) !important;
+}
+
+.profile-options-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--epic-space-xl) !important;
+  margin-bottom: var(--epic-space-2xl) !important;
+}
+
+.profile-option-card {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--epic-radius-xl) !important;
+  box-shadow: var(--epic-shadow-sm) !important;
+  transition: all var(--epic-transition-fast) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  width: 100% !important;
+}
+
+/* Aurora Gradient Top Border for Profile Cards */
+.profile-option-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 0 auto 0 !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, var(--aurora-blue), var(--aurora-teal), var(--gold)) !important;
+  opacity: 0.9 !important;
+}
+
+.profile-option-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--epic-shadow-md) !important;
+  border-color: var(--gold) !important;
+}
+
+.profile-option-card:hover::before {
+  opacity: 1 !important;
+}
+
+.option-card-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: var(--epic-space-lg) !important;
+  padding: var(--epic-space-xl) !important;
+  border-bottom: 1px solid var(--border) !important;
+  background: var(--bg-2) !important;
+}
+
+.option-icon-container {
+  flex-shrink: 0 !important;
+}
+
+.option-icon {
+  width: 48px !important;
+  height: 48px !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--epic-radius-lg) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--tx-2) !important;
+  transition: var(--epic-transition-fast) !important;
+}
+
+.profile-option-card:hover .option-icon {
+  background: var(--gold-600) !important;
+  color: var(--bg) !important;
+  border-color: var(--gold-600) !important;
+  transform: scale(1.05) !important;
+}
+
+.option-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+  position: relative !important;
+}
+
+.option-title {
+  font-size: var(--epic-text-lg) !important;
+  font-weight: var(--epic-font-semibold) !important;
+  color: var(--tx) !important;
+  margin: 0 0 var(--epic-space-xs) 0 !important;
+  line-height: 1.3 !important;
+}
+
+.option-description {
+  font-size: var(--epic-text-sm) !important;
+  color: var(--tx-2) !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.option-badge {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  font-size: var(--epic-text-xs) !important;
+  font-weight: var(--epic-font-medium) !important;
+  padding: var(--epic-space-xs) var(--epic-space-sm) !important;
+  border-radius: var(--epic-radius-sm) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  background: var(--gold-600) !important;
+  color: var(--bg) !important;
+}
+
+.option-badge.security {
+  background: var(--danger) !important;
+  color: white !important;
+}
+
+.option-card-body {
+  padding: var(--epic-space-xl) !important;
+}
+
+/* ===== COMPACT FORM ELEMENTS ===== */
+
+.form-group-compact {
+  margin-bottom: var(--epic-space-lg) !important;
+}
+
+.form-group-compact:last-child {
+  margin-bottom: 0 !important;
+}
+
+.form-label-compact {
+  display: block !important;
+  font-size: var(--epic-text-sm) !important;
+  font-weight: var(--epic-font-medium) !important;
+  color: var(--tx) !important;
+  margin-bottom: var(--epic-space-sm) !important;
+  line-height: 1.4 !important;
+}
+
+.form-label-compact.required::after {
+  content: " *" !important;
+  color: var(--danger) !important;
+}
+
+.form-input-compact,
+.form-textarea-compact {
+  width: 100% !important;
+  padding: var(--epic-space-sm) var(--epic-space-md) !important;
+  font-size: var(--epic-text-sm) !important;
+  color: var(--tx) !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--epic-radius-lg) !important;
+  transition: all var(--epic-transition-fast) !important;
+  outline: none !important;
+}
+
+.form-input-compact:focus,
+.form-textarea-compact:focus {
+  border-color: var(--gold-600) !important;
+  box-shadow: 0 0 0 3px rgba(232, 204, 107, 0.1) !important;
+}
+
+.form-input-compact:disabled {
+  background: var(--bg-2) !important;
+  color: var(--tx-3) !important;
+  cursor: not-allowed !important;
+}
+
+.form-textarea-compact {
+  resize: vertical !important;
+  min-height: 80px !important;
+}
+
+.form-row-compact {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: var(--epic-space-lg) !important;
+}
+
+.form-help-small {
+  font-size: var(--epic-text-xs) !important;
+  color: var(--tx-3) !important;
+  margin-top: var(--epic-space-xs) !important;
+  line-height: 1.4 !important;
+}
+
+/* ===== PHOTO UPLOAD SECTION ===== */
+
+.photo-upload-section {
+  text-align: center !important;
+}
+
+.photo-upload-section .btn {
+  margin-bottom: var(--epic-space-sm) !important;
+}
+
+/* ===== INFO GRID COMPACT ===== */
+
+.info-grid-compact {
+  display: grid !important;
+  gap: var(--epic-space-md) !important;
+}
+
+.info-item-compact {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: var(--epic-space-sm) 0 !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.info-item-compact:last-child {
+  border-bottom: none !important;
+}
+
+.info-label-compact {
+  font-size: var(--epic-text-sm) !important;
+  font-weight: var(--epic-font-medium) !important;
+  color: var(--tx-2) !important;
+}
+
+.info-value-compact {
+  font-size: var(--epic-text-sm) !important;
+  color: var(--tx) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--epic-space-sm) !important;
+}
+
+.badge-compact {
+  font-size: var(--epic-text-xs) !important;
+  font-weight: var(--epic-font-medium) !important;
+  padding: var(--epic-space-xs) var(--epic-space-sm) !important;
+  border-radius: var(--epic-radius-sm) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.badge-compact.badge-success {
+  background: rgba(34, 197, 94, 0.1) !important;
+  color: var(--success) !important;
+  border: 1px solid rgba(34, 197, 94, 0.2) !important;
+}
+
+.badge-compact.badge-secondary {
+  background: rgba(156, 163, 175, 0.1) !important;
+  color: var(--tx-2) !important;
+  border: 1px solid rgba(156, 163, 175, 0.2) !important;
+}
+
+.referral-code-compact {
+  font-family: 'Courier New', monospace !important;
+  font-size: var(--epic-text-xs) !important;
+  background: var(--bg-2) !important;
+  padding: var(--epic-space-xs) var(--epic-space-sm) !important;
+  border-radius: var(--epic-radius-sm) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.copy-btn-compact {
+  background: none !important;
+  border: none !important;
+  color: var(--tx-2) !important;
+  cursor: pointer !important;
+  padding: var(--epic-space-xs) !important;
+  border-radius: var(--epic-radius-sm) !important;
+  transition: var(--epic-transition-fast) !important;
+}
+
+.copy-btn-compact:hover {
+  background: var(--bg-2) !important;
+  color: var(--tx) !important;
+}
+
+/* ===== SECURITY NOTICE COMPACT ===== */
+
+.security-notice-compact {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--epic-space-sm) !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  border-radius: var(--epic-radius-lg) !important;
+  padding: var(--epic-space-md) !important;
+  margin-bottom: var(--epic-space-lg) !important;
+  font-size: var(--epic-text-sm) !important;
+  color: var(--danger) !important;
+}
+
+/* ===== FORM ACTIONS ===== */
+
+.profile-form-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--epic-space-md) !important;
+  padding: var(--epic-space-xl) 0 !important;
+  border-top: 1px solid var(--border) !important;
+  margin-top: var(--epic-space-2xl) !important;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+  .profile-edit-card-with-photo {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: var(--epic-space-lg) !important;
+  }
+  
+  .profile-header-new {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: var(--epic-space-lg) !important;
+  }
+  
+  .profile-options-grid {
+    gap: var(--epic-space-lg) !important;
+  }
+  
+  .profile-option-card {
+    width: 100% !important;
+  }
+  
+  .option-card-header {
+    padding: var(--epic-space-lg) !important;
+  }
+  
+  .option-card-body {
+    padding: var(--epic-space-lg) !important;
+  }
+  
+  .form-row-compact {
+    grid-template-columns: 1fr !important;
+    gap: var(--epic-space-md) !important;
+  }
+  
+  .profile-form-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: var(--epic-space-sm) !important;
+  }
+  
+  .profile-form-actions .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-photo {
+    width: 100px !important;
+    height: 100px !important;
+  }
+  
+  .profile-title-new {
+    font-size: var(--epic-text-xl) !important;
+  }
+  
+  .completion-circle-small {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  .progress-ring-small {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  .progress-ring-small circle {
+    cx: 25 !important;
+    cy: 25 !important;
+    r: 18 !important;
+  }
+  
+  .tips-list-inline {
+    flex-direction: column !important;
+    gap: var(--epic-space-sm) !important;
+  }
+  
+  .option-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .option-title {
+    font-size: var(--epic-text-base) !important;
+  }
+}
+
+/* ===== INTEGRATION WITH EXISTING THEME ===== */
+
+/* Ensure compatibility with Aurora Dark Gold theme */
+.profile-edit-card-with-photo,
+.profile-option-card {
+  box-shadow: var(--shadow-card) !important;
+}
+
+.profile-title-new {
+  color: var(--tx) !important;
+}
+
+.profile-description-new {
+  color: var(--tx-2) !important;
+}
+
+/* Button consistency */
+.profile-form-actions .btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: var(--epic-space-sm) !important;
+}
+
+/* Ensure proper spacing in main content area */
+.member-main-content .profile-edit-section:first-child {
+  margin-top: 0 !important;
+}
+
+.member-main-content .profile-form-cards:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Hide duplicate form actions if any */
+.form-actions {
+  display: none !important;
+}
+
+.password-form {
+  display: none !important;
+}
+
+/* Ensure form elements work properly */
+.profile-form-cards input[type="file"] {
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Focus states for accessibility */
+.profile-option-card:focus-within {
+  outline: 2px solid var(--gold-600) !important;
+  outline-offset: 2px !important;
+}
+
+.copy-btn-compact:focus {
+  outline: 2px solid var(--tx-3) !important;
+  outline-offset: 2px !important;
+}
+
+/* Loading states */
+.profile-option-card.loading {
+  opacity: 0.7 !important;
+  pointer-events: none !important;
+}
+
+.profile-option-card.loading::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 20px !important;
+  height: 20px !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 50% !important;
+  border-top-color: var(--gold-600) !important;
+  animation: spin 1s ease-in-out infinite !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}

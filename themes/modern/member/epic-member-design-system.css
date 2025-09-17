@@ -1,0 +1,1684 @@
+/**
+ * EPIC Hub Member Design System
+ * Unified CSS standards untuk seluruh halaman member area
+ * Menggabungkan pola desain dari dashboard/member dan dashboard/member/profile
+ * 
+ * @version 1.0.0
+ * @author EPIC Hub Team
+ * @description File CSS terpusat sebagai rekomendasi standar untuk konsistensi visual
+ */
+
+/* ===== 1. DESIGN TOKENS & COLOR SCHEME ===== */
+/* Base design tokens yang konsisten di seluruh aplikasi */
+:root {
+  /* === Base & Surface Colors === */
+  --bg: #0B0D11;              /* Main background */
+  --bg-2: #111318;            /* Elevated background */
+  --card: #151923;            /* Card background */
+  --border: #232938;          /* Border & dividers */
+  
+  /* === Typography Colors === */
+  --tx: #F4F5F7;              /* Primary text */
+  --tx-2: #B9BFCC;            /* Secondary text */
+  --tx-3: #8791A4;            /* Muted text */
+  
+  /* === Brand Gold Palette === */
+  --gold: #D8B74A;            /* Primary gold */
+  --gold-600: #E8CC6B;        /* Gold hover state */
+  --gold-700: #B8942E;        /* Gold active state */
+  --gold-soft: #3A3116;       /* Gold soft background */
+  
+  /* === Aurora Accent Colors === */
+  --aurora-blue: #4AA3FF;
+  --aurora-teal: #19C6B5;
+  --aurora-green: #22C55E;
+  
+  /* === Status Colors === */
+  --success: #22C55E;
+  --info: #3B82F6;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  
+  /* === Focus & Interaction === */
+  --ring: rgba(232, 204, 107, 0.35);
+  
+  /* === Typography Scale === */
+  --font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  
+  /* === Font Weights === */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* === Spacing System (8pt grid) === */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  
+  /* === Border Radius === */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-pill: 9999px;
+  
+  /* === Shadows === */
+  --shadow-card: 0 6px 20px rgba(0, 0, 0, 0.25);
+  --shadow-elevated: 0 12px 40px rgba(0, 0, 0, 0.4);
+  --shadow-aurora: 0 10px 30px rgba(0, 0, 0, 0.35);
+  
+  /* === Transitions === */
+  --transition-fast: 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  
+  /* === Gradients === */
+  --gradient-aurora: linear-gradient(90deg, var(--aurora-blue), var(--aurora-teal), var(--gold));
+  --gradient-gold: linear-gradient(135deg, #FFD700 0%, #FFC107 50%, #FF8F00 100%);
+}
+
+/* ===== 2. BASE STYLES & TYPOGRAPHY ===== */
+/* Foundation styles untuk konsistensi */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--tx);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* === Typography Hierarchy === */
+h1 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--tx);
+  line-height: 1.2;
+  margin: 0 0 var(--space-4) 0;
+}
+
+h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tx);
+  line-height: 1.3;
+  margin: 0 0 var(--space-3) 0;
+}
+
+h3 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tx);
+  line-height: 1.4;
+  margin: 0 0 var(--space-3) 0;
+}
+
+p {
+  color: var(--tx-2);
+  margin: 0 0 var(--space-4) 0;
+  line-height: 1.6;
+}
+
+/* ===== 3. CARD COMPONENTS ===== */
+/* Komponen card yang konsisten dengan aurora gradient top border */
+
+.epic-card,
+.member-card,
+.profile-card,
+.welcome-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-normal);
+}
+
+/* Aurora gradient top border - signature design element */
+.epic-card::before,
+.member-card::before,
+.profile-card::before,
+.welcome-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-aurora);
+  opacity: 0.9;
+  z-index: 1;
+}
+
+/* Card hover states */
+.epic-card:hover,
+.member-card:hover,
+.profile-card:hover,
+.welcome-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.epic-card:hover::before,
+.member-card:hover::before,
+.profile-card:hover::before,
+.welcome-card:hover::before {
+  opacity: 1;
+}
+
+/* === Card Layout Components === */
+.card-with-photo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  padding: var(--space-8);
+}
+
+.card-photo-container {
+  flex-shrink: 0;
+}
+
+.card-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 2px solid var(--border);
+  background: var(--bg-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-normal);
+}
+
+.card-photo:hover {
+  border-color: var(--gold-600);
+  transform: scale(1.02);
+}
+
+.card-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-header-section {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-5);
+}
+
+.card-text-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-actions {
+  flex-shrink: 0;
+}
+
+/* === Card Content Elements === */
+.card-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--tx);
+  margin: 0 0 var(--space-2) 0;
+  line-height: 1.2;
+}
+
+.card-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--tx-2);
+  margin: 0 0 var(--space-3) 0;
+  line-height: 1.5;
+}
+
+.card-description {
+  font-size: var(--font-size-base);
+  color: var(--tx-2);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ===== 4. BUTTON SYSTEM ===== */
+/* Sistem button yang konsisten */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+/* === Button Variants === */
+.btn-primary {
+  background: var(--gradient-gold);
+  color: #000000;
+  border-color: var(--gold);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 2px 8px rgba(216, 183, 74, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(216, 183, 74, 0.4);
+}
+
+.btn-secondary {
+  background: var(--bg-2);
+  color: var(--tx);
+  border-color: var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--card);
+  border-color: var(--gold);
+  color: var(--gold-600);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.btn-outline:hover {
+  background: var(--gold);
+  color: #000000;
+}
+
+/* === Button Sizes === */
+.btn-sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-xs);
+}
+
+.btn-lg {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--font-size-lg);
+}
+
+/* ===== 5. FORM ELEMENTS ===== */
+/* Form styling yang konsisten */
+
+.form-group {
+  margin-bottom: var(--space-5);
+}
+
+.form-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--tx);
+  margin-bottom: var(--space-2);
+}
+
+.form-label.required::after {
+  content: ' *';
+  color: var(--danger);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-2);
+  color: var(--tx);
+  font-size: var(--font-size-base);
+  transition: var(--transition-fast);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* === Compact Form Elements === */
+.form-group-compact {
+  margin-bottom: var(--space-4);
+}
+
+.form-label-compact {
+  font-size: var(--font-size-xs);
+  margin-bottom: var(--space-1);
+}
+
+.form-input-compact {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+/* ===== 6. BADGE & STATUS SYSTEM ===== */
+/* Badge components untuk status dan level */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* === Badge Variants === */
+.badge-free {
+  background: rgba(139, 148, 158, 0.1);
+  color: var(--tx-3);
+  border: 1px solid rgba(139, 148, 158, 0.2);
+}
+
+.badge-epic {
+  background: var(--gradient-gold);
+  color: #000000;
+  border: 1px solid var(--gold);
+  font-weight: var(--font-weight-semibold);
+}
+
+.badge-epis {
+  background: linear-gradient(135deg, var(--aurora-blue), var(--aurora-teal));
+  color: white;
+  border: 1px solid var(--aurora-blue);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* === Status Badges === */
+.status-success {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.status-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.status-info {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--info);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* ===== 7. GRID & LAYOUT SYSTEM ===== */
+/* Layout utilities untuk konsistensi spacing */
+
+.grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+.grid-auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid-auto-fill {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* === Flex Utilities === */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.gap-8 { gap: var(--space-8); }
+
+/* === Spacing Utilities === */
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+.mb-8 { margin-bottom: var(--space-8); }
+
+.p-4 { padding: var(--space-4); }
+.p-6 { padding: var(--space-6); }
+.p-8 { padding: var(--space-8); }
+
+/* ===== 8. RESPONSIVE BREAKPOINTS ===== */
+/* Responsive design system */
+
+/* Mobile First Approach */
+/* Base styles: Mobile (320px+) */
+
+/* Small tablets and large phones (576px+) */
+@media (min-width: 576px) {
+  .grid-sm-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-sm-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Tablets (768px+) */
+@media (min-width: 768px) {
+  .grid-md-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-md-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-md-4 { grid-template-columns: repeat(4, 1fr); }
+  
+  .card-with-photo {
+    gap: var(--space-10);
+    padding: var(--space-10);
+  }
+}
+
+/* Desktops (992px+) */
+@media (min-width: 992px) {
+  .grid-lg-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-lg-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-lg-5 { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* Large desktops (1200px+) */
+@media (min-width: 1200px) {
+  .grid-xl-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-xl-5 { grid-template-columns: repeat(5, 1fr); }
+  .grid-xl-6 { grid-template-columns: repeat(6, 1fr); }
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 767px) {
+  .card-with-photo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-6);
+    padding: var(--space-6);
+  }
+  
+  .card-header-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-4);
+  }
+  
+  .card-photo {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  /* Learning Progress Mobile Adjustments */
+  .product-access-section {
+    margin: 0 0 var(--space-8) 0;
+  }
+  
+  .product-access-card-with-icon {
+    margin: 0 -var(--space-3);
+  }
+  
+  .learning-progress-main-section {
+    margin: var(--space-8) 0 var(--space-10) 0;
+  }
+  
+  .learning-progress-main-card {
+    margin: 0 -var(--space-3);
+    border-radius: var(--radius-lg);
+  }
+  
+  .learning-card-header {
+    padding: var(--space-5) var(--space-4) var(--space-4) var(--space-4);
+  }
+  
+  .learning-header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-4);
+  }
+  
+  .learning-main-icon {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .learning-main-title {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .learning-card-body {
+    padding: var(--space-4);
+  }
+  
+  .learning-overview-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    padding: 0;
+    margin-bottom: var(--space-6);
+  }
+  
+  .overview-stat-item {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+  
+  .stat-value {
+    font-size: var(--font-size-xl);
+  }
+  
+  .overall-progress-section {
+    margin: var(--space-1) 0 var(--space-6) 0;
+    padding: var(--space-4);
+  }
+  
+  .progress-header {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-3);
+  }
+  
+  .completion-rate {
+    text-align: center;
+  }
+  
+  .active-courses-section {
+    margin: var(--space-1) 0 var(--space-4) 0;
+  }
+  
+  .course-progress-item {
+    margin: 0;
+    padding: var(--space-4);
+  }
+  
+  .course-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+  
+  .course-basic-info {
+    width: 100%;
+  }
+  
+  .course-progress-indicator {
+    align-self: center;
+  }
+  
+  .progress-stats-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+    text-align: left;
+  }
+  
+  .progress-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  
+  .progress-stat:last-child {
+    border-bottom: none;
+  }
+  
+  .course-action-row {
+    gap: var(--space-2);
+  }
+  
+  .course-action-btn {
+    width: 100%;
+  }
+  
+  .learning-empty-state {
+    padding: var(--space-8) var(--space-3);
+    margin: var(--space-4) 0 var(--space-3) 0;
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* Small Mobile Adjustments */
+@media (max-width: 480px) {
+  .product-access-section {
+    margin: 0 0 var(--space-6) 0;
+  }
+  
+  .product-access-card-with-icon {
+    margin: 0 -var(--space-2);
+  }
+  
+  .learning-progress-main-section {
+    margin: var(--space-6) 0 var(--space-8) 0;
+  }
+  
+  .learning-progress-main-card {
+    margin: 0 -var(--space-2);
+  }
+  
+  .learning-overview-stats {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+  
+  .overview-stat-item {
+    padding: var(--space-3);
+  }
+  
+  .learning-main-title {
+    font-size: var(--font-size-xl);
+  }
+  
+  .learning-card-header {
+    padding: var(--space-4) var(--space-3) var(--space-3) var(--space-3);
+  }
+  
+  .learning-card-body {
+    padding: var(--space-3);
+  }
+  
+  .overall-progress-section {
+    margin: var(--space-1) 0 var(--space-5) 0;
+    padding: var(--space-3);
+  }
+  
+  .active-courses-section {
+    margin: var(--space-1) 0 var(--space-3) 0;
+  }
+  
+  .course-progress-item {
+    padding: var(--space-3);
+  }
+  
+  .progress-circle-container {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .progress-circle {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .learning-empty-state {
+    padding: var(--space-6) var(--space-2);
+    margin: var(--space-3) 0 var(--space-2) 0;
+  }
+}
+
+/* ===== 9. UTILITY CLASSES ===== */
+/* Helper classes untuk konsistensi */
+
+/* Text utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-primary { color: var(--tx); }
+.text-secondary { color: var(--tx-2); }
+.text-muted { color: var(--tx-3); }
+.text-gold { color: var(--gold); }
+
+/* Display utilities */
+.hidden { display: none; }
+.block { display: block; }
+.inline-block { display: inline-block; }
+
+/* Position utilities */
+.relative { position: relative; }
+.absolute { position: absolute; }
+
+/* Width utilities */
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+
+/* Flex utilities */
+.flex-1 { flex: 1; }
+.flex-shrink-0 { flex-shrink: 0; }
+
+/* ===== 10. COMPONENT SPECIFIC STYLES ===== */
+/* Komponen khusus yang sering digunakan */
+
+/* === Product Access Section === */
+.product-access-section {
+  margin: 0 0 var(--space-10) 0;
+}
+
+.product-access-card-with-icon {
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+/* === Learning Progress Main Card === */
+.learning-progress-main-section {
+  margin: var(--space-10) 0 var(--space-12) 0;
+}
+
+.learning-progress-main-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-normal);
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.learning-progress-main-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-aurora);
+  opacity: 0.9;
+  z-index: 1;
+}
+
+.learning-progress-main-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.learning-card-header {
+  padding: var(--space-8) var(--space-8) var(--space-6) var(--space-8);
+  border-bottom: 1px solid var(--border);
+}
+
+.learning-header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.learning-icon-container {
+  flex-shrink: 0;
+}
+
+.learning-main-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-xl);
+  background: var(--gold-soft);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.learning-header-text {
+  flex: 1;
+}
+
+.learning-main-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--tx);
+  margin: 0 0 var(--space-2) 0;
+  line-height: 1.2;
+}
+
+.learning-main-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--tx-2);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.learning-card-body {
+  padding: var(--space-8);
+}
+
+/* === Learning Overview Statistics === */
+.learning-overview-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-5);
+  margin-bottom: var(--space-8);
+  padding: 0 var(--space-2);
+}
+
+.overview-stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: var(--transition-fast);
+}
+
+.overview-stat-item:hover {
+  background: var(--card);
+  transform: translateY(-1px);
+}
+
+.stat-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--tx-3);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.stat-icon-wrapper.active {
+  background: var(--gold);
+  color: #000000;
+  opacity: 1;
+}
+
+.stat-icon-wrapper.completed {
+  background: var(--success);
+  color: white;
+  opacity: 1;
+}
+
+.stat-icon-wrapper.time {
+  background: var(--info);
+  color: white;
+  opacity: 1;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--tx);
+  margin-bottom: var(--space-1);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--tx);
+  margin-bottom: var(--space-1);
+}
+
+.stat-sublabel {
+  font-size: var(--font-size-sm);
+  color: var(--tx-3);
+  margin: 0;
+}
+
+/* === Overall Progress Section === */
+.overall-progress-section {
+  margin: var(--space-2) var(--space-2) var(--space-8) var(--space-2);
+  padding: var(--space-6);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+}
+
+.progress-section-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tx);
+  margin: 0;
+}
+
+.completion-rate {
+  text-align: right;
+}
+
+.completion-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--gold);
+  display: block;
+}
+
+.completion-label {
+  font-size: var(--font-size-sm);
+  color: var(--tx-3);
+}
+
+.overall-progress-bar {
+  margin-bottom: var(--space-4);
+}
+
+.progress-track {
+  width: 100%;
+  height: 12px;
+  background: var(--bg);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+
+.progress-fill-main {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-600));
+  border-radius: var(--radius-pill);
+  transition: width var(--transition-normal);
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+  color: var(--tx-3);
+}
+
+/* === Active Courses Section === */
+.active-courses-section {
+  margin: var(--space-2) var(--space-2) var(--space-6) var(--space-2);
+}
+
+.courses-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tx);
+  margin-bottom: var(--space-5);
+}
+
+.courses-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* === Course Progress Items === */
+.course-progress-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin: 0 var(--space-1);
+  transition: var(--transition-normal);
+}
+
+.course-progress-item.completed {
+  border-color: var(--success);
+  background: linear-gradient(135deg, var(--card) 0%, rgba(34, 197, 94, 0.03) 100%);
+}
+
+.course-progress-item.in-progress {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, var(--card) 0%, rgba(216, 183, 74, 0.03) 100%);
+}
+
+.course-progress-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+.course-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-5);
+}
+
+.course-basic-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex: 1;
+}
+
+.course-type-indicator {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--bg-2);
+  color: var(--tx-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.course-title-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.course-item-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tx);
+  margin: 0 0 var(--space-1) 0;
+  line-height: 1.3;
+}
+
+.course-meta-info {
+  display: flex;
+  gap: var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--tx-3);
+}
+
+.course-type-label {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-weight-medium);
+}
+
+.course-duration {
+  opacity: 0.8;
+}
+
+/* === Progress Circle Indicator === */
+.course-progress-indicator {
+  flex-shrink: 0;
+}
+
+.progress-circle-container {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.progress-circle {
+  transform: rotate(-90deg);
+}
+
+.progress-bg {
+  fill: none;
+  stroke: var(--bg-2);
+  stroke-width: 5;
+}
+
+.progress-bar-circle {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--transition-normal);
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.progress-percentage {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tx);
+}
+
+/* === Course Progress Details === */
+.course-progress-details {
+  margin-top: var(--space-5);
+}
+
+.progress-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.progress-stat {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tx);
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.stat-text {
+  font-size: var(--font-size-xs);
+  color: var(--tx-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-badge.completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+}
+
+.stat-badge.active {
+  background: rgba(216, 183, 74, 0.1);
+  color: var(--gold);
+}
+
+.course-progress-bar {
+  margin-bottom: var(--space-4);
+}
+
+.linear-progress {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-2);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.linear-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-600));
+  border-radius: var(--radius-pill);
+  transition: width var(--transition-normal);
+}
+
+/* === Course Actions === */
+.course-action-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.course-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.course-action-btn.primary {
+  background: var(--gold);
+  color: #000000;
+  border-color: var(--gold);
+}
+
+.course-action-btn.primary:hover {
+  background: var(--gold-600);
+  transform: translateY(-1px);
+}
+
+.course-action-btn.secondary {
+  background: var(--bg-2);
+  color: var(--tx-2);
+  border-color: var(--border);
+}
+
+.course-action-btn.secondary:hover {
+  background: var(--card);
+  color: var(--tx);
+}
+
+.next-lesson-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--tx-3);
+  padding: var(--space-2);
+}
+
+/* === Learning Empty State === */
+.learning-empty-state {
+  text-align: center;
+  padding: var(--space-10) var(--space-6);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin: var(--space-6) var(--space-2) var(--space-4) var(--space-2);
+}
+
+.empty-state-content {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.empty-state-icon {
+  margin-bottom: var(--space-6);
+  color: var(--tx-3);
+  opacity: 0.7;
+}
+
+.empty-state-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tx);
+  margin-bottom: var(--space-4);
+}
+
+.empty-state-description {
+  color: var(--tx-2);
+  margin-bottom: var(--space-6);
+  line-height: 1.6;
+}
+
+.empty-state-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6);
+  background: var(--gold);
+  color: #000000;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.empty-state-action:hover {
+  background: var(--gold-600);
+  transform: translateY(-1px);
+}
+
+/* === Breadcrumb Navigation === */
+.product-breadcrumb {
+  margin-bottom: var(--space-4);
+}
+
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.breadcrumb-link {
+  color: var(--tx-3);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  transition: var(--transition-fast);
+}
+
+.breadcrumb-link:hover {
+  color: var(--gold);
+}
+
+.breadcrumb-current {
+  color: var(--tx-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.breadcrumb-separator {
+  color: var(--tx-3);
+  flex-shrink: 0;
+}
+
+/* === Progress Circle === */
+.progress-circle {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-bg {
+  fill: none;
+  stroke: var(--bg-2);
+  stroke-width: 4;
+}
+
+.progress-ring-fill {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease-in-out;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tx);
+}
+
+/* === Stats Grid === */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.stat-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--tx);
+  margin-bottom: var(--space-1);
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--tx-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* === Action Cards === */
+.action-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  transition: var(--transition-normal);
+  cursor: pointer;
+}
+
+.action-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--gold);
+}
+
+.action-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--gold-soft);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.action-content {
+  flex: 1;
+}
+
+.action-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tx);
+  margin-bottom: var(--space-1);
+}
+
+.action-description {
+  font-size: var(--font-size-sm);
+  color: var(--tx-3);
+}
+
+/* ===== 11. PLACEHOLDER SUPPORT ===== */
+/* Support untuk placeholder ${key_name} jika diperlukan */
+
+/* Placeholder class - gunakan dengan mengganti 'key-name' sesuai kebutuhan */
+.placeholder-content,
+.placeholder-section {
+  /* Placeholder styles untuk konten yang akan diisi */
+  background: var(--bg-2);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--tx-3);
+  font-style: italic;
+}
+
+/* Contoh penggunaan dengan attribute selector untuk dynamic placeholders */
+[class*="placeholder-"] {
+  background: var(--bg-2);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--tx-3);
+}
+
+/* ===== 12. ANIMATION & TRANSITIONS ===== */
+/* Animasi yang konsisten */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-normal) ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn var(--transition-normal) ease-out;
+}
+
+/* Hover animations */
+.hover-lift:hover {
+  transform: translateY(-2px);
+  transition: var(--transition-fast);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+  transition: var(--transition-fast);
+}
+
+/* ===== 13. ACCESSIBILITY ===== */
+/* Accessibility improvements */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus styles */
+.focus-ring:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== 14. PRINT STYLES ===== */
+/* Print optimizations */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .epic-card,
+  .member-card {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+  
+  .epic-card::before,
+  .member-card::before {
+    display: none;
+  }
+}
+
+/**
+ * === USAGE GUIDELINES ===
+ * 
+ * 1. Gunakan design tokens (CSS variables) untuk konsistensi
+ * 2. Ikuti spacing system (8pt grid) untuk rhythm yang harmonis
+ * 3. Gunakan komponen card dengan aurora gradient untuk visual identity
+ * 4. Terapkan responsive breakpoints untuk semua layout
+ * 5. Manfaatkan utility classes untuk styling cepat
+ * 6. Pertahankan accessibility dengan focus states dan semantic HTML
+ * 
+ * === COMPONENT HIERARCHY ===
+ * 
+ * 1. Cards: .epic-card, .member-card, .profile-card, .welcome-card
+ * 2. Buttons: .btn dengan variants (.btn-primary, .btn-secondary, dll)
+ * 3. Forms: .form-group, .form-input, .form-label
+ * 4. Badges: .badge dengan variants (.badge-epic, .badge-free, dll)
+ * 5. Layout: .grid, .flex dengan utilities
+ * 6. Typography: h1-h3, .text-* utilities
+ * 
+ * === CUSTOMIZATION ===
+ * 
+ * Untuk customization, override CSS variables di :root atau gunakan
+ * CSS custom properties untuk komponen spesifik.
+ * 
+ * Contoh:
+ * :root {
+ *   --gold: #your-custom-gold;
+ *   --card: #your-custom-card-bg;
+ * }
+ */

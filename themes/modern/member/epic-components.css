@@ -1,0 +1,783 @@
+/**
+ * EPIC Hub Member Components System
+ * Unified UI components untuk konsistensi di semua halaman
+ * 
+ * @version 1.0.0
+ * @author EPIC Hub Team
+ */
+
+/* ===== BUTTON COMPONENTS ===== */
+
+/* Base Button Styles */
+.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--epic-space-sm) !important;
+  padding: var(--epic-space-md) var(--epic-space-lg) !important;
+  font-size: var(--epic-text-sm) !important;
+  font-weight: var(--epic-font-medium) !important;
+  line-height: 1.4 !important;
+  border-radius: var(--epic-radius-lg) !important;
+  border: 1px solid transparent !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: all var(--epic-transition-fast) !important;
+  white-space: nowrap !important;
+  user-select: none !important;
+}
+
+.btn:focus {
+  outline: 2px solid var(--tx-3) !important;
+  outline-offset: 2px !important;
+}
+
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+/* Button Variants */
+.btn-primary {
+  background: var(--gold-600) !important;
+  color: var(--bg) !important;
+  border-color: var(--gold-600) !important;
+}
+
+.btn-primary:hover {
+  background: var(--gold-700) !important;
+  border-color: var(--gold-700) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--epic-shadow-md) !important;
+}
+
+.btn-secondary {
+  background: var(--bg-2) !important;
+  color: var(--tx) !important;
+  border-color: var(--border) !important;
+}
+
+.btn-secondary:hover {
+  background: var(--card) !important;
+  border-color: var(--tx-3) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--epic-shadow-md) !important;
+}
+
+.btn-success {
+  background: var(--success) !important;
+  color: white !important;
+  border-color: var(--success) !important;
+}
+
+.btn-success:hover {
+  background: #16A34A !important;
+  border-color: #16A34A !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--epic-shadow-md) !important;
+}
+
+.btn-warning {
+  background: var(--warning) !important;
+  color: white !important;
+  border-color: var(--warning) !important;
+}
+
+.btn-warning:hover {
+  background: #D97706 !important;
+  border-color: #D97706 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--epic-shadow-md) !important;
+}
+
+.btn-danger {
+  background: var(--danger) !important;
+  color: white !important;
+  border-color: var(--danger) !important;
+}
+
+.btn-danger:hover {
+  background: #DC2626 !important;
+  border-color: #DC2626 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--epic-shadow-md) !important;
+}
+
+.btn-info {
+  background: var(--info) !important;
+  color: white !important;
+  border-color: var(--info) !important;
+}
+
+.btn-info:hover {
+  background: #2563EB !important;
+  border-color: #2563EB !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--epic-shadow-md) !important;
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: var(--epic-space-sm) var(--epic-space-md) !important;
+  font-size: var(--epic-text-xs) !important;
+  min-height: 32px !important;
+}
+
+.btn-lg {
+  padding: var(--epic-space-lg) var(--epic-space-xl) !important;
+  font-size: var(--epic-text-base) !important;
+  min-height: 48px !important;
+}
+
+.btn-xl {
+  padding: var(--epic-space-xl) var(--epic-space-2xl) !important;
+  font-size: var(--epic-text-lg) !important;
+  min-height: 56px !important;
+}
+
+/* Button Styles */
+.btn-outline {
+  background: transparent !important;
+  border-width: 1px !important;
+}
+
+.btn-outline.btn-primary {
+  color: var(--gold-600) !important;
+  border-color: var(--gold-600) !important;
+}
+
+.btn-outline.btn-primary:hover {
+  background: var(--gold-600) !important;
+  color: var(--bg) !important;
+}
+
+.btn-ghost {
+  background: transparent !important;
+  border: none !important;
+  color: var(--tx-2) !important;
+}
+
+.btn-ghost:hover {
+  background: var(--bg-2) !important;
+  color: var(--tx) !important;
+}
+
+/* ===== FORM COMPONENTS ===== */
+
+/* Form Groups */
+.form-group {
+  margin-bottom: var(--epic-space-lg) !important;
+}
+
+.form-label {
+  display: block !important;
+  font-size: var(--epic-text-sm) !important;
+  font-weight: var(--epic-font-medium) !important;
+  color: var(--tx) !important;
+  margin-bottom: var(--epic-space-sm) !important;
+  line-height: 1.4 !important;
+}
+
+.form-label.required::after {
+  content: " *" !important;
+  color: var(--danger) !important;
+}
+
+.form-help {
+  font-size: var(--epic-text-xs) !important;
+  color: var(--tx-3) !important;
+  margin-top: var(--epic-space-xs) !important;
+  line-height: 1.4 !important;
+}
+
+/* Input Fields */
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100% !important;
+  padding: var(--epic-space-md) !important;
+  font-size: var(--epic-text-sm) !important;
+  color: var(--tx) !important;
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--epic-radius-lg) !important;
+  transition: all var(--epic-transition-fast) !important;
+  outline: none !important;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--gold-600) !important;
+  box-shadow: 0 0 0 3px rgba(232, 204, 107, 0.1) !important;
+}
+
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled {
+  background: var(--bg-2) !important;
+  color: var(--tx-3) !important;
+  cursor: not-allowed !important;
+}
+
+.form-input.error,
+.form-select.error,
+.form-textarea.error {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.form-input.success,
+.form-select.success,
+.form-textarea.success {
+  border-color: var(--success) !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1) !important;
+}
+
+/* Textarea */
+.form-textarea {
+  min-height: 120px !important;
+  resize: vertical !important;
+}
+
+/* Input Groups */
+.input-group {
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+.input-group .form-input {
+  border-radius: 0 !important;
+}
+
+.input-group .form-input:first-child {
+  border-top-left-radius: var(--epic-radius-lg) !important;
+  border-bottom-left-radius: var(--epic-radius-lg) !important;
+}
+
+.input-group .form-input:last-child {
+  border-top-right-radius: var(--epic-radius-lg) !important;
+  border-bottom-right-radius: var(--epic-radius-lg) !important;
+}
+
+.input-group-addon {
+  display: flex !important;
+  align-items: center !important;
+  padding: var(--epic-space-md) !important;
+  background: var(--bg-2) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--tx-2) !important;
+  font-size: var(--epic-text-sm) !important;
+  white-space: nowrap !important;
+}
+
+.input-group-addon:first-child {
+  border-top-left-radius: var(--epic-radius-lg) !important;
+  border-bottom-left-radius: var(--epic-radius-lg) !important;
+  border-right: none !important;
+}
+
+.input-group-addon:last-child {
+  border-top-right-radius: var(--epic-radius-lg) !important;
+  border-bottom-right-radius: var(--epic-radius-lg) !important;
+  border-left: none !important;
+}
+
+/* Checkboxes and Radios */
+.form-check {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: var(--epic-space-sm) !important;
+  margin-bottom: var(--epic-space-md) !important;
+}
+
+.form-check-input {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+}
+
+.form-check-label {
+  font-size: var(--epic-text-sm) !important;
+  color: var(--tx) !important;
+  cursor: pointer !important;
+  line-height: 1.4 !important;
+}
+
+/* ===== CARD COMPONENTS ===== */
+
+.card {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--epic-radius-xl) !important;
+  box-shadow: var(--epic-shadow-sm) !important;
+  overflow: hidden !important;
+}
+
+.card-header {
+  padding: var(--epic-space-xl) !important;
+  border-bottom: 1px solid var(--border) !important;
+  background: var(--bg-2) !important;
+}
+
+.card-title {
+  font-size: var(--epic-text-lg) !important;
+  font-weight: var(--epic-font-semibold) !important;
+  color: var(--tx) !important;
+  margin: 0 !important;
+}
+
+.card-subtitle {
+  font-size: var(--epic-text-sm) !important;
+  color: var(--tx-2) !important;
+  margin: var(--epic-space-xs) 0 0 0 !important;
+}
+
+.card-body {
+  padding: var(--epic-space-xl) !important;
+}
+
+.card-footer {
+  padding: var(--epic-space-xl) !important;
+  border-top: 1px solid var(--border) !important;
+  background: var(--bg-2) !important;
+}
+
+/* ===== BADGE COMPONENTS ===== */
+
+.badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: var(--epic-space-xs) !important;
+  padding: var(--epic-space-xs) var(--epic-space-sm) !important;
+  font-size: var(--epic-text-xs) !important;
+  font-weight: var(--epic-font-medium) !important;
+  line-height: 1 !important;
+  border-radius: var(--epic-radius-sm) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.badge-primary {
+  background: rgba(232, 204, 107, 0.1) !important;
+  color: var(--gold-600) !important;
+  border: 1px solid rgba(232, 204, 107, 0.2) !important;
+}
+
+.badge-secondary {
+  background: rgba(156, 163, 175, 0.1) !important;
+  color: var(--tx-2) !important;
+  border: 1px solid rgba(156, 163, 175, 0.2) !important;
+}
+
+.badge-success {
+  background: rgba(34, 197, 94, 0.1) !important;
+  color: var(--success) !important;
+  border: 1px solid rgba(34, 197, 94, 0.2) !important;
+}
+
+.badge-warning {
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: var(--warning) !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+}
+
+.badge-danger {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: var(--danger) !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+}
+
+.badge-info {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: var(--info) !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Badge Sizes */
+.badge-sm {
+  padding: 2px var(--epic-space-xs) !important;
+  font-size: 10px !important;
+}
+
+.badge-lg {
+  padding: var(--epic-space-sm) var(--epic-space-md) !important;
+  font-size: var(--epic-text-sm) !important;
+}
+
+/* ===== PILL COMPONENTS ===== */
+
+.pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: var(--epic-space-xs) !important;
+  padding: var(--epic-space-sm) var(--epic-space-md) !important;
+  font-size: var(--epic-text-xs) !important;
+  font-weight: var(--epic-font-medium) !important;
+  line-height: 1 !important;
+  border-radius: var(--epic-radius-xl) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.pill-primary {
+  background: var(--gold-600) !important;
+  color: var(--bg) !important;
+}
+
+.pill-secondary {
+  background: var(--bg-2) !important;
+  color: var(--tx-2) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.pill-success {
+  background: var(--success) !important;
+  color: white !important;
+}
+
+.pill-warning {
+  background: var(--warning) !important;
+  color: white !important;
+}
+
+.pill-danger {
+  background: var(--danger) !important;
+  color: white !important;
+}
+
+.pill-info {
+  background: var(--info) !important;
+  color: white !important;
+}
+
+/* ===== DROPDOWN COMPONENTS ===== */
+
+.dropdown {
+  position: relative !important;
+  display: inline-block !important;
+}
+
+.dropdown-toggle {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--tx) !important;
+  padding: var(--epic-space-md) var(--epic-space-lg) !important;
+  border-radius: var(--epic-radius-lg) !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--epic-space-sm) !important;
+  transition: all var(--epic-transition-fast) !important;
+}
+
+.dropdown-toggle:hover {
+  background: var(--bg-2) !important;
+  border-color: var(--tx-3) !important;
+}
+
+.dropdown-menu {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  z-index: 1000 !important;
+  min-width: 200px !important;
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--epic-radius-lg) !important;
+  box-shadow: var(--epic-shadow-lg) !important;
+  padding: var(--epic-space-sm) 0 !important;
+  margin-top: var(--epic-space-xs) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(-10px) !important;
+  transition: all var(--epic-transition-fast) !important;
+}
+
+.dropdown.active .dropdown-menu {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
+.dropdown-item {
+  display: block !important;
+  width: 100% !important;
+  padding: var(--epic-space-sm) var(--epic-space-lg) !important;
+  font-size: var(--epic-text-sm) !important;
+  color: var(--tx) !important;
+  text-decoration: none !important;
+  border: none !important;
+  background: none !important;
+  cursor: pointer !important;
+  transition: all var(--epic-transition-fast) !important;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-2) !important;
+  color: var(--tx) !important;
+}
+
+.dropdown-divider {
+  height: 1px !important;
+  background: var(--border) !important;
+  margin: var(--epic-space-sm) 0 !important;
+}
+
+/* ===== MODAL COMPONENTS ===== */
+
+.modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: all var(--epic-transition-normal) !important;
+}
+
+.modal-overlay.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.modal {
+  background: var(--card) !important;
+  border-radius: var(--epic-radius-xl) !important;
+  box-shadow: var(--epic-shadow-xl) !important;
+  max-width: 500px !important;
+  width: 90% !important;
+  max-height: 90vh !important;
+  overflow: hidden !important;
+  transform: scale(0.9) !important;
+  transition: all var(--epic-transition-normal) !important;
+}
+
+.modal-overlay.active .modal {
+  transform: scale(1) !important;
+}
+
+.modal-header {
+  padding: var(--epic-space-xl) !important;
+  border-bottom: 1px solid var(--border) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.modal-title {
+  font-size: var(--epic-text-lg) !important;
+  font-weight: var(--epic-font-semibold) !important;
+  color: var(--tx) !important;
+  margin: 0 !important;
+}
+
+.modal-close {
+  background: none !important;
+  border: none !important;
+  color: var(--tx-2) !important;
+  cursor: pointer !important;
+  padding: var(--epic-space-xs) !important;
+  border-radius: var(--epic-radius-sm) !important;
+  transition: all var(--epic-transition-fast) !important;
+}
+
+.modal-close:hover {
+  background: var(--bg-2) !important;
+  color: var(--tx) !important;
+}
+
+.modal-body {
+  padding: var(--epic-space-xl) !important;
+  overflow-y: auto !important;
+}
+
+.modal-footer {
+  padding: var(--epic-space-xl) !important;
+  border-top: 1px solid var(--border) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: var(--epic-space-md) !important;
+}
+
+/* ===== PROGRESS COMPONENTS ===== */
+
+.progress {
+  width: 100% !important;
+  height: 8px !important;
+  background: var(--bg-2) !important;
+  border-radius: var(--epic-radius-xl) !important;
+  overflow: hidden !important;
+}
+
+.progress-bar {
+  height: 100% !important;
+  background: var(--gold-600) !important;
+  border-radius: var(--epic-radius-xl) !important;
+  transition: width var(--epic-transition-normal) !important;
+}
+
+.progress-bar.success {
+  background: var(--success) !important;
+}
+
+.progress-bar.warning {
+  background: var(--warning) !important;
+}
+
+.progress-bar.danger {
+  background: var(--danger) !important;
+}
+
+.progress-bar.info {
+  background: var(--info) !important;
+}
+
+/* ===== LOADING COMPONENTS ===== */
+
+.loading {
+  display: inline-block !important;
+  width: 20px !important;
+  height: 20px !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 50% !important;
+  border-top-color: var(--gold-600) !important;
+  animation: spin 1s ease-in-out infinite !important;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-sm {
+  width: 16px !important;
+  height: 16px !important;
+  border-width: 1.5px !important;
+}
+
+.loading-lg {
+  width: 32px !important;
+  height: 32px !important;
+  border-width: 3px !important;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+  .btn {
+    padding: var(--epic-space-sm) var(--epic-space-md) !important;
+    font-size: var(--epic-text-xs) !important;
+  }
+  
+  .btn-lg {
+    padding: var(--epic-space-md) var(--epic-space-lg) !important;
+    font-size: var(--epic-text-sm) !important;
+  }
+  
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: var(--epic-space-sm) !important;
+  }
+  
+  .card-header,
+  .card-body,
+  .card-footer {
+    padding: var(--epic-space-lg) !important;
+  }
+  
+  .modal {
+    width: 95% !important;
+    margin: var(--epic-space-lg) !important;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: var(--epic-space-lg) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  .btn-group {
+    flex-direction: column !important;
+    gap: var(--epic-space-sm) !important;
+  }
+  
+  .input-group {
+    flex-direction: column !important;
+  }
+  
+  .input-group .form-input,
+  .input-group .input-group-addon {
+    border-radius: var(--epic-radius-lg) !important;
+  }
+  
+  .dropdown-menu {
+    left: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+.btn-group {
+  display: flex !important;
+  gap: var(--epic-space-sm) !important;
+}
+
+.btn-block {
+  width: 100% !important;
+  justify-content: center !important;
+}
+
+.form-row {
+  display: flex !important;
+  gap: var(--epic-space-lg) !important;
+  align-items: flex-end !important;
+}
+
+.form-col {
+  flex: 1 !important;
+}
+
+.form-col-auto {
+  flex: none !important;
+}
+
+/* Integration with existing theme */
+.epic-btn-primary {
+  background: var(--gold-600) !important;
+  color: var(--bg) !important;
+  border-color: var(--gold-600) !important;
+}
+
+.epic-btn-primary:hover {
+  background: var(--gold-700) !important;
+  border-color: var(--gold-700) !important;
+}
+
+/* Ensure proper spacing */
+.epic-form-section {
+  margin-bottom: var(--epic-space-2xl) !important;
+}
+
+.epic-form-section:last-child {
+  margin-bottom: 0 !important;
+}

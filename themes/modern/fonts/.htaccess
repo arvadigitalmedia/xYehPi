@@ -1,0 +1,29 @@
+# Prevent 404 errors for missing font files
+# Return empty response for font requests
+
+<FilesMatch "\.(woff|woff2|ttf|otf|eot)$">
+    # Set proper MIME types
+    <IfModule mod_mime.c>
+        AddType font/woff .woff
+        AddType font/woff2 .woff2
+        AddType font/truetype .ttf
+        AddType font/opentype .otf
+        AddType application/vnd.ms-fontobject .eot
+    </IfModule>
+    
+    # Cache fonts for better performance
+    <IfModule mod_expires.c>
+        ExpiresActive on
+        ExpiresDefault "access plus 1 year"
+    </IfModule>
+    
+    # Allow cross-origin requests
+    <IfModule mod_headers.c>
+        Header set Access-Control-Allow-Origin "*"
+    </IfModule>
+</FilesMatch>
+
+# Redirect missing font files to PHP handler
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^.*\.(woff|woff2|ttf|otf|eot)$ font-handler.php [L]
