@@ -1,7 +1,9 @@
 name: Deploy dev-test via FTPS
 on:
   push:
-    branches: ["dev"]   # atau main, sesuaikan
+    branches: ["main"]         # ganti "dev" jadi "main" kalau kamu push ke main
+  workflow_dispatch: {}       # agar bisa dijalankan manual dari tab Actions
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -13,7 +15,8 @@ jobs:
           username: ${{ secrets.FTP_USERNAME_DEV }}
           password: ${{ secrets.FTP_PASSWORD_DEV }}
           protocol: ftps
-          server-dir: /home/bustanu1/public_html/dev-test/
+          port: ${{ secrets.FTP_PORT }}          # opsional; kosongkan kalau 21
+          server-dir: /home/bisnisem/dev-test.bisnisemasperak.com/   # ganti sesuai docroot dev-test
           exclude: |
             **/.git*
             **/.github/**
