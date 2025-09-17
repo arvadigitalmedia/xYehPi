@@ -1,0 +1,26 @@
+name: Deploy dev-test via FTPS
+on:
+  push:
+    branches: ["dev"]   # atau main, sesuaikan
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME_DEV }}
+          password: ${{ secrets.FTP_PASSWORD_DEV }}
+          protocol: ftps
+          server-dir: /home/bustanu1/public_html/dev-test/
+          exclude: |
+            **/.git*
+            **/.github/**
+            .cpanel.yml
+            .env
+            *.log
+            node_modules/**
+            vendor/**
+            storage/**
+            uploads/**
