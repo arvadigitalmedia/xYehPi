@@ -27,14 +27,17 @@ extract($data ?? []);
     </div>
 <?php endif; ?>
 
-<!-- Autoresponder Navigation -->
+<!-- Integration Navigation -->
 <div class="settings-navigation">
     <nav class="settings-nav">
         <a href="<?= epic_url('admin/integrasi/autoresponder-email') ?>" class="settings-nav-item active">
             <i data-feather="send" class="settings-nav-icon"></i>
             <span>Autoresponder Email</span>
         </a>
-
+        <a href="<?= epic_url('admin/zoom-integration') ?>" class="settings-nav-item">
+            <i data-feather="video" class="settings-nav-icon"></i>
+            <span>Zoom Integration</span>
+        </a>
     </nav>
 </div>
 

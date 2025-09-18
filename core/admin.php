@@ -154,6 +154,22 @@ function epic_admin_route($segments) {
             epic_admin_integrasi($segments);
             break;
             
+        case 'zoom-integration':
+            epic_admin_integrasi_zoom();
+            break;
+            
+        case 'zoom-add-event':
+            epic_admin_zoom_add_event();
+            break;
+            
+        case 'event-scheduling':
+            epic_admin_event_scheduling();
+            break;
+            
+        case 'event-scheduling-add':
+            epic_admin_event_scheduling_add();
+            break;
+            
         case 'member-area':
             epic_admin_member_area($segments);
             break;
@@ -957,6 +973,9 @@ function epic_admin_integrasi($segments) {
             epic_admin_integrasi_autoresponder_email();
             break;
             
+        case 'zoom-integration':
+            epic_admin_integrasi_zoom();
+            break;
 
         case 'payment-gateway':
             epic_admin_integrasi_payment_gateway();
@@ -978,6 +997,38 @@ function epic_admin_integrasi($segments) {
 function epic_admin_integrasi_autoresponder_email() {
     // Use existing autoresponder settings page
     include __DIR__ . '/../themes/modern/admin/settings-autoresponder.php';
+}
+
+/**
+ * Integrasi Zoom Integration
+ */
+function epic_admin_integrasi_zoom() {
+    // Use existing zoom integration page
+    include __DIR__ . '/../themes/modern/admin/zoom-integration.php';
+}
+
+/**
+ * Zoom Add Event Page
+ */
+function epic_admin_zoom_add_event() {
+    // Use zoom add event page
+    include __DIR__ . '/../admin/zoom-add-event.php';
+}
+
+/**
+ * Event Scheduling Management Page
+ */
+function epic_admin_event_scheduling() {
+    // Use event scheduling page
+    include __DIR__ . '/../admin/event-scheduling.php';
+}
+
+/**
+ * Event Scheduling Add Page
+ */
+function epic_admin_event_scheduling_add() {
+    // Use event scheduling add page
+    include __DIR__ . '/../admin/event-scheduling-add.php';
 }
 
 /**

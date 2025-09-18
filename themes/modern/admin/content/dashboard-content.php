@@ -221,6 +221,12 @@
         // Revenue Chart
         const ctx1 = document.getElementById('revenueChart');
         if (ctx1) {
+            // Destroy existing chart if it exists
+            const existingChart1 = Chart.getChart(ctx1);
+            if (existingChart1) {
+                existingChart1.destroy();
+            }
+            
             new Chart(ctx1, {
                 type: 'line',
                 data: {
@@ -267,6 +273,12 @@
         // Top Affiliates Chart
         const ctx2 = document.getElementById('affiliatesChart');
         if (ctx2) {
+            // Destroy existing chart if it exists
+            const existingChart2 = Chart.getChart(ctx2);
+            if (existingChart2) {
+                existingChart2.destroy();
+            }
+            
             new Chart(ctx2, {
                 type: 'bar',
                 data: {

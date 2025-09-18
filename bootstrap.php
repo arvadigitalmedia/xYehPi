@@ -25,11 +25,23 @@ date_default_timezone_set('Asia/Jakarta');
 // Define constants
 define('EPIC_VERSION', '2.0.0');
 define('EPIC_ROOT', __DIR__);
+define('EPIC_PATH', __DIR__); // Alias for compatibility
+define('EPIC_LOADED', true); // Security constant
 define('EPIC_CONFIG_DIR', EPIC_ROOT . '/config');
 define('EPIC_CORE_DIR', EPIC_ROOT . '/core');
 define('EPIC_THEME_DIR', EPIC_ROOT . '/themes');
 define('EPIC_UPLOAD_DIR', EPIC_ROOT . '/uploads');
 define('EPIC_CACHE_DIR', EPIC_ROOT . '/cache');
+
+// Debug mode - check environment
+$current_domain = $_SERVER['HTTP_HOST'] ?? 'localhost';
+if (strpos($current_domain, 'localhost') !== false || 
+    strpos($current_domain, '127.0.0.1') !== false ||
+    strpos($current_domain, '.local') !== false) {
+    define('EPIC_DEBUG', true);
+} else {
+    define('EPIC_DEBUG', false);
+}
 
 // Load configuration
 if (file_exists(EPIC_CONFIG_DIR . '/config.php')) {
@@ -58,6 +70,12 @@ if (file_exists(EPIC_CORE_DIR . '/router.php')) {
 if (file_exists(EPIC_CORE_DIR . '/template.php')) {
     require_once EPIC_CORE_DIR . '/template.php';
 }
+if (file_exists(EPIC_CORE_DIR . '/admin.php')) {
+    require_once EPIC_CORE_DIR . '/admin.php';
+}
+if (file_exists(EPIC_CORE_DIR . '/dashboard.php')) {
+    require_once EPIC_CORE_DIR . '/dashboard.php';
+}
 if (file_exists(EPIC_CORE_DIR . '/landing.php')) {
     require_once EPIC_CORE_DIR . '/landing.php';
 }
@@ -72,6 +90,19 @@ if (file_exists(EPIC_CORE_DIR . '/starsender-triggers.php')) {
 }
 if (file_exists(EPIC_CORE_DIR . '/epis-functions.php')) {
     require_once EPIC_CORE_DIR . '/epis-functions.php';
+}
+
+// Load Zoom Integration if available
+if (file_exists(EPIC_CORE_DIR . '/zoom-integration.php')) {
+    require_once EPIC_CORE_DIR . '/zoom-integration.php';
+}
+if (file_exists(EPIC_CORE_DIR . '/zoom-routes.php')) {
+    require_once EPIC_CORE_DIR . '/zoom-routes.php';
+}
+
+// Load Event Scheduling if available
+if (file_exists(EPIC_CORE_DIR . '/event-scheduling.php')) {
+    require_once EPIC_CORE_DIR . '/event-scheduling.php';
 }
 
 // Initialize application

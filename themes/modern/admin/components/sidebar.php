@@ -33,6 +33,7 @@ $manage_submenu = [
     ['path' => '/admin/manage/order', 'text' => 'Order'],
     ['path' => '/admin/manage/product', 'text' => 'Product'],
     ['path' => '/admin/manage/landing-page-manager', 'text' => 'Landing Page Manager'],
+    ['path' => '/admin/event-scheduling', 'text' => 'Event Scheduling'],
     ['path' => '/admin/manage/payout', 'text' => 'Payout'],
     ['path' => '/admin/manage/finance', 'text' => 'Finance'],
     ['path' => '/admin/manage/update-price', 'text' => 'Update Price']
@@ -40,7 +41,11 @@ $manage_submenu = [
 
 // Settings submenu removed - now using direct link to general settings
 
-// Integrasi submenu removed - now using direct link to autoresponder email
+// Integrasi submenu
+$integrasi_submenu = [
+    ['path' => '/admin/integrasi/autoresponder-email', 'text' => 'Autoresponder Email'],
+    ['path' => '/admin/zoom-integration', 'text' => 'Zoom Integration']
+];
 
 $dashboard_member_submenu = [
     ['path' => '/admin/member-area/home', 'text' => 'Home Dashboard'],
@@ -102,10 +107,20 @@ $dashboard_member_submenu = [
         </a>
         
         <!-- 5. Integrasi -->
-        <a href="<?= epic_url('admin/integrasi/autoresponder-email') ?>" class="sidebar-nav-item <?= isMenuActive('/admin/integrasi', $current_url) ? 'active' : '' ?>">
-            <i data-feather="zap" class="sidebar-nav-icon"></i>
-            <span class="sidebar-nav-text">Integrasi</span>
-        </a>
+        <div class="sidebar-nav-group">
+            <div class="sidebar-nav-item sidebar-nav-parent <?= shouldExpandSubmenu($integrasi_submenu, $current_url) ? 'expanded' : '' ?>" onclick="toggleSubmenu(this)">
+                <i data-feather="zap" class="sidebar-nav-icon"></i>
+                <span class="sidebar-nav-text">Integrasi</span>
+                <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
+            </div>
+            <div class="sidebar-submenu <?= shouldExpandSubmenu($integrasi_submenu, $current_url) ? 'show' : '' ?>">
+                <?php foreach ($integrasi_submenu as $item): ?>
+                    <a href="<?= epic_url($item['path']) ?>" class="sidebar-submenu-item <?= isMenuActive($item['path'], $current_url) ? 'active' : '' ?>">
+                        <span class="sidebar-submenu-text"><?= $item['text'] ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
         
         <!-- 6. Dashboard Member -->
         <div class="sidebar-nav-group">
