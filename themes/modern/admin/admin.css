@@ -2007,6 +2007,14 @@ body {
   gap: var(--spacing-4);
 }
 
+/* Hide mobile menu toggle on desktop - Ensure it's completely hidden */
+.mobile-menu-toggle {
+  display: none !important;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .topbar-title {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
@@ -3436,8 +3444,14 @@ body {
 
 @media (max-width: 768px) {
   .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
     transform: translateX(-100%);
     transition: transform var(--transition-normal);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   }
   
   .admin-sidebar.mobile-open {
@@ -3454,6 +3468,52 @@ body {
   
   .topbar-left {
     gap: var(--spacing-2);
+  }
+  
+  /* Mobile Menu Toggle Button - Override desktop hiding */
+  .mobile-menu-toggle {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--surface-3);
+    border: 1px solid var(--ink-600);
+    border-radius: var(--radius-md);
+    color: var(--ink-200);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .mobile-menu-toggle:hover {
+    background: var(--surface-4);
+    color: var(--gold-400);
+    border-color: var(--gold-400);
+  }
+  
+  .mobile-menu-toggle:active {
+    transform: scale(0.95);
+  }
+  
+  /* Mobile menu backdrop */
+  body.mobile-menu-open::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 1;
+    transition: opacity var(--transition-normal);
+  }
+  
+  body.mobile-menu-open {
+    overflow: hidden;
   }
   
   .sidebar-logo-image {
@@ -4956,5 +5016,7 @@ img[loading="lazy"].loaded {
 .youtube-facade:hover::before {
   filter: brightness(1.2);
 }
+
+/* Duplicate mobile menu toggle styles removed - using main definition above */
 
 /* End of Performance Optimizations */

@@ -853,66 +853,8 @@ document.getElementById('category-form').addEventListener('submit', function(e) 
 
 // Edit functions
 function editEvent(id) {
-    // Get event data and populate edit modal
-    const formData = new FormData();
-    formData.append('action', 'get_event');
-    formData.append('id', id);
-    
-    fetch(window.location.href, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.event) {
-            const event = data.event;
-            
-            // Update modal title
-            document.querySelector('#eventModal .modal-title').textContent = 'Edit Event';
-            
-            // Populate form fields
-            document.getElementById('event_title').value = event.title || '';
-            document.getElementById('event_category').value = event.category_id || '';
-            document.getElementById('event_description').value = event.description || '';
-            document.getElementById('event_location').value = event.location || '';
-            document.getElementById('event_start_time').value = event.start_time ? event.start_time.replace(' ', 'T') : '';
-            document.getElementById('event_end_time').value = event.end_time ? event.end_time.replace(' ', 'T') : '';
-            document.getElementById('event_max_participants').value = event.max_participants || '';
-            document.getElementById('event_status').value = event.status || 'published';
-            document.getElementById('event_url').value = event.event_url || '';
-            document.getElementById('event_notes').value = event.notes || '';
-            document.getElementById('registration_required').checked = event.registration_required == 1;
-            
-            // Set access levels
-            const accessLevels = JSON.parse(event.access_levels || '[]');
-            document.querySelectorAll('input[name="access_levels[]"]').forEach(checkbox => {
-                checkbox.checked = accessLevels.includes(checkbox.value);
-            });
-            
-            // Add hidden field for event ID
-            let hiddenIdField = document.getElementById('edit_event_id');
-            if (!hiddenIdField) {
-                hiddenIdField = document.createElement('input');
-                hiddenIdField.type = 'hidden';
-                hiddenIdField.id = 'edit_event_id';
-                hiddenIdField.name = 'event_id';
-                document.getElementById('event-form').appendChild(hiddenIdField);
-            }
-            hiddenIdField.value = id;
-            
-            // Update form action for editing
-            document.getElementById('event-form').dataset.action = 'update_event';
-            
-            // Open modal
-            openEventModal();
-        } else {
-            alert('Error: Failed to load event data');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while loading event data');
-    });
+    // Redirect to add page with edit parameter
+    window.location.href = `<?= epic_url('admin/event-scheduling-add') ?>?edit=${id}`;
 }
 
 function editCategory(id) {

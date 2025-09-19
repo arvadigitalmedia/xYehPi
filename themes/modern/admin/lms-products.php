@@ -146,7 +146,7 @@ if (!$lms_tables_exist) {
                 COUNT(pr.id) as review_count
          FROM epic_products p
          LEFT JOIN epic_product_categories c ON p.category_id = c.id
-         LEFT JOIN epic_users u ON p.instructor_id = u.id
+         LEFT JOIN users u ON p.instructor_id = u.id
          LEFT JOIN epic_product_modules m ON p.id = m.product_id AND m.status = 'published'
          LEFT JOIN epic_product_reviews pr ON p.id = pr.product_id AND pr.status = 'approved'
          WHERE {$where}
@@ -174,7 +174,7 @@ if ($lms_tables_exist) {
     
     // Get instructors for filter
     $instructors = db()->select(
-        "SELECT id, name FROM epic_users WHERE role IN ('admin', 'super_admin') ORDER BY name"
+        "SELECT id, name FROM users WHERE role IN ('admin', 'super_admin') ORDER BY name"
     ) ?: [];
 }
 

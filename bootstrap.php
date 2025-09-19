@@ -280,14 +280,7 @@ function epic_csrf_token() {
     return $_SESSION['epic_csrf_token'];
 }
 
-function epic_verify_csrf($token) {
-    return isset($_SESSION['epic_csrf_token']) && 
-           hash_equals($_SESSION['epic_csrf_token'], $token);
-}
-
-function epic_verify_csrf_token($token) {
-    return epic_verify_csrf($token);
-}
+// Legacy CSRF functions removed - using new implementation from csrf-protection.php
 
 
 function epic_old($key, $default = '') {

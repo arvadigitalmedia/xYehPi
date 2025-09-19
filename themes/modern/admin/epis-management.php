@@ -155,7 +155,7 @@ $stats = [
 // Get eligible EPIC users for promotion
 $eligible_epic_users = db()->select(
     "SELECT u.id, u.name, u.email, u.created_at
-     FROM epic_users u
+     FROM users u
      LEFT JOIN epic_epis_accounts ea ON u.id = ea.user_id
      WHERE u.status = 'epic' AND ea.id IS NULL
      ORDER BY u.name ASC

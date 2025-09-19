@@ -246,7 +246,7 @@ function epic_route_referral($segments) {
     }
     
     // Find referrer by affiliate code
-    $referrer = db()->selectOne('epic_users', ['id', 'name', 'affiliate_code'], [
+    $referrer = db()->selectOne('users', ['id', 'name', 'affiliate_code'], [
         'affiliate_code' => $affiliate_code
     ]);
     
@@ -280,14 +280,46 @@ function epic_route_register() {
     $success = null;
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $name = epic_sanitize($_POST['name'] ?? '');
-        $email = epic_sanitize($_POST['email'] ?? '');
-        $phone = epic_sanitize($_POST['phone'] ?? '');
-        $password = $_POST['password'] ?? '';
-        $confirm_password = $_POST['confirm_password'] ?? '';
+        // Rate limiting for registration
+        require_once EPIC_ROOT . '/core/rate-limiter.php';
+        epic_check_registration_rate_limit();
+        
+        // CSRF Protection dan validasi input
+        require_once EPIC_ROOT . '/core/csrf-protection.php';
+        
+        // Validasi form dengan CSRF protection
+        $validation = epic_validate_registration_form($_POST);
+        
+        if (!$validation['valid']) {
+            $errors = $validation['errors'];
+            
+            // Handle CSRF error specifically
+            if (isset($errors['csrf'])) {
+                epic_csrf_error($errors['csrf']);
+                exit;
+            }
+            
+            // Set error messages for display
+            foreach ($errors as $field => $message) {
+                $_SESSION['error_' . $field] = $message;
+            }
+            $_SESSION['error'] = 'Terdapat kesalahan pada form. Silakan periksa kembali.';
+            
+            // Redirect back with errors
+            header('Location: ' . epic_url('register'));
+            exit;
+        }
+        
+        // Ambil data yang sudah divalidasi dan disanitasi
+        $validated_data = $validation['data'];
+        $name = $validated_data['name'];
+        $email = $validated_data['email'];
+        $phone = $validated_data['phone'] ?? '';
+        $password = $validated_data['password'];
+        $confirm_password = $validated_data['confirm_password'];
         // Get referral code from form, cookies, or session
         $tracking = epic_get_referral_tracking();
-        $referral_code = epic_sanitize($_POST['referral_code'] ?? ($tracking ? $tracking['code'] : ''));
+        $referral_code = $validated_data['referral_code'] ?? ($tracking ? $tracking['code'] : '');
         $terms = isset($_POST['terms']);
         $marketing = isset($_POST['marketing']);
         
@@ -310,19 +342,15 @@ function epic_route_register() {
         $require_referral = epic_setting('require_referral', '0') == '1';
         $epic_account_only = epic_setting('epic_account_only', '1') == '1';
         
-        // Validation
-        if (empty($name) || empty($email) || empty($password)) {
-            $error = 'Name, email, and password are required.';
-        } elseif (!epic_validate_email($email)) {
-            $error = 'Please enter a valid email address.';
-        } elseif (strlen($password) < 8) {
-            $error = 'Password must be at least 8 characters long.';
-        } elseif ($password !== $confirm_password) {
-            $error = 'Passwords do not match.';
-        } elseif (!$terms) {
-            $error = 'You must agree to the Terms of Service and Privacy Policy.';
+        // Additional validation for terms and referral requirements
+        if (!$terms) {
+            $_SESSION['error'] = 'You must agree to the Terms of Service and Privacy Policy.';
+            header('Location: ' . epic_url('register'));
+            exit;
         } elseif ($require_referral && empty($referral_code)) {
-            $error = 'Kode referral wajib untuk melanjutkan registrasi.';
+            $_SESSION['error'] = 'Kode referral wajib untuk melanjutkan registrasi.';
+            header('Location: ' . epic_url('register'));
+            exit;
         } elseif (!empty($referral_code)) {
             // Validate referral code using new function
             $referrer = epic_get_referrer_info($referral_code);
@@ -825,7 +853,7 @@ function epic_track_landing_page_visit($landing_page_id, $sponsor_id) {
 function epic_get_home_stats() {
     try {
         return [
-            'total_users' => db()->count('epic_users'),
+            'total_users' => db()->count('users'),
             'total_products' => db()->count('epic_products', "status = 'active'"),
             'total_orders' => db()->count('epic_orders', "status = 'paid'"),
             'total_commissions' => db()->selectValue(

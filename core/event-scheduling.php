@@ -18,6 +18,18 @@ class EpicEventScheduling {
     public function __construct() {
         global $epic_db;
         $this->db = $epic_db;
+        
+        // Validate database connection
+        if (!$this->db) {
+            throw new Exception('Database connection not available');
+        }
+        
+        // Test database connection
+        try {
+            $this->db->query('SELECT 1');
+        } catch (PDOException $e) {
+            throw new Exception('Database connection failed: ' . $e->getMessage());
+        }
     }
     
     /**
@@ -183,6 +195,37 @@ class EpicEventScheduling {
     }
     
     /**
+     * Validate access levels based on event type
+     */
+    public function validateEventAccessLevels($category_name, $access_levels) {
+        $validation_rules = [
+            'EPI Connect' => ['epis'],
+            'EPI Insight' => ['epis', 'epic'],
+            'Webinar EPI' => ['free', 'epis', 'epic']
+        ];
+        
+        // Check if category has specific rules
+        if (!isset($validation_rules[$category_name])) {
+            return ['valid' => true, 'message' => ''];
+        }
+        
+        $allowed_levels = $validation_rules[$category_name];
+        $invalid_levels = array_diff($access_levels, $allowed_levels);
+        
+        if (!empty($invalid_levels)) {
+            $allowed_text = implode(', ', array_map('strtoupper', $allowed_levels));
+            $invalid_text = implode(', ', array_map('strtoupper', $invalid_levels));
+            
+            return [
+                'valid' => false,
+                'message' => "Event {$category_name} hanya dapat diakses oleh: {$allowed_text}. Level akses tidak valid: {$invalid_text}"
+            ];
+        }
+        
+        return ['valid' => true, 'message' => ''];
+    }
+    
+    /**
      * Get all events with pagination and filters
      */
     public function getEvents($page = 1, $limit = 20, $filters = []) {
@@ -221,7 +264,7 @@ class EpicEventScheduling {
                        u.name as creator_name
                 FROM epi_event_schedules e
                 LEFT JOIN epic_event_categories c ON e.category_id = c.id
-                LEFT JOIN users u ON e.created_by = u.id
+                LEFT JOIN epic_users u ON e.created_by = u.id
                 {$where_clause}
                 ORDER BY e.created_at DESC, e.start_time DESC
                 LIMIT ? OFFSET ?
@@ -263,6 +306,27 @@ class EpicEventScheduling {
     /**
      * Get single event by ID
      */
+    public function getEventById($id) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT e.*, c.name as category_name, c.color as category_color, c.icon as category_icon,
+                       u.name as creator_name
+                FROM epi_event_schedules e
+                LEFT JOIN epic_event_categories c ON e.category_id = c.id
+                LEFT JOIN epic_users u ON e.created_by = u.id
+                WHERE e.id = ?
+            ");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log('Failed to get event by ID: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Get single event by ID
+     */
     public function getEvent($id) {
         try {
             $stmt = $this->db->prepare("
@@ -270,7 +334,7 @@ class EpicEventScheduling {
                        c.access_levels as category_access_levels, u.name as creator_name
                 FROM epi_event_schedules e
                 LEFT JOIN epic_event_categories c ON e.category_id = c.id
-                LEFT JOIN users u ON e.created_by = u.id
+                LEFT JOIN epic_users u ON e.created_by = u.id
                 WHERE e.id = ?
             ");
             $stmt->execute([$id]);
@@ -286,106 +350,233 @@ class EpicEventScheduling {
      */
     public function createEvent($data) {
         try {
+            // Detect draft mode from action parameter
+            $is_draft = isset($data['action']) && $data['action'] === 'save_draft';
+            
             // Validate required fields
             if (empty($data['title'])) {
-                error_log('Event creation failed: Title is required');
-                return false;
+                return ['success' => false, 'message' => 'Judul event wajib diisi'];
             }
             
             if (empty($data['category_id'])) {
-                error_log('Event creation failed: Category is required');
-                return false;
+                return ['success' => false, 'message' => 'Kategori event wajib dipilih'];
             }
             
-            if (empty($data['start_time']) || empty($data['end_time'])) {
-                error_log('Event creation failed: Start time and end time are required');
-                return false;
+            // For published events, validate time fields
+            if (!$is_draft) {
+                if (empty($data['start_time']) || empty($data['end_time'])) {
+                    return ['success' => false, 'message' => 'Waktu mulai dan berakhir wajib diisi'];
+                }
+                
+                // Validate date format and logic
+                $start_time = strtotime($data['start_time']);
+                $end_time = strtotime($data['end_time']);
+                
+                if ($start_time === false || $end_time === false) {
+                    return ['success' => false, 'message' => 'Format tanggal tidak valid'];
+                }
+                
+                if ($end_time <= $start_time) {
+                    return ['success' => false, 'message' => 'Waktu berakhir harus setelah waktu mulai'];
+                }
+            } else {
+                // For draft, validate time format if provided
+                if (!empty($data['start_time'])) {
+                    $start_time = strtotime($data['start_time']);
+                    if ($start_time === false) {
+                        return ['success' => false, 'message' => 'Format waktu mulai tidak valid'];
+                    }
+                }
+                
+                if (!empty($data['end_time'])) {
+                    $end_time = strtotime($data['end_time']);
+                    if ($end_time === false) {
+                        return ['success' => false, 'message' => 'Format waktu berakhir tidak valid'];
+                    }
+                }
+                
+                // Check time logic if both provided
+                if (!empty($data['start_time']) && !empty($data['end_time'])) {
+                    $start_time = strtotime($data['start_time']);
+                    $end_time = strtotime($data['end_time']);
+                    if ($end_time <= $start_time) {
+                        return ['success' => false, 'message' => 'Waktu berakhir harus setelah waktu mulai'];
+                    }
+                }
             }
             
-            // Validate category exists
-            $stmt = $this->db->prepare("SELECT id FROM epic_event_categories WHERE id = ? AND is_active = 1");
-            $stmt->execute([$data['category_id']]);
-            if (!$stmt->fetch()) {
-                error_log('Event creation failed: Invalid or inactive category ID: ' . $data['category_id']);
-                return false;
+            // Validate category exists and get category info for access level validation
+            $category_info = null;
+            if (!empty($data['category_id'])) {
+                $stmt = $this->db->prepare("SELECT id, name FROM epic_event_categories WHERE id = ? AND is_active = 1");
+                $stmt->execute([$data['category_id']]);
+                $category_info = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$category_info) {
+                    return ['success' => false, 'message' => 'Kategori tidak valid atau tidak aktif'];
+                }
             }
             
-            // Validate date format and logic
-            $start_time = strtotime($data['start_time']);
-            $end_time = strtotime($data['end_time']);
-            
-            if ($start_time === false || $end_time === false) {
-                error_log('Event creation failed: Invalid date format');
-                return false;
+            // Validate access levels based on event type (only for published events)
+            if (!$is_draft && $category_info && isset($data['access_levels'])) {
+                $access_levels_input = is_array($data['access_levels']) ? $data['access_levels'] : json_decode($data['access_levels'], true);
+                if ($access_levels_input) {
+                    $validation = $this->validateEventAccessLevels($category_info['name'], $access_levels_input);
+                    if (!$validation['valid']) {
+                        return ['success' => false, 'message' => $validation['message']];
+                    }
+                }
             }
             
-            if ($end_time <= $start_time) {
-                error_log('Event creation failed: End time must be after start time');
-                return false;
-            }
+            // Determine status
+            $status = $is_draft ? 'draft' : 'published';
             
-            // Validate access levels
-            if (empty($data['access_levels']) || !is_array($data['access_levels'])) {
-                error_log('Event creation failed: At least one access level must be specified');
-                return false;
+            // Set access levels from input or default
+            $access_levels = ['free', 'epic', 'epis']; // Default to all levels
+            if (isset($data['access_levels'])) {
+                $input_levels = is_array($data['access_levels']) ? $data['access_levels'] : json_decode($data['access_levels'], true);
+                if ($input_levels && is_array($input_levels)) {
+                    $access_levels = $input_levels;
+                }
             }
             
             $stmt = $this->db->prepare("
                 INSERT INTO epi_event_schedules (
                     category_id, title, description, location, start_time, end_time, timezone,
                     max_participants, registration_required, registration_deadline,
-                    access_levels, status, event_url, notes, created_by
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    access_levels, status, created_by
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
-            $result = $stmt->execute([
-                intval($data['category_id']),
-                trim($data['title']),
+            // For draft, use default times if not provided
+            $start_time = $data['start_time'] ?? null;
+            $end_time = $data['end_time'] ?? null;
+            
+            if ($is_draft) {
+                // Use default future times for draft if not provided
+                if (empty($start_time)) {
+                    $start_time = date('Y-m-d H:i:s', strtotime('+1 day'));
+                }
+                if (empty($end_time)) {
+                    $end_time = date('Y-m-d H:i:s', strtotime('+1 day +2 hours'));
+                }
+            }
+            
+            // Prepare execute parameters
+            $execute_params = [
+                $data['category_id'] ?? null,
+                trim($data['title'] ?? ''),
                 trim($data['description'] ?? ''),
                 trim($data['location'] ?? ''),
-                $data['start_time'],
-                $data['end_time'],
+                $start_time,
+                $end_time,
                 $data['timezone'] ?? 'Asia/Jakarta',
                 !empty($data['max_participants']) ? intval($data['max_participants']) : null,
                 $data['registration_required'] ?? 0,
                 $data['registration_deadline'] ?? null,
-                json_encode($data['access_levels']),
-                $data['status'] ?? 'draft',
-                trim($data['event_url'] ?? ''),
-                trim($data['notes'] ?? ''),
+                json_encode($access_levels),
+                $status,
                 $data['created_by'] ?? 1
-            ]);
+            ];
+            
+            // Log parameters for debugging
+            error_log('Event creation attempt - Status: ' . $status . ', Params: ' . json_encode($execute_params));
+            
+            $result = $stmt->execute($execute_params);
             
             if ($result) {
                 $event_id = $this->db->lastInsertId();
-                error_log('Event created successfully: ' . $data['title'] . ' (ID: ' . $event_id . ')');
+                $action = $is_draft ? 'Draft disimpan' : 'Event dibuat';
+                error_log($action . ' berhasil: ' . ($data['title'] ?? 'Untitled') . ' (ID: ' . $event_id . ')');
+                
+                return [
+                    'success' => true,
+                    'event_id' => $event_id,
+                    'message' => $action . ' berhasil'
+                ];
             } else {
                 $error_info = $this->db->errorInfo();
                 error_log('Event creation failed - Database error: ' . $error_info[2]);
+                return ['success' => false, 'message' => 'Gagal menyimpan ke database: ' . $error_info[2]];
             }
             
-            return $result;
+        } catch (PDOException $e) {
+            $error_code = $e->getCode();
+            $error_message = $e->getMessage();
+            
+            // Log detailed error
+            error_log('PDO Error creating event: ' . $error_message);
+            error_log('Event data: ' . json_encode($data));
+            
+            // User-friendly error messages
+            if (strpos($error_message, 'Connection') !== false) {
+                return ['success' => false, 'message' => 'Koneksi database bermasalah. Silakan coba lagi.'];
+            } elseif (strpos($error_message, 'Duplicate') !== false) {
+                return ['success' => false, 'message' => 'Event dengan judul yang sama sudah ada.'];
+            } elseif (strpos($error_message, 'foreign key') !== false) {
+                return ['success' => false, 'message' => 'Kategori yang dipilih tidak valid.'];
+            } else {
+                return ['success' => false, 'message' => 'Gagal menyimpan event. Silakan periksa data dan coba lagi.'];
+            }
         } catch (Exception $e) {
             error_log('Failed to create event: ' . $e->getMessage());
             error_log('Event data: ' . json_encode($data));
-            return false;
+            return ['success' => false, 'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'];
         }
     }
     
     /**
      * Update event
      */
-    public function updateEvent($id, $data) {
+    public function updateEvent($data) {
         try {
+            $id = $data['id'];
+            
+            // Validate required fields for published events
+            if (isset($data['is_draft']) && !$data['is_draft']) {
+                if (empty($data['title'])) {
+                    return ['success' => false, 'message' => 'Judul event wajib diisi'];
+                }
+                if (empty($data['category_id'])) {
+                    return ['success' => false, 'message' => 'Kategori event wajib dipilih'];
+                }
+                if (empty($data['start_time']) || empty($data['end_time'])) {
+                    return ['success' => false, 'message' => 'Waktu mulai dan berakhir wajib diisi'];
+                }
+                
+                // Get category info for validation
+                $category = $this->getEventCategoryById($data['category_id']);
+                if (!$category) {
+                    return ['success' => false, 'message' => 'Kategori tidak valid'];
+                }
+                
+                // Validate access levels for published events
+                $validation_result = $this->validateEventAccessLevels($category['name'], $data['access_levels']);
+                if (!$validation_result['valid']) {
+                    return ['success' => false, 'message' => $validation_result['message']];
+                }
+            }
+            
+            // Set access levels from input or default
+            $access_levels = ['free', 'epic', 'epis']; // Default to all levels
+            if (isset($data['access_levels'])) {
+                $input_levels = is_array($data['access_levels']) ? $data['access_levels'] : json_decode($data['access_levels'], true);
+                if ($input_levels && is_array($input_levels)) {
+                    $access_levels = $input_levels;
+                }
+            }
+            
+            // Determine status
+            $status = isset($data['is_draft']) && $data['is_draft'] ? 'draft' : 'published';
+            
             $stmt = $this->db->prepare("
                 UPDATE epi_event_schedules 
                 SET category_id = ?, title = ?, description = ?, location = ?, start_time = ?, end_time = ?, timezone = ?,
                     max_participants = ?, registration_required = ?, registration_deadline = ?,
-                    access_levels = ?, status = ?, event_url = ?, notes = ?
+                    access_levels = ?, status = ?, event_url = ?, notes = ?, updated_at = NOW()
                 WHERE id = ?
             ");
             
-            return $stmt->execute([
+            $result = $stmt->execute([
                 $data['category_id'],
                 $data['title'],
                 $data['description'] ?? '',
@@ -394,17 +585,24 @@ class EpicEventScheduling {
                 $data['end_time'],
                 $data['timezone'] ?? 'Asia/Jakarta',
                 $data['max_participants'] ?? null,
-                $data['registration_required'] ?? 0,
+                isset($data['registration_required']) ? 1 : 0,
                 $data['registration_deadline'] ?? null,
-                json_encode($data['access_levels'] ?? ['free']),
-                $data['status'] ?? 'draft',
+                json_encode($access_levels),
+                $status,
                 $data['event_url'] ?? '',
                 $data['notes'] ?? '',
                 $id
             ]);
+            
+            if ($result) {
+                return ['success' => true, 'message' => 'Event berhasil diupdate', 'event_id' => $id];
+            } else {
+                return ['success' => false, 'message' => 'Gagal mengupdate event'];
+            }
+            
         } catch (Exception $e) {
             error_log('Failed to update event: ' . $e->getMessage());
-            return false;
+            return ['success' => false, 'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()];
         }
     }
     

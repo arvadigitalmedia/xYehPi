@@ -39,6 +39,11 @@ if (empty($breadcrumb)) {
 ?>
 <header class="admin-topbar">
     <div class="topbar-left">
+        <!-- Mobile Menu Toggle -->
+        <button type="button" class="mobile-menu-toggle" onclick="toggleMobileSidebar()">
+            <i data-feather="menu" width="20" height="20"></i>
+        </button>
+        
         <?php if ($show_back_button): ?>
             <button type="button" class="topbar-back-btn" onclick="window.location.href='<?= $back_url ?>'">
                 <i data-feather="arrow-left" width="20" height="20"></i>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Mobile Menu</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .test-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #005a87;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Test Mobile Menu - Admin Panel</h1>
+        
+        <div class="test-section">
+            <h2>✅ Perubahan yang Telah Dilakukan</h2>
+            <div class="status success">
+                <strong>JavaScript:</strong> Diperbaiki untuk menggunakan class 'mobile-open' yang sesuai dengan CSS
+            </div>
+            <div class="status success">
+                <strong>CSS:</strong> Ditambahkan styling untuk sidebar mobile dengan backdrop overlay
+            </div>
+            <div class="status success">
+                <strong>Tombol Toggle:</strong> Ditambahkan di semua file admin (member-add.php, member-edit.php, affiliates.php)
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Fitur Mobile Menu</h2>
+            <div class="status info">
+                <strong>Breakpoint:</strong> Menu mobile aktif pada layar ≤ 768px
+            </div>
+            <div class="status info">
+                <strong>Tombol Toggle:</strong> Hamburger menu dengan ikon Feather
+            </div>
+            <div class="status info">
+                <strong>Sidebar:</strong> Slide dari kiri dengan backdrop overlay
+            </div>
+            <div class="status info">
+                <strong>Interaksi:</strong> Klik tombol atau backdrop untuk menutup menu
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📱 Cara Testing</h2>
+            <ol>
+                <li>Buka halaman admin (member-add.php, member-edit.php, atau affiliates.php)</li>
+                <li>Resize browser ke lebar ≤ 768px atau gunakan device mode mobile</li>
+                <li>Klik tombol hamburger (☰) di kiri atas</li>
+                <li>Sidebar akan muncul dari kiri dengan backdrop gelap</li>
+                <li>Klik backdrop atau tombol lagi untuk menutup</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 Link Testing</h2>
+            <button class="test-button" onclick="window.open('/test-bisnisemasperak/themes/modern/admin/member-add.php', '_blank')">
+                Test Member Add
+            </button>
+            <button class="test-button" onclick="window.open('/test-bisnisemasperak/themes/modern/admin/member-edit.php', '_blank')">
+                Test Member Edit
+            </button>
+            <button class="test-button" onclick="window.open('/test-bisnisemasperak/themes/modern/admin/affiliates.php', '_blank')">
+                Test Affiliates
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Checklist Verifikasi</h2>
+            <ul>
+                <li>✅ Tombol hamburger terlihat di mobile (≤ 768px)</li>
+                <li>✅ Sidebar tersembunyi secara default di mobile</li>
+                <li>✅ Klik tombol hamburger membuka sidebar</li>
+                <li>✅ Backdrop overlay muncul saat menu terbuka</li>
+                <li>✅ Klik backdrop menutup menu</li>
+                <li>✅ Menu dapat diakses dengan keyboard (Tab + Enter)</li>
+                <li>✅ Animasi smooth saat buka/tutup</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Simulasi resize untuk testing
+        function simulateResize(width) {
+            document.body.style.width = width + 'px';
+            window.dispatchEvent(new Event('resize'));
+        }
+
+        // Info viewport
+        function showViewportInfo() {
+            const width = window.innerWidth;
+            const isMobile = width <= 768;
+            console.log(`Viewport: ${width}px, Mobile: ${isMobile}`);
+        }
+
+        window.addEventListener('resize', showViewportInfo);
+        showViewportInfo();
+    </script>
+</body>
+</html>

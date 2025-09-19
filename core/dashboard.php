@@ -437,10 +437,19 @@ function epic_handle_profile_update($user) {
             'updated_at' => date('Y-m-d H:i:s')
         ];
         
+        // Check if user is currently inactive and activate them after profile update
+        if ($user['status'] === 'inactive') {
+            $update_data['status'] = 'active';
+            
+            // Log the status change
+            epic_log_activity($user['id'], 'profile_activation', 'User activated after profile update', 'user', $user['id']);
+        }
+        
         $updated = db()->update(
-            db()->table('users'),
+            'users',
             $update_data,
-            ['id' => $user['id']]
+            'id = ?',
+            [$user['id']]
         );
         
         if ($updated) {

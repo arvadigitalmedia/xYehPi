@@ -198,6 +198,44 @@ extract($layout_data);
             }
         }
         
+        // Mobile Sidebar Toggle
+        function toggleMobileSidebar() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            const body = document.body;
+            
+            if (sidebar.classList.contains('mobile-open')) {
+                sidebar.classList.remove('mobile-open');
+                body.classList.remove('mobile-menu-open');
+            } else {
+                sidebar.classList.add('mobile-open');
+                body.classList.add('mobile-menu-open');
+            }
+        }
+        
+        // Close mobile sidebar when clicking backdrop
+        document.addEventListener('click', function(e) {
+            const sidebar = document.querySelector('.admin-sidebar');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            // Check if click is outside sidebar and not on toggle button
+            if (window.innerWidth <= 768 && 
+                sidebar.classList.contains('mobile-open') && 
+                !sidebar.contains(e.target) && 
+                !mobileToggle.contains(e.target)) {
+                toggleMobileSidebar();
+            }
+        });
+        
+        // Close mobile sidebar on window resize to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                const sidebar = document.querySelector('.admin-sidebar');
+                const body = document.body;
+                sidebar.classList.remove('mobile-open');
+                body.classList.remove('mobile-menu-open');
+            }
+        });
+        
         // Alpine.js Admin App
         function adminApp() {
             return {

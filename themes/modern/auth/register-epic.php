@@ -24,6 +24,10 @@ $form_data = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
+        // RATE LIMITING - Prevent registration spam
+        require_once EPIC_ROOT . '/core/rate-limiter.php';
+        epic_check_registration_rate_limit();
+        
         // Get form data
         $name = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');

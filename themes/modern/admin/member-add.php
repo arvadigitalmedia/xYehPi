@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($errors)) {
             // Check email duplicate
             $email_duplicate = db()->selectValue(
-                "SELECT id FROM epic_users WHERE email = ? LIMIT 1",
+                "SELECT id FROM users WHERE email = ? LIMIT 1",
                 [$email]
             );
             
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Check WhatsApp duplicate
             $phone_duplicate = db()->selectValue(
-                "SELECT id FROM epic_users WHERE phone = ? LIMIT 1",
+                "SELECT id FROM users WHERE phone = ? LIMIT 1",
                 [$whatsapp]
             );
             
@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check sponsor exists
         if (empty($errors)) {
             $sponsor = db()->selectOne(
-                "SELECT id, name FROM epic_users WHERE referral_code = ?",
+                "SELECT id, name FROM users WHERE referral_code = ?",
                 [$sponsor_code]
             );
             
@@ -122,10 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Generate auto-increment sponsor ID
         $auto_sponsor_id = null;
         if (empty($errors)) {
-            $last_sponsor_id = db()->selectValue(
-                "SELECT MAX(id) FROM epic_users"
+            $last_id = db()->selectValue(
+                "SELECT MAX(id) FROM users"
             ) ?: 0;
-            $auto_sponsor_id = $last_sponsor_id + 1;
+            $auto_sponsor_id = $last_id + 1;
         }
         
         if (!empty($errors)) {
@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             do {
                 $referral_code = $base . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
                 $exists = db()->selectValue(
-                    "SELECT id FROM epic_users WHERE referral_code = ?",
+                    "SELECT id FROM users WHERE referral_code = ?",
                     [$referral_code]
                 );
                 $attempts++;
@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             try {
                 // Insert new member with auto-generated ID
-                $member_id = db()->insert('epic_users', [
+                $member_id = db()->insert('users', [
                     'id' => $auto_sponsor_id,
                     'name' => $full_name,
                     'email' => strtolower($email),
@@ -549,7 +549,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <span class="sidebar-nav-text">Edit Profile</span>
                 </a>
                 
-                <!-- 3. Manage -->
+                <!-- 3. Dashboard Member -->
+                <div class="sidebar-nav-group">
+                    <div class="sidebar-nav-item sidebar-nav-parent">
+                        <i data-feather="users" class="sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Dashboard Member</span>
+                        <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
+                    </div>
+                    <div class="sidebar-submenu">
+                        <a href="<?= epic_url('admin/dashboard-member/prospek') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Prospek</span>
+                        </a>
+                        <a href="<?= epic_url('admin/dashboard-member/bonus-cash') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Bonus Cash</span>
+                        </a>
+                        <a href="<?= epic_url('admin/dashboard-member/akses-produk') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Akses Produk</span>
+                        </a>
+                        <a href="<?= epic_url('admin/dashboard-member/history-order') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">History Order</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 4. Manage -->
                 <div class="sidebar-nav-group">
                     <div class="sidebar-nav-item sidebar-nav-parent expanded">
                         <i data-feather="settings" class="sidebar-nav-icon"></i>
@@ -581,48 +604,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
                 
-                <!-- 4. Settings -->
-                <a href="<?= epic_url('admin/settings/general') ?>" class="sidebar-nav-item">
-                    <i data-feather="sliders" class="sidebar-nav-icon"></i>
-                    <span class="sidebar-nav-text">Settings</span>
-                </a>
-                
                 <!-- 5. Integrasi -->
                 <a href="<?= epic_url('admin/integrasi/autoresponder-email') ?>" class="sidebar-nav-item">
                     <i data-feather="zap" class="sidebar-nav-icon"></i>
                     <span class="sidebar-nav-text">Integrasi</span>
                 </a>
                 
-                <!-- 6. Dashboard Member -->
-                <div class="sidebar-nav-group">
-                    <div class="sidebar-nav-item sidebar-nav-parent">
-                        <i data-feather="monitor" class="sidebar-nav-icon"></i>
-                        <span class="sidebar-nav-text">Dashboard Member</span>
-                        <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
-                    </div>
-                    <div class="sidebar-submenu">
-                        <a href="<?= epic_url('admin/dashboard-member/prospek') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Prospek</span>
-                        </a>
-                        <a href="<?= epic_url('admin/dashboard-member/bonus-cash') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Bonus Cash</span>
-                        </a>
-                        <a href="<?= epic_url('admin/dashboard-member/akses-produk') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Akses Produk</span>
-                        </a>
-                        <a href="<?= epic_url('admin/dashboard-member/history-order') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">History Order</span>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- 7. Blog -->
+                <!-- 6. Blog -->
                 <a href="<?= epic_url('admin/blog') ?>" class="sidebar-nav-item">
                     <i data-feather="edit-3" class="sidebar-nav-icon"></i>
                     <span class="sidebar-nav-text">Blog</span>
                 </a>
                 
-
+                <!-- 7. Settings -->
+                <a href="<?= epic_url('admin/settings/general') ?>" class="sidebar-nav-item">
+                    <i data-feather="sliders" class="sidebar-nav-icon"></i>
+                    <span class="sidebar-nav-text">Settings</span>
+                </a>
                 
                 <!-- Separator -->
                 <div class="sidebar-separator"></div>
@@ -646,6 +644,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Topbar -->
             <header class="admin-topbar">
                 <div class="topbar-left">
+                    <!-- Mobile Menu Toggle -->
+                    <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+                        <i data-feather="menu" width="20" height="20"></i>
+                    </button>
+                    
                     <h1 class="topbar-title">Tambah Member</h1>
                     <nav class="topbar-breadcrumb">
                         <a href="<?= epic_url('admin') ?>">Admin</a>

@@ -23,7 +23,7 @@ if (!$member_id) {
 
 // Get member data
 $member = db()->selectOne(
-    "SELECT * FROM epic_users WHERE id = ?",
+    "SELECT * FROM " . db()->table(TABLE_USERS) . " WHERE id = ?",
     [$member_id]
 );
 
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($errors)) {
             // Check email duplicate
             $email_duplicate = db()->selectValue(
-                "SELECT id FROM epic_users WHERE email = ? AND id != ? LIMIT 1",
+                "SELECT id FROM " . db()->table(TABLE_USERS) . " WHERE email = ? AND id != ? LIMIT 1",
                 [$email, $member_id]
             );
             
@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Check WhatsApp duplicate
             $phone_duplicate = db()->selectValue(
-                "SELECT id FROM epic_users WHERE phone = ? AND id != ? LIMIT 1",
+                "SELECT id FROM " . db()->table(TABLE_USERS) . " WHERE phone = ? AND id != ? LIMIT 1",
                 [$whatsapp, $member_id]
             );
             
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check sponsor exists (if changed)
         if (empty($errors) && !empty($sponsor_code)) {
             $sponsor = db()->selectOne(
-                "SELECT id, name FROM epic_users WHERE referral_code = ?",
+                "SELECT id, name FROM " . db()->table(TABLE_USERS) . " WHERE referral_code = ?",
                 [$sponsor_code]
             );
             
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Update sponsor if changed
                 if (!empty($sponsor_code)) {
                     $sponsor = db()->selectOne(
-                        "SELECT id FROM epic_users WHERE referral_code = ?",
+                        "SELECT id FROM " . db()->table(TABLE_USERS) . " WHERE referral_code = ?",
                         [$sponsor_code]
                     );
                     if ($sponsor) {
@@ -180,12 +180,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 // Update member
-                $result = db()->update('epic_users', $update_data, 'id = ?', [$member_id]);
+                $result = db()->update(TABLE_USERS, $update_data, 'id = ?', [$member_id]);
                 
                 if (!$result) {
                     // Check if the member still exists
                     $member_exists = db()->selectValue(
-                        "SELECT id FROM epic_users WHERE id = ?",
+                        "SELECT id FROM " . db()->table(TABLE_USERS) . " WHERE id = ?",
                         [$member_id]
                     );
                     
@@ -217,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Refresh member data
                 $member = db()->selectOne(
-                    "SELECT * FROM epic_users WHERE id = ?",
+                    "SELECT * FROM " . db()->table(TABLE_USERS) . " WHERE id = ?",
                     [$member_id]
                 );
                 
@@ -565,7 +565,27 @@ if (empty($form_data)) {
                     <span class="sidebar-nav-text">Edit Profile</span>
                 </a>
                 
-                <!-- 3. Manage -->
+                <!-- 3. Dashboard Member -->
+                <div class="sidebar-nav-group">
+                    <div class="sidebar-nav-item sidebar-nav-parent">
+                        <i data-feather="users" class="sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Dashboard Member</span>
+                        <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
+                    </div>
+                    <div class="sidebar-submenu">
+                        <a href="<?= epic_url('admin/dashboard-member/layout') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Layout</span>
+                        </a>
+                        <a href="<?= epic_url('admin/dashboard-member/widgets') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Widgets</span>
+                        </a>
+                        <a href="<?= epic_url('admin/dashboard-member/permissions') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Permissions</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 4. Manage -->
                 <div class="sidebar-nav-group">
                     <div class="sidebar-nav-item sidebar-nav-parent expanded">
                         <i data-feather="settings" class="sidebar-nav-icon"></i>
@@ -597,37 +617,23 @@ if (empty($form_data)) {
                     </div>
                 </div>
                 
-                <!-- 4. Settings -->
-                <a href="<?= epic_url('admin/settings/general') ?>" class="sidebar-nav-item">
-                    <i data-feather="sliders" class="sidebar-nav-icon"></i>
-                    <span class="sidebar-nav-text">Settings</span>
-                </a>
-                
                 <!-- 5. Integrasi -->
                 <a href="<?= epic_url('admin/integrasi/autoresponder-email') ?>" class="sidebar-nav-item">
                     <i data-feather="zap" class="sidebar-nav-icon"></i>
                     <span class="sidebar-nav-text">Integrasi</span>
                 </a>
                 
-                <!-- 6. Dashboard Member -->
-                <div class="sidebar-nav-group">
-                    <div class="sidebar-nav-item sidebar-nav-parent">
-                        <i data-feather="monitor" class="sidebar-nav-icon"></i>
-                        <span class="sidebar-nav-text">Dashboard Member</span>
-                        <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
-                    </div>
-                    <div class="sidebar-submenu">
-                        <a href="<?= epic_url('admin/dashboard-member/layout') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Layout</span>
-                        </a>
-                        <a href="<?= epic_url('admin/dashboard-member/widgets') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Widgets</span>
-                        </a>
-                        <a href="<?= epic_url('admin/dashboard-member/permissions') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Permissions</span>
-                        </a>
-                    </div>
-                </div>
+                <!-- 6. Blog -->
+                <a href="<?= epic_url('admin/blog') ?>" class="sidebar-nav-item">
+                    <i data-feather="edit-3" class="sidebar-nav-icon"></i>
+                    <span class="sidebar-nav-text">Blog</span>
+                </a>
+                
+                <!-- 7. Settings -->
+                <a href="<?= epic_url('admin/settings/general') ?>" class="sidebar-nav-item">
+                    <i data-feather="sliders" class="sidebar-nav-icon"></i>
+                    <span class="sidebar-nav-text">Settings</span>
+                </a>
             </nav>
             
             <div class="sidebar-footer">
@@ -642,6 +648,11 @@ if (empty($form_data)) {
             <!-- Topbar -->
             <header class="admin-topbar">
                 <div class="topbar-left">
+                    <!-- Mobile Menu Toggle -->
+                    <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+                        <i data-feather="menu" width="20" height="20"></i>
+                    </button>
+                    
                     <button class="topbar-menu-btn" @click="sidebarCollapsed = !sidebarCollapsed">
                         <i data-feather="menu" width="20" height="20"></i>
                     </button>

@@ -23,7 +23,7 @@ if ($action === 'edit' && $product_id) {
         "SELECT p.*, c.name as category_name, u.name as instructor_name
          FROM epic_products p
          LEFT JOIN epic_product_categories c ON p.category_id = c.id
-         LEFT JOIN epic_users u ON p.instructor_id = u.id
+         LEFT JOIN users u ON p.instructor_id = u.id
          WHERE p.id = ?",
         [$product_id]
     );

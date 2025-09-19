@@ -25,7 +25,7 @@ if (isset($_GET['action']) && isset($_GET['id']) && is_numeric($_GET['id'])) {
     try {
         switch ($action) {
             case 'activate':
-                $result = db()->update('users', 
+                $result = db()->update(TABLE_USERS, 
                     ['status' => 'active', 'updated_at' => date('Y-m-d H:i:s')], 
                     'id = ?', [$member_id]
                 );
@@ -38,7 +38,7 @@ if (isset($_GET['action']) && isset($_GET['id']) && is_numeric($_GET['id'])) {
                 break;
                 
             case 'deactivate':
-                $result = db()->update('users', 
+                $result = db()->update(TABLE_USERS, 
                     ['status' => 'inactive', 'updated_at' => date('Y-m-d H:i:s')], 
                     'id = ?', [$member_id]
                 );
@@ -47,6 +47,30 @@ if (isset($_GET['action']) && isset($_GET['id']) && is_numeric($_GET['id'])) {
                     epic_log_activity($user['id'], 'member_deactivated', "Member ID {$member_id} deactivated", 'user', $member_id);
                 } else {
                     $error = 'Gagal menonaktifkan member.';
+                }
+                break;
+                
+            case 'upgrade':
+                // Use the safe upgrade function
+                $upgrade_result = epic_safe_upgrade_to_epic($member_id, $user['id']);
+                
+                if ($upgrade_result['success']) {
+                    $success = $upgrade_result['message'];
+                    
+                    // Add details about preserved data
+                    $details = [];
+                    if ($upgrade_result['referral_preserved']) {
+                        $details[] = 'data referral terjaga';
+                    }
+                    if ($upgrade_result['supervisor_preserved']) {
+                        $details[] = 'EPIS supervisor terjaga';
+                    }
+                    
+                    if (!empty($details)) {
+                        $success .= ' (' . implode(', ', $details) . ')';
+                    }
+                } else {
+                    $error = $upgrade_result['message'];
                 }
                 break;
                 
@@ -101,14 +125,28 @@ if (!empty($search)) {
     $params[] = "%{$search}%";
 }
 
-if (!empty($status_filter)) {
-    $conditions[] = "status = ?";
-    $params[] = $status_filter;
+// Filter berdasarkan status
+if (!empty($status_filter) && $status_filter !== 'all') {
+    if ($status_filter === 'active') {
+        $conditions[] = "status IN ('free', 'epic', 'epis')";
+    } elseif ($status_filter === 'inactive') {
+        $conditions[] = "status IN ('pending', 'suspended', 'banned')";
+    }
 }
 
-if (!empty($role_filter)) {
-    $conditions[] = "role = ?";
-    $params[] = $role_filter;
+// Filter berdasarkan role/hierarchy level
+if (!empty($role_filter) && $role_filter !== 'all') {
+    if ($role_filter === 'free') {
+        $conditions[] = "(hierarchy_level = 1 OR status = 'free')";
+    } elseif ($role_filter === 'epic') {
+        $conditions[] = "(hierarchy_level = 2 OR status = 'epic')";
+    } elseif ($role_filter === 'epis') {
+        $conditions[] = "(hierarchy_level = 3 OR status = 'epis')";
+    } else {
+        // Legacy role filter untuk admin, super_admin, dll
+        $conditions[] = "role = ?";
+        $params[] = $role_filter;
+    }
 }
 
 $where_clause = !empty($conditions) ? 'WHERE ' . implode(' AND ', $conditions) : '';
@@ -121,23 +159,28 @@ $total_count = db()->selectValue(
 
 $total_pages = ceil($total_count / $per_page);
 
-// Get members data
+// Get members data with supervisor info
 $members = db()->select(
-    "SELECT *
-     FROM " . db()->table('users') . "
+    "SELECT u.*, 
+                 supervisor.name as supervisor_name,
+                 supervisor.referral_code as supervisor_code
+          FROM " . db()->table('users') . " u
+          LEFT JOIN " . db()->table('users') . " supervisor ON u.epis_supervisor_id = supervisor.id
      {$where_clause}
-     ORDER BY created_at DESC
+     ORDER BY u.created_at DESC
      LIMIT {$per_page} OFFSET {$offset}",
     $params
 );
 
-// Get statistics
+// Statistik berdasarkan hierarchy level dan status
 $stats = [
-    'total' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('users')),
-    'active' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('users') . " WHERE status = 'active'"),
-    'inactive' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('users') . " WHERE status = 'inactive'"),
-    'admin' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('users') . " WHERE role IN ('admin', 'super_admin')"),
-    'premium' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('users') . " WHERE role = 'premium'")
+    'total' => db()->selectOne("SELECT COUNT(*) as count FROM " . db()->table('users'))['count'],
+    'active' => db()->selectOne("SELECT COUNT(*) as count FROM " . db()->table('users') . " WHERE status IN ('free', 'epic', 'epis')")['count'],
+    'inactive' => db()->selectOne("SELECT COUNT(*) as count FROM " . db()->table('users') . " WHERE status IN ('pending', 'suspended', 'banned')")['count'],
+    'free_account' => db()->selectOne("SELECT COUNT(*) as count FROM " . db()->table('users') . " WHERE hierarchy_level = 1 OR status = 'free'")['count'],
+    'epic_account' => db()->selectOne("SELECT COUNT(*) as count FROM " . db()->table('users') . " WHERE hierarchy_level = 2 OR status = 'epic'")['count'],
+    'epis_account' => db()->selectOne("SELECT COUNT(*) as count FROM " . db()->table('users') . " WHERE hierarchy_level = 3 OR status = 'epis'")['count'],
+    'admin' => db()->selectOne("SELECT COUNT(*) as count FROM " . db()->table('users') . " WHERE role IN ('admin', 'super_admin')")['count']
 ];
 
 // Prepare data untuk layout

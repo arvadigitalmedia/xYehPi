@@ -123,7 +123,36 @@ $affiliates = [
                     <span class="sidebar-nav-text">Edit Profile</span>
                 </div>
                 
-                <!-- 3. Manage -->
+                <!-- 3. Dashboard Member -->
+                <div class="sidebar-nav-group">
+                    <div class="sidebar-nav-item sidebar-nav-parent" onclick="toggleSubmenu(this)">
+                        <i data-feather="users" class="sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Dashboard Member</span>
+                        <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
+                    </div>
+                    <div class="sidebar-submenu">
+                        <a href="<?= epic_url('admin/member-area/home') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Home Dashboard</span>
+                        </a>
+                        <a href="<?= epic_url('admin/member-area/profile') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Edit Profil</span>
+                        </a>
+                        <a href="<?= epic_url('admin/member-area/prospects') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Prospek</span>
+                        </a>
+                        <a href="<?= epic_url('admin/member-area/bonus') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Bonus Cash</span>
+                        </a>
+                        <a href="<?= epic_url('admin/member-area/products') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Akses Produk</span>
+                        </a>
+                        <a href="<?= epic_url('admin/member-area/orders') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">History Order</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 4. Manage -->
                 <div class="sidebar-nav-group">
                     <div class="sidebar-nav-item sidebar-nav-parent expanded" onclick="toggleSubmenu(this)">
                         <i data-feather="settings" class="sidebar-nav-icon"></i>
@@ -155,7 +184,30 @@ $affiliates = [
                     </div>
                 </div>
                 
-                <!-- 3. Settings -->
+                <!-- 5. Integrasi -->
+                <div class="sidebar-nav-group">
+                    <div class="sidebar-nav-item sidebar-nav-parent" onclick="toggleSubmenu(this)">
+                        <i data-feather="zap" class="sidebar-nav-icon"></i>
+                        <span class="sidebar-nav-text">Integrasi</span>
+                        <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
+                    </div>
+                    <div class="sidebar-submenu">
+                        <a href="<?= epic_url('admin/integrasi/autoresponder-email') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Autoresponder Email</span>
+                        </a>
+                        <a href="<?= epic_url('admin/zoom-integration') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Zoom Integration</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 6. Blog -->
+                <a href="<?= epic_url('admin/blog') ?>" class="sidebar-nav-item">
+                    <i data-feather="edit-3" class="sidebar-nav-icon"></i>
+                    <span class="sidebar-nav-text">Blog</span>
+                </a>
+                
+                <!-- 7. Settings -->
                 <div class="sidebar-nav-group">
                     <div class="sidebar-nav-item sidebar-nav-parent" onclick="toggleSubmenu(this)">
                         <i data-feather="sliders" class="sidebar-nav-icon"></i>
@@ -180,22 +232,6 @@ $affiliates = [
                         </a>
                     </div>
                 </div>
-                
-                <!-- 4. Integrasi -->
-                <div class="sidebar-nav-group">
-                    <div class="sidebar-nav-item sidebar-nav-parent" onclick="toggleSubmenu(this)">
-                        <i data-feather="zap" class="sidebar-nav-icon"></i>
-                        <span class="sidebar-nav-text">Integrasi</span>
-                        <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
-                    </div>
-                    <div class="sidebar-submenu">
-                        <a href="<?= epic_url('admin/integrasi/autoresponder-email') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Autoresponder Email</span>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- 5. Dashboard Member -->
                 <div class="sidebar-nav-group">
                     <div class="sidebar-nav-item sidebar-nav-parent" onclick="toggleSubmenu(this)">
                         <i data-feather="users" class="sidebar-nav-icon"></i>
@@ -247,9 +283,14 @@ $affiliates = [
             <!-- Topbar -->
             <header class="admin-topbar">
                 <div class="topbar-left">
+                    <!-- Mobile Menu Toggle -->
+                    <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+                        <i data-feather="menu" width="20" height="20"></i>
+                    </button>
+                    
                     <h1 class="topbar-title">Affiliates</h1>
                     <nav class="topbar-breadcrumb">
-                        <span>Admin</span>
+                        <a href="<?= epic_url('admin') ?>">Admin</a>
                         <span class="breadcrumb-separator">/</span>
                         <span>Affiliates</span>
                     </nav>

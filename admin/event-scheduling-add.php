@@ -4,9 +4,8 @@
  * Halaman standalone untuk menambah event scheduling baru
  */
 
-if (!defined('EPIC_LOADED')) {
-    die('Direct access not allowed');
-}
+// Bootstrap sistem terlebih dahulu
+require_once __DIR__ . '/../bootstrap.php';
 
 // Include routing helper for consistent error handling
 require_once __DIR__ . '/../themes/modern/admin/routing-helper.php';
@@ -17,90 +16,142 @@ $user = $init_result['user'];
 
 // Load Event Scheduling core
 require_once EPIC_PATH . '/core/event-scheduling.php';
-global $epic_event_scheduling;
+
+// Initialize Event Scheduling class
+$epic_event_scheduling = new EpicEventScheduling();
+
+// Check if this is edit mode
+$edit_mode = false;
+$edit_event = null;
+if (isset($_GET['edit']) && !empty($_GET['edit'])) {
+    $edit_id = intval($_GET['edit']);
+    try {
+        $edit_event = $epic_event_scheduling->getEventById($edit_id);
+        if ($edit_event) {
+            $edit_mode = true;
+        }
+    } catch (Exception $e) {
+        $error = 'Gagal memuat data event: ' . $e->getMessage();
+    }
+}
 
 // Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_event') {
-    // Validate input
-    if (empty($_POST['title'])) {
-        $error = 'Event title is required.';
-    } elseif (empty($_POST['category_id'])) {
-        $error = 'Event category is required.';
-    } elseif (empty($_POST['start_time']) || empty($_POST['end_time'])) {
-        $error = 'Start time and end time are required.';
-    } elseif (empty($_POST['access_levels']) || !is_array($_POST['access_levels'])) {
-        $error = 'At least one access level must be selected.';
-    } else {
-        // Validate date logic
-        $start_time = strtotime($_POST['start_time']);
-        $end_time = strtotime($_POST['end_time']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $error = '';
+    $success = '';
+    
+    try {
+        // Determine action type
+        $action = $_POST['action'];
+        $is_draft = ($action === 'save_draft');
         
-        if ($start_time === false || $end_time === false) {
-            $error = 'Invalid date format.';
-        } elseif ($end_time <= $start_time) {
-            $error = 'End time must be after start time.';
-        } else {
-            // Format datetime properly for database
-            $start_time = epic_sanitize($_POST['start_time']);
-            $end_time = epic_sanitize($_POST['end_time']);
-            
-            // Convert datetime-local format to MySQL datetime format
-            if (strpos($start_time, 'T') !== false) {
-                $start_time = str_replace('T', ' ', $start_time) . ':00';
-            }
-            if (strpos($end_time, 'T') !== false) {
-                $end_time = str_replace('T', ' ', $end_time) . ':00';
+        // Validate required fields (less strict for draft)
+        if (!$is_draft) {
+            if (empty($_POST['title'])) {
+                throw new Exception('Judul event wajib diisi');
             }
             
-            $result = $epic_event_scheduling->createEvent([
-                'category_id' => intval($_POST['category_id']),
-                'title' => epic_sanitize($_POST['title']),
-                'description' => epic_sanitize($_POST['description']),
-                'location' => epic_sanitize($_POST['location']),
-                'start_time' => $start_time,
-                'end_time' => $end_time,
-                'max_participants' => !empty($_POST['max_participants']) ? intval($_POST['max_participants']) : null,
-                'registration_required' => isset($_POST['registration_required']) ? 1 : 0,
-                'access_levels' => $_POST['access_levels'],
-                'status' => epic_sanitize($_POST['status']) ?: 'draft',
-                'event_url' => epic_sanitize($_POST['event_url']),
-                'notes' => epic_sanitize($_POST['notes']),
-                'created_by' => epic_get_current_user_id()
-            ]);
+            if (empty($_POST['category_id'])) {
+                throw new Exception('Kategori event wajib dipilih');
+            }
             
-            if ($result) {
-                // Redirect back to event scheduling page with success message
-                $success_type = ($_POST['status'] === 'draft') ? 'event_draft_saved' : 'event_created';
-                header('Location: ' . epic_url('admin/event-scheduling?success=' . $success_type));
-                exit;
-            } else {
-                $error = 'Failed to create event. Please check that the category exists and all required fields are filled correctly.';
+            if (empty($_POST['start_time'])) {
+                throw new Exception('Waktu mulai wajib diisi');
+            }
+            
+            if (empty($_POST['end_time'])) {
+                throw new Exception('Waktu berakhir wajib diisi');
+            }
+            
+            // Validate time format and logic
+            if (strtotime($_POST['start_time']) >= strtotime($_POST['end_time'])) {
+                throw new Exception('Waktu mulai harus lebih awal dari waktu berakhir');
             }
         }
+        
+        // Sanitize and prepare data
+        $event_data = [
+            'title' => epic_sanitize($_POST['title'] ?? ''),
+            'description' => epic_sanitize($_POST['description'] ?? ''),
+            'category_id' => !empty($_POST['category_id']) ? intval($_POST['category_id']) : null,
+            'start_time' => $_POST['start_time'] ?? null,
+            'end_time' => $_POST['end_time'] ?? null,
+            'location' => epic_sanitize($_POST['location'] ?? ''),
+            'max_participants' => intval($_POST['max_participants'] ?? 0),
+            'registration_deadline' => $_POST['registration_deadline'] ?? null,
+            'is_public' => isset($_POST['is_public']) ? 1 : 0,
+            'requires_approval' => isset($_POST['requires_approval']) ? 1 : 0,
+            'is_draft' => $is_draft ? 1 : 0,
+            'access_levels' => $_POST['access_levels'] ?? ['free', 'epic', 'epis'],
+            'created_by' => $user['id']
+        ];
+        
+        // Check if this is edit mode
+        if (isset($_POST['event_id']) && !empty($_POST['event_id'])) {
+            // Update existing event
+            $event_data['id'] = intval($_POST['event_id']);
+            $result = $epic_event_scheduling->updateEvent($event_data);
+        } else {
+            // Create new event
+            $result = $epic_event_scheduling->createEvent($event_data);
+        }
+        
+        if ($result['success']) {
+            if ($is_draft) {
+                $success = 'Draft berhasil disimpan dengan ID: ' . $result['event_id'];
+            } else {
+                $success = 'Event berhasil dibuat dengan ID: ' . $result['event_id'];
+            }
+        } else {
+            $error = $result['message'] ?? ($is_draft ? 'Gagal menyimpan draft' : 'Gagal membuat event');
+        }
+        
+    } catch (Exception $e) {
+        $error = $e->getMessage();
     }
 }
 
 // Get categories for dropdown
-$categories = $epic_event_scheduling->getEventCategories();
+try {
+    $categories = $epic_event_scheduling->getEventCategories();
+    if (empty($categories)) {
+        $error = 'Tidak ada kategori event yang tersedia. Silakan buat kategori terlebih dahulu.';
+    }
+} catch (Exception $e) {
+    $error = 'Gagal memuat kategori event: ' . $e->getMessage();
+    $categories = [];
+}
 
 // Use admin layout system
 require_once __DIR__ . '/../themes/modern/admin/layout-helper.php';
 
 // Prepare layout data
 $layout_data = [
-    'page_title' => 'Add New Event - EPIC Hub Admin',
-    'header_title' => 'Add New Event',
+    'page_title' => ($edit_mode ? 'Edit Event' : 'Add New Event') . ' - EPIC Hub Admin',
+    'header_title' => $edit_mode ? 'Edit Event' : 'Add New Event',
     'current_page' => 'manage',
     'breadcrumb' => [
         ['text' => 'Admin', 'url' => epic_url('admin')],
         ['text' => 'Manage', 'url' => '#'],
         ['text' => 'Event Scheduling', 'url' => epic_url('admin/event-scheduling')],
-        ['text' => 'Add New Event']
+        ['text' => $edit_mode ? 'Edit Event' : 'Add New Event']
     ],
     'categories' => $categories,
-    'error' => $error ?? null
+    'edit_mode' => $edit_mode,
+    'edit_event' => $edit_event,
+    'error' => $error ?? '',
+    'success' => $success ?? ''
 ];
 
 // Render admin page
-epic_render_admin_page(__DIR__ . '/../themes/modern/admin/content/event-scheduling-add-content.php', $layout_data);
+try {
+    epic_render_admin_page(__DIR__ . '/../themes/modern/admin/content/event-scheduling-add-content.php', $layout_data);
+} catch (Exception $e) {
+    // Fallback error display
+    echo '<div style="padding: 20px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin: 20px;">';
+    echo '<h3>Error</h3>';
+    echo '<p>Gagal memuat halaman: ' . htmlspecialchars($e->getMessage()) . '</p>';
+    echo '<p><a href="' . epic_url('admin/event-scheduling') . '">Kembali ke Event Scheduling</a></p>';
+    echo '</div>';
+}
 ?>

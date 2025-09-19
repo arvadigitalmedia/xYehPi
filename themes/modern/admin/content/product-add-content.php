@@ -309,7 +309,7 @@
                         <?php
                         // Get available instructors
                         try {
-                            $instructors = db()->select("SELECT id, name FROM epic_users WHERE role IN ('admin', 'super_admin') ORDER BY name") ?: [];
+                            $instructors = db()->select("SELECT id, name FROM users WHERE role IN ('admin', 'super_admin') ORDER BY name") ?: [];
                             foreach ($instructors as $instructor) {
                                 $selected = ($form_data['instructor_id'] ?? '') == $instructor['id'] ? 'selected' : '';
                                 echo "<option value='{$instructor['id']}' {$selected}>" . htmlspecialchars($instructor['name']) . "</option>";

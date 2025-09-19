@@ -236,17 +236,24 @@ class AdminInterface {
                 this.closeMobileMenu();
             }
         });
+        
+        // Close mobile menu when clicking backdrop
+        document.addEventListener('click', (e) => {
+            if (this.mobileMenuOpen && e.target === document.body) {
+                this.closeMobileMenu();
+            }
+        });
     }
     
     toggleMobileMenu() {
         this.mobileMenuOpen = !this.mobileMenuOpen;
-        this.sidebar.classList.toggle('open', this.mobileMenuOpen);
+        this.sidebar.classList.toggle('mobile-open', this.mobileMenuOpen);
         document.body.classList.toggle('mobile-menu-open', this.mobileMenuOpen);
     }
     
     closeMobileMenu() {
         this.mobileMenuOpen = false;
-        this.sidebar.classList.remove('open');
+        this.sidebar.classList.remove('mobile-open');
         document.body.classList.remove('mobile-menu-open');
     }
     

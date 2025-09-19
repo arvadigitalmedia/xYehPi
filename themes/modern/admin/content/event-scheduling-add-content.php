@@ -18,10 +18,10 @@ extract($layout_data);
     <div class="page-header-content">
         <div class="page-header-left">
             <h1 class="page-title">
-                <i data-feather="plus-circle" class="page-title-icon"></i>
-                Add New Event
+                <i data-feather="<?= $edit_mode ? 'edit' : 'plus-circle' ?>" class="page-title-icon"></i>
+                <?= $edit_mode ? 'Edit Event' : 'Add New Event' ?>
             </h1>
-            <p class="page-description">Create a new event for member information and scheduling</p>
+            <p class="page-description"><?= $edit_mode ? 'Update event information and scheduling' : 'Create a new event for member information and scheduling' ?></p>
         </div>
         <div class="page-header-right">
             <a href="<?= epic_url('admin/event-scheduling') ?>" class="btn btn-secondary">
@@ -32,8 +32,16 @@ extract($layout_data);
     </div>
 </div>
 
+<!-- Success Alert -->
+<?php if (isset($success) && !empty($success)): ?>
+<div class="alert alert-success">
+    <i data-feather="check-circle" width="16" height="16"></i>
+    <?= htmlspecialchars($success) ?>
+</div>
+<?php endif; ?>
+
 <!-- Error Alert -->
-<?php if (isset($error)): ?>
+<?php if (isset($error) && !empty($error)): ?>
 <div class="alert alert-danger">
     <i data-feather="alert-circle" width="16" height="16"></i>
     <?= htmlspecialchars($error) ?>
@@ -52,6 +60,9 @@ extract($layout_data);
     <div class="settings-card-body">
         <form method="POST" action="<?= epic_url('admin/event-scheduling-add') ?>" class="event-form">
             <input type="hidden" name="action" value="create_event">
+            <?php if ($edit_mode && $edit_event): ?>
+                <input type="hidden" name="event_id" value="<?= $edit_event['id'] ?>">
+            <?php endif; ?>
             
             <!-- Basic Information -->
             <div class="form-section">
@@ -64,7 +75,8 @@ extract($layout_data);
                     <div class="form-group">
                         <label for="title" class="form-label required">Event Title</label>
                         <input type="text" id="title" name="title" class="form-control" required 
-                               placeholder="Enter event title" maxlength="200">
+                               placeholder="Enter event title" maxlength="200"
+                               value="<?= $edit_mode && $edit_event ? htmlspecialchars($edit_event['title']) : '' ?>">
                         <small class="form-help">A clear and descriptive title for your event</small>
                     </div>
                 </div>
@@ -73,7 +85,7 @@ extract($layout_data);
                     <div class="form-group">
                         <label for="description" class="form-label">Description</label>
                         <textarea id="description" name="description" class="form-control" rows="4" 
-                                  placeholder="Describe your event in detail..."></textarea>
+                                  placeholder="Describe your event in detail..."><?= $edit_mode && $edit_event ? htmlspecialchars($edit_event['description']) : '' ?></textarea>
                         <small class="form-help">Provide detailed information about the event content and objectives</small>
                     </div>
                 </div>
@@ -85,7 +97,8 @@ extract($layout_data);
                             <option value="">Select a category</option>
                             <?php foreach ($categories as $category): ?>
                                 <option value="<?= $category['id'] ?>" 
-                                        data-color="<?= htmlspecialchars($category['color']) ?>">
+                                        data-color="<?= htmlspecialchars($category['color']) ?>"
+                                        <?= ($edit_mode && $edit_event && $edit_event['category_id'] == $category['id']) ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($category['name']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -96,7 +109,8 @@ extract($layout_data);
                     <div class="form-group">
                         <label for="location" class="form-label">Location</label>
                         <input type="text" id="location" name="location" class="form-control" 
-                               placeholder="e.g., Online via Zoom, Jakarta Convention Center">
+                               placeholder="e.g., Online via Zoom, Jakarta Convention Center"
+                               value="<?= $edit_mode && $edit_event ? htmlspecialchars($edit_event['location']) : '' ?>">
                         <small class="form-help">Where the event will take place (online or physical location)</small>
                     </div>
                 </div>
@@ -112,13 +126,15 @@ extract($layout_data);
                 <div class="form-row">
                     <div class="form-group">
                         <label for="start_time" class="form-label required">Start Date & Time</label>
-                        <input type="datetime-local" id="start_time" name="start_time" class="form-control" required>
+                        <input type="datetime-local" id="start_time" name="start_time" class="form-control" required
+                               value="<?= $edit_mode && $edit_event && $edit_event['start_time'] ? date('Y-m-d\TH:i', strtotime($edit_event['start_time'])) : '' ?>">
                         <small class="form-help">When the event will begin</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="end_time" class="form-label required">End Date & Time</label>
-                        <input type="datetime-local" id="end_time" name="end_time" class="form-control" required>
+                        <input type="datetime-local" id="end_time" name="end_time" class="form-control" required
+                               value="<?= $edit_mode && $edit_event && $edit_event['end_time'] ? date('Y-m-d\TH:i', strtotime($edit_event['end_time'])) : '' ?>">
                         <small class="form-help">When the event will end</small>
                     </div>
                 </div>
@@ -137,7 +153,15 @@ extract($layout_data);
                         <div class="access-level-grid">
                             <div class="access-level-card">
                                 <div class="access-level-header">
-                                    <input type="checkbox" id="access_free" name="access_levels[]" value="free" checked>
+                                    <input type="checkbox" id="access_free" name="access_levels[]" value="free" 
+                                           <?php 
+                                           if ($edit_mode && $edit_event) {
+                                               $access_levels = json_decode($edit_event['access_levels'], true) ?: [];
+                                               echo in_array('free', $access_levels) ? 'checked' : '';
+                                           } else {
+                                               echo 'checked';
+                                           }
+                                           ?>>
                                     <label for="access_free" class="access-level-label">
                                         <div class="access-level-icon free">
                                             <i data-feather="users" width="20" height="20"></i>
@@ -152,7 +176,13 @@ extract($layout_data);
                             
                             <div class="access-level-card">
                                 <div class="access-level-header">
-                                    <input type="checkbox" id="access_epic" name="access_levels[]" value="epic">
+                                    <input type="checkbox" id="access_epic" name="access_levels[]" value="epic"
+                                           <?php 
+                                           if ($edit_mode && $edit_event) {
+                                               $access_levels = json_decode($edit_event['access_levels'], true) ?: [];
+                                               echo in_array('epic', $access_levels) ? 'checked' : '';
+                                           }
+                                           ?>>
                                     <label for="access_epic" class="access-level-label">
                                         <div class="access-level-icon epic">
                                             <i data-feather="star" width="20" height="20"></i>
@@ -167,7 +197,13 @@ extract($layout_data);
                             
                             <div class="access-level-card">
                                 <div class="access-level-header">
-                                    <input type="checkbox" id="access_epis" name="access_levels[]" value="epis">
+                                    <input type="checkbox" id="access_epis" name="access_levels[]" value="epis"
+                                           <?php 
+                                           if ($edit_mode && $edit_event) {
+                                               $access_levels = json_decode($edit_event['access_levels'], true) ?: [];
+                                               echo in_array('epis', $access_levels) ? 'checked' : '';
+                                           }
+                                           ?>>
                                     <label for="access_epis" class="access-level-label">
                                         <div class="access-level-icon epis">
                                             <i data-feather="crown" width="20" height="20"></i>
@@ -196,7 +232,8 @@ extract($layout_data);
                     <div class="form-group">
                         <label for="max_participants" class="form-label">Maximum Participants</label>
                         <input type="number" id="max_participants" name="max_participants" class="form-control" 
-                               min="1" max="1000" placeholder="Leave empty for unlimited">
+                               min="1" max="1000" placeholder="Leave empty for unlimited"
+                               value="<?= $edit_mode && $edit_event && $edit_event['max_participants'] ? $edit_event['max_participants'] : '' ?>">
                         <small class="form-help">Maximum number of participants (leave empty for unlimited)</small>
                     </div>
                     
@@ -207,7 +244,8 @@ extract($layout_data);
                     <div class="form-group">
                         <label for="event_url" class="form-label">Event URL</label>
                         <input type="url" id="event_url" name="event_url" class="form-control" 
-                               placeholder="https://zoom.us/j/123456789 or meeting link">
+                               placeholder="https://zoom.us/j/123456789 or meeting link"
+                               value="<?= $edit_mode && $edit_event ? htmlspecialchars($edit_event['event_url']) : '' ?>">
                         <small class="form-help">Link to join the event (Zoom, Google Meet, etc.)</small>
                     </div>
                 </div>
@@ -215,7 +253,8 @@ extract($layout_data);
                 <div class="form-row">
                     <div class="form-group">
                         <div class="form-checkbox">
-                            <input type="checkbox" id="registration_required" name="registration_required" value="1">
+                            <input type="checkbox" id="registration_required" name="registration_required" value="1"
+                                   <?= $edit_mode && $edit_event && $edit_event['registration_required'] ? 'checked' : '' ?>>
                             <label for="registration_required" class="checkbox-label">
                                 <span class="checkbox-indicator"></span>
                                 <span class="checkbox-text">Require Registration</span>
@@ -229,7 +268,7 @@ extract($layout_data);
                     <div class="form-group">
                         <label for="notes" class="form-label">Admin Notes</label>
                         <textarea id="notes" name="notes" class="form-control" rows="3" 
-                                  placeholder="Internal notes for admin use only..."></textarea>
+                                  placeholder="Internal notes for admin use only..."><?= $edit_mode && $edit_event ? htmlspecialchars($edit_event['notes']) : '' ?></textarea>
                         <small class="form-help">Private notes visible only to administrators</small>
                     </div>
                 </div>
@@ -242,8 +281,8 @@ extract($layout_data);
                     Simpan Draft
                 </button>
                 <button type="button" id="create-event-btn" class="btn btn-primary">
-                    <i data-feather="check-circle" width="16" height="16"></i>
-                    Create Event
+                    <i data-feather="<?= $edit_mode ? 'save' : 'check-circle' ?>" width="16" height="16"></i>
+                    <?= $edit_mode ? 'Update Event' : 'Create Event' ?>
                 </button>
                 <a href="<?= epic_url('admin/event-scheduling') ?>" class="btn btn-outline">
                     <i data-feather="x" width="16" height="16"></i>
@@ -640,35 +679,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // Save Draft button handler
     saveDraftBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        submitForm('draft');
+        submitForm('save_draft');
     });
     
     // Create Event button handler
     createEventBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        submitForm('published');
+        submitForm('create_event');
     });
     
     // Form submission function
-    function submitForm(status) {
+    function submitForm(action) {
         validateTimes();
         validateAccessLevels();
         
-        if (!form.checkValidity()) {
+        // For draft, skip some validations
+        if (action === 'save_draft') {
+            // Remove required attributes temporarily for draft
+            const requiredFields = form.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                field.removeAttribute('required');
+            });
+        }
+        
+        if (!form.checkValidity() && action !== 'save_draft') {
             form.classList.add('was-validated');
             return;
         }
-        
-        // Create hidden input for status
-        let statusInput = document.getElementById('hidden-status');
-        if (!statusInput) {
-            statusInput = document.createElement('input');
-            statusInput.type = 'hidden';
-            statusInput.id = 'hidden-status';
-            statusInput.name = 'status';
-            form.appendChild(statusInput);
-        }
-        statusInput.value = status;
         
         // Create hidden input for action
         let actionInput = document.getElementById('hidden-action');
@@ -679,13 +716,13 @@ document.addEventListener('DOMContentLoaded', function() {
             actionInput.name = 'action';
             form.appendChild(actionInput);
         }
-        actionInput.value = 'create_event';
+        actionInput.value = action;
         
         // Show loading state
-        const clickedBtn = status === 'draft' ? saveDraftBtn : createEventBtn;
+        const clickedBtn = action === 'save_draft' ? saveDraftBtn : createEventBtn;
         const originalText = clickedBtn.innerHTML;
         clickedBtn.disabled = true;
-        clickedBtn.innerHTML = '<i data-feather="loader" width="16" height="16" class="animate-spin"></i> ' + (status === 'draft' ? 'Menyimpan...' : 'Membuat...');
+        clickedBtn.innerHTML = '<i data-feather="loader" width="16" height="16" class="animate-spin"></i> ' + (action === 'save_draft' ? 'Menyimpan...' : 'Membuat...');
         
         // Replace feather icons
         if (window.feather) {

@@ -17,7 +17,38 @@ class EpicZoomIntegration {
     public function __construct() {
         global $epic_db;
         $this->db = $epic_db;
+        
+        // Validate database connection before proceeding
+        if (!$this->validateDatabaseConnection()) {
+            error_log('Zoom Integration: Database connection validation failed');
+            return;
+        }
+        
         $this->loadZoomCredentials();
+    }
+    
+    /**
+     * Validate database connection
+     */
+    private function validateDatabaseConnection() {
+        try {
+            if (!$this->db) {
+                error_log('Zoom Integration: Database object not available');
+                return false;
+            }
+            
+            // Test connection with simple query
+            $stmt = $this->db->query("SELECT 1");
+            if (!$stmt) {
+                error_log('Zoom Integration: Database connection test failed');
+                return false;
+            }
+            
+            return true;
+        } catch (Exception $e) {
+            error_log('Zoom Integration: Database validation error - ' . $e->getMessage());
+            return false;
+        }
     }
     
     /**
@@ -27,35 +58,56 @@ class EpicZoomIntegration {
         try {
             // Check if database connection exists
             if (!$this->db) {
-                error_log('Database connection not available for Zoom integration');
+                error_log('Zoom Integration: Database connection not available for credential loading');
+                $this->setDefaultCredentials();
                 return;
             }
             
             // Check if zoom settings table exists
             $stmt = $this->db->prepare("SHOW TABLES LIKE 'epic_zoom_settings'");
+            if (!$stmt) {
+                error_log('Zoom Integration: Failed to check zoom_settings table existence');
+                $this->setDefaultCredentials();
+                return;
+            }
+            
             $stmt->execute();
             if ($stmt->rowCount() == 0) {
                 // Table doesn't exist yet, use default empty values
-                $this->zoom_api_key = '';
-                $this->zoom_api_secret = '';
-                $this->zoom_account_id = '';
+                error_log('Zoom Integration: zoom_settings table not found, using default values');
+                $this->setDefaultCredentials();
                 return;
             }
             
             $stmt = $this->db->prepare("SELECT setting_key, setting_value FROM epic_zoom_settings WHERE setting_key IN ('zoom_api_key', 'zoom_api_secret', 'zoom_account_id')");
+            if (!$stmt) {
+                error_log('Zoom Integration: Failed to prepare credentials query');
+                $this->setDefaultCredentials();
+                return;
+            }
+            
             $stmt->execute();
             $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
             
             $this->zoom_api_key = $settings['zoom_api_key'] ?? '';
             $this->zoom_api_secret = $settings['zoom_api_secret'] ?? '';
             $this->zoom_account_id = $settings['zoom_account_id'] ?? '';
+            
+            error_log('Zoom Integration: Credentials loaded successfully');
+            
         } catch (Exception $e) {
-            error_log('Failed to load Zoom credentials: ' . $e->getMessage());
-            // Set default empty values on error
-            $this->zoom_api_key = '';
-            $this->zoom_api_secret = '';
-            $this->zoom_account_id = '';
+            error_log('Zoom Integration: Failed to load credentials - ' . $e->getMessage());
+            $this->setDefaultCredentials();
         }
+    }
+    
+    /**
+     * Set default empty credentials
+     */
+    private function setDefaultCredentials() {
+        $this->zoom_api_key = '';
+        $this->zoom_api_secret = '';
+        $this->zoom_account_id = '';
     }
     
     /**

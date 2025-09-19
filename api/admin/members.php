@@ -81,12 +81,12 @@ function handleCheckDuplicate() {
         
         // Check for duplicates with specific checks
         $email_duplicate = db()->selectValue(
-            "SELECT id FROM epic_users WHERE email = ? LIMIT 1",
+            "SELECT id FROM users WHERE email = ? LIMIT 1",
             [$email]
         );
         
         $phone_duplicate = db()->selectValue(
-            "SELECT id FROM epic_users WHERE phone = ? LIMIT 1",
+            "SELECT id FROM users WHERE phone = ? LIMIT 1",
             [$phone]
         );
         
@@ -146,7 +146,7 @@ function handleAddMember() {
         
         // Check sponsor exists
         $sponsor = db()->selectOne(
-            "SELECT id, name FROM epic_users WHERE id = ? OR referral_code = ?",
+            "SELECT id, name FROM users WHERE id = ? OR referral_code = ?",
             [$data['sponsor_id'], $data['sponsor_id']]
         );
         
@@ -170,7 +170,7 @@ function handleAddMember() {
         
         try {
             // Insert new member
-            $member_id = db()->insert('epic_users', [
+            $member_id = db()->insert('users', [
                 'name' => $data['full_name'],
                 'email' => $data['email'],
                 'phone' => $data['whatsapp'],
@@ -320,7 +320,7 @@ function generateReferralCode($name) {
     do {
         $code = $base . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
         $exists = db()->selectValue(
-            "SELECT id FROM epic_users WHERE referral_code = ?",
+            "SELECT id FROM users WHERE referral_code = ?",
             [$code]
         );
         $attempts++;

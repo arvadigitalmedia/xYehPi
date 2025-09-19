@@ -84,7 +84,23 @@ $dashboard_member_submenu = [
             <span class="sidebar-nav-text">Edit Profile</span>
         </a>
         
-        <!-- 3. Manage -->
+        <!-- 3. Dashboard Member -->
+        <div class="sidebar-nav-group">
+            <div class="sidebar-nav-item sidebar-nav-parent <?= shouldExpandSubmenu($dashboard_member_submenu, $current_url) ? 'expanded' : '' ?>" onclick="toggleSubmenu(this)">
+                <i data-feather="users" class="sidebar-nav-icon"></i>
+                <span class="sidebar-nav-text">Dashboard Member</span>
+                <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
+            </div>
+            <div class="sidebar-submenu <?= shouldExpandSubmenu($dashboard_member_submenu, $current_url) ? 'show' : '' ?>">
+                <?php foreach ($dashboard_member_submenu as $item): ?>
+                    <a href="<?= epic_url($item['path']) ?>" class="sidebar-submenu-item <?= isMenuActive($item['path'], $current_url) ? 'active' : '' ?>">
+                        <span class="sidebar-submenu-text"><?= $item['text'] ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        
+        <!-- 4. Manage -->
         <div class="sidebar-nav-group">
             <div class="sidebar-nav-item sidebar-nav-parent <?= shouldExpandSubmenu($manage_submenu, $current_url) ? 'expanded' : '' ?>" onclick="toggleSubmenu(this)">
                 <i data-feather="settings" class="sidebar-nav-icon"></i>
@@ -99,12 +115,6 @@ $dashboard_member_submenu = [
                 <?php endforeach; ?>
             </div>
         </div>
-        
-        <!-- 4. Settings -->
-        <a href="<?= epic_url('admin/settings/general') ?>" class="sidebar-nav-item <?= isMenuActive('/admin/settings', $current_url) ? 'active' : '' ?>">
-            <i data-feather="sliders" class="sidebar-nav-icon"></i>
-            <span class="sidebar-nav-text">Settings</span>
-        </a>
         
         <!-- 5. Integrasi -->
         <div class="sidebar-nav-group">
@@ -122,26 +132,16 @@ $dashboard_member_submenu = [
             </div>
         </div>
         
-        <!-- 6. Dashboard Member -->
-        <div class="sidebar-nav-group">
-            <div class="sidebar-nav-item sidebar-nav-parent <?= shouldExpandSubmenu($dashboard_member_submenu, $current_url) ? 'expanded' : '' ?>" onclick="toggleSubmenu(this)">
-                <i data-feather="users" class="sidebar-nav-icon"></i>
-                <span class="sidebar-nav-text">Dashboard Member</span>
-                <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
-            </div>
-            <div class="sidebar-submenu <?= shouldExpandSubmenu($dashboard_member_submenu, $current_url) ? 'show' : '' ?>">
-                <?php foreach ($dashboard_member_submenu as $item): ?>
-                    <a href="<?= epic_url($item['path']) ?>" class="sidebar-submenu-item <?= isMenuActive($item['path'], $current_url) ? 'active' : '' ?>">
-                        <span class="sidebar-submenu-text"><?= $item['text'] ?></span>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        
-        <!-- 7. Blog -->
+        <!-- 6. Blog -->
         <a href="<?= epic_url('admin/blog') ?>" class="sidebar-nav-item <?= isMenuActive('/admin/blog', $current_url) ? 'active' : '' ?>">
             <i data-feather="edit-3" class="sidebar-nav-icon"></i>
             <span class="sidebar-nav-text">Blog</span>
+        </a>
+        
+        <!-- 7. Settings -->
+        <a href="<?= epic_url('admin/settings/general') ?>" class="sidebar-nav-item <?= isMenuActive('/admin/settings', $current_url) ? 'active' : '' ?>">
+            <i data-feather="sliders" class="sidebar-nav-icon"></i>
+            <span class="sidebar-nav-text">Settings</span>
         </a>
         
 

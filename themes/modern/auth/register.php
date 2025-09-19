@@ -669,6 +669,11 @@ if ($referral_code) {
             
             <!-- Registration Form -->
             <form method="POST" action="<?= epic_url('register') ?>" class="space-y-6" id="registerForm">
+                <?php 
+                // Add CSRF protection
+                require_once EPIC_ROOT . '/core/csrf-protection.php';
+                echo epic_csrf_field('register');
+                ?>
                 <input type="hidden" name="referral_code" value="<?= htmlspecialchars($referral_code) ?>">
                 
                 <!-- Full Name Field -->
@@ -1034,6 +1039,150 @@ if ($referral_code) {
     </div>
     
     <script>
+        // Auto-load referral data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for referral code in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            
+            if (refCode && !document.querySelector('.referrer-card')) {
+                // Auto-load referral data if not already loaded
+                checkReferralCode(refCode, true);
+            }
+            
+            // Set referral cookie for future visits
+            if (refCode) {
+                setReferralCookie(refCode);
+            }
+        });
+        
+        // Check referral code function
+        async function checkReferralCode(code, isAutoLoad = false) {
+            if (!code || code.trim() === '') {
+                if (!isAutoLoad) {
+                    showMessage('Masukkan kode referral terlebih dahulu', 'error');
+                }
+                return;
+            }
+            
+            try {
+                // Show loading state
+                const checkBtn = document.querySelector('.referral-form button[type="submit"]');
+                if (checkBtn && !isAutoLoad) {
+                    checkBtn.disabled = true;
+                    checkBtn.innerHTML = '<svg class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Checking...';
+                }
+                
+                // Make AJAX request to validate referral
+                const response = await fetch('<?= epic_url("api/check-referral") ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ referral_code: code.trim() })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.referrer) {
+                    // Set referral cookie
+                    setReferralCookie(code, result.referrer.name);
+                    
+                    // Reload page with referral parameter to show referrer info
+                    if (!isAutoLoad) {
+                        window.location.href = '<?= epic_url("register") ?>?ref=' + encodeURIComponent(code.trim());
+                    }
+                } else {
+                    if (!isAutoLoad) {
+                        showMessage(result.message || 'Kode referral tidak valid atau tidak memenuhi syarat', 'error');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error checking referral:', error);
+                if (!isAutoLoad) {
+                    showMessage('Terjadi kesalahan saat memvalidasi kode referral', 'error');
+                }
+            } finally {
+                // Reset button state
+                const checkBtn = document.querySelector('.referral-form button[type="submit"]');
+                if (checkBtn && !isAutoLoad) {
+                    checkBtn.disabled = false;
+                    checkBtn.innerHTML = 'Cek';
+                }
+            }
+        }
+        
+        // Set referral cookie
+        function setReferralCookie(code, name = '') {
+            const cookieData = {
+                code: code,
+                name: name,
+                timestamp: Date.now(),
+                ip: '<?= $_SERVER["REMOTE_ADDR"] ?? "unknown" ?>'
+            };
+            
+            const cookieValue = btoa(JSON.stringify(cookieData));
+            const expireDate = new Date();
+            expireDate.setTime(expireDate.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
+            
+            document.cookie = `epic_referral=${cookieValue}; expires=${expireDate.toUTCString()}; path=/; SameSite=Lax`;
+            document.cookie = `epic_ref_code=${code}; expires=${expireDate.toUTCString()}; path=/; SameSite=Lax`;
+            document.cookie = `epic_ref_name=${name}; expires=${expireDate.toUTCString()}; path=/; SameSite=Lax`;
+        }
+        
+        // Show message function
+        function showMessage(message, type = 'info') {
+            // Remove existing messages
+            const existingMessages = document.querySelectorAll('.temp-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `temp-message mb-4 p-4 rounded-lg border ${
+                type === 'error' 
+                    ? 'bg-red-500 bg-opacity-20 border-red-500 border-opacity-30 text-red-300' 
+                    : 'bg-blue-500 bg-opacity-20 border-blue-500 border-opacity-30 text-blue-300'
+            }`;
+            
+            messageDiv.innerHTML = `
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        ${type === 'error' 
+                            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
+                            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
+                        }
+                    </svg>
+                    <span class="text-sm">${message}</span>
+                </div>
+            `;
+            
+            // Insert before form
+            const form = document.getElementById('registerForm');
+            if (form) {
+                form.parentNode.insertBefore(messageDiv, form);
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.remove();
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Handle referral form submission
+        document.addEventListener('submit', function(e) {
+            if (e.target.classList.contains('referral-form')) {
+                e.preventDefault();
+                const input = e.target.querySelector('input[name="ref"]');
+                if (input) {
+                    checkReferralCode(input.value);
+                }
+            }
+        });
+        
         // Toggle password visibility
         function togglePassword(fieldId) {
             const passwordInput = document.getElementById(fieldId);
