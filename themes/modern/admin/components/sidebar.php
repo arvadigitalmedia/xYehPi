@@ -143,7 +143,11 @@ $dashboard_member_submenu = [
             <span class="sidebar-nav-text">Settings</span>
         </a>
         
-
+        <!-- 8. Dashboard Monitoring EPIS -->
+        <a href="<?= epic_url('admin/epis-monitoring-dashboard') ?>" class="sidebar-nav-item <?= isMenuActive('/admin/epis-monitoring-dashboard', $current_url) ? 'active' : '' ?>">
+            <i data-feather="monitor" class="sidebar-nav-icon"></i>
+            <span class="sidebar-nav-text">Monitoring EPIS</span>
+        </a>
         
         <!-- Separator -->
         <div class="sidebar-separator"></div>

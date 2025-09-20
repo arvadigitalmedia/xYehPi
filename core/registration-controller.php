@@ -91,10 +91,6 @@ class EpicRegistrationController {
      */
     private function handleRegistrationSubmission() {
         try {
-            // Rate limiting for registration
-            require_once EPIC_ROOT . '/core/rate-limiter.php';
-            epic_check_registration_rate_limit();
-            
             // CSRF Protection dan validasi input
             require_once EPIC_ROOT . '/core/csrf-protection.php';
             
@@ -105,6 +101,10 @@ class EpicRegistrationController {
                 $this->handleValidationErrors($validation['errors']);
                 return;
             }
+            
+            // Enhanced rate limiting with email protection
+            require_once EPIC_ROOT . '/core/rate-limiter.php';
+            epic_check_enhanced_registration_rate_limit($validation['data']['email'] ?? null);
             
             // Process successful registration
             $this->processRegistration($validation['data']);

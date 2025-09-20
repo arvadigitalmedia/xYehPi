@@ -370,18 +370,15 @@ function epic_get_registration_validation_rules() {
         'password' => [
             'required' => true,
             'type' => 'string',
-            'min_length' => 8,
+            'min_length' => 6,
             'max_length' => 255,
             'required_message' => 'Password wajib diisi',
-            'min_length_message' => 'Password minimal 8 karakter',
+            'min_length_message' => 'Password minimal 6 karakter',
             'max_length_message' => 'Password maksimal 255 karakter',
             'custom' => function($password) {
-                // Password strength validation
-                if (!preg_match('/[A-Z]/', $password)) {
-                    return 'Password harus mengandung minimal 1 huruf besar';
-                }
-                if (!preg_match('/[a-z]/', $password)) {
-                    return 'Password harus mengandung minimal 1 huruf kecil';
+                // Basic password validation - at least one letter and one number
+                if (!preg_match('/[a-zA-Z]/', $password)) {
+                    return 'Password harus mengandung minimal 1 huruf';
                 }
                 if (!preg_match('/[0-9]/', $password)) {
                     return 'Password harus mengandung minimal 1 angka';

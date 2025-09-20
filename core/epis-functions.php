@@ -169,6 +169,9 @@ function epic_get_all_epis_accounts($filters = []) {
  * Add EPIC user to EPIS network
  */
 function epic_add_to_epis_network($epis_id, $epic_user_id, $recruitment_type = 'direct', $recruited_by_epic_id = null) {
+    // START DATABASE TRANSACTION - CRITICAL SECTION
+    db()->beginTransaction();
+    
     try {
         // Validate EPIS account
         $epis = epic_get_epis_account($epis_id);
@@ -217,7 +220,7 @@ function epic_add_to_epis_network($epis_id, $epic_user_id, $recruitment_type = '
         }
         
         // Update EPIC user supervisor
-        db()->update('epic_users', 
+        $update_user_result = db()->update('epic_users', 
             [
                 'epis_supervisor_id' => $epis_id,
                 'supervisor_locked' => true,
@@ -227,19 +230,33 @@ function epic_add_to_epis_network($epis_id, $epic_user_id, $recruitment_type = '
             [$epic_user_id]
         );
         
-        // Update EPIS current count
-        db()->query(
-            "UPDATE epic_epis_accounts SET current_epic_count = current_epic_count + 1 WHERE user_id = ?",
+        if (!$update_user_result) {
+            throw new Exception('Failed to update EPIC user supervisor assignment');
+        }
+        
+        // Update EPIS current count (atomic within transaction)
+        $update_count_result = db()->query(
+            "UPDATE epic_epis_accounts SET current_epic_count = current_epic_count + 1, updated_at = NOW() WHERE user_id = ? AND status = 'active'",
             [$epis_id]
         );
+        
+        if (!$update_count_result) {
+            throw new Exception("Failed to update EPIS counter for user ID: {$epis_id}");
+        }
         
         // Log activity
         epic_log_activity($epis_id, 'epic_added_to_network', "EPIC user {$epic_user['name']} added to network");
         epic_log_activity($epic_user_id, 'assigned_to_epis', "Assigned to EPIS {$epis['name']}");
         
+        // COMMIT TRANSACTION - All operations successful
+        db()->commit();
+        
         return $network_id;
         
     } catch (Exception $e) {
+        // ROLLBACK TRANSACTION - Something went wrong
+        db()->rollback();
+        
         error_log("EPIS Network Addition Error: " . $e->getMessage());
         throw $e;
     }

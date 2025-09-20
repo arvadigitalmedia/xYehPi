@@ -168,10 +168,21 @@ function epic_admin_route($segments) {
             epic_admin_member_area($segments);
             break;
             
+        case 'epis-monitoring-dashboard':
+            epic_admin_epis_monitoring_dashboard();
+            break;
+            
         default:
             epic_route_404();
             break;
     }
+}
+
+/**
+ * EPIS Monitoring Dashboard
+ */
+function epic_admin_epis_monitoring_dashboard() {
+    include __DIR__ . '/../admin/epis-monitoring-dashboard.php';
 }
 
 /**

@@ -251,8 +251,11 @@ function epic_route_resend_confirmation() {
 }
 
 function epic_route_dashboard($segments) {
+    $page = $segments[1] ?? 'home';
+    
+    // Load dashboard controller
     require_once EPIC_CORE_DIR . '/dashboard.php';
-    epic_handle_dashboard_route($segments);
+    epic_dashboard_route($page, array_slice($segments, 2));
 }
 
 function epic_route_products($segments) {
@@ -260,18 +263,33 @@ function epic_route_products($segments) {
 }
 
 function epic_route_order($segments) {
+    if (!isset($segments[1])) {
+        epic_route_404();
+        return;
+    }
+    
+    $product = epic_get_product_by_slug($segments[1]);
+    
+    if (!$product) {
+        epic_route_404();
+        return;
+    }
+    
+    // Load order controller
     require_once EPIC_CORE_DIR . '/order.php';
-    epic_handle_order_route($segments);
+    epic_order_process($product);
 }
 
 function epic_route_articles($segments) {
+    // Load articles controller
     require_once EPIC_CORE_DIR . '/articles.php';
-    epic_handle_articles_route($segments);
+    epic_articles_route($segments);
 }
 
 function epic_route_blog($segments) {
+    // Load blog controller
     require_once EPIC_CORE_DIR . '/blog.php';
-    epic_handle_blog_route($segments);
+    epic_blog_route($segments);
 }
 
 function epic_route_admin($segments) {

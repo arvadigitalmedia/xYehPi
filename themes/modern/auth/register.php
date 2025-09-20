@@ -22,9 +22,7 @@ if (epic_is_logged_in()) {
     epic_redirect(epic_url('dashboard'));
 }
 
-// Get available EPIS supervisors
-$available_epis = epic_get_available_epis_supervisors();
-$epis_required = epic_setting('epis_registration_required', '1') === '1';
+// EPIC Supervisor functionality removed - simplified registration
 
 // Form fields are now hardcoded in template for better performance
 
@@ -60,13 +58,6 @@ if ($require_referral && empty($referral_code)) {
 if ($referral_code) {
     $referrer = epic_get_referrer_info($referral_code);
     if ($referrer) {
-        // Get EPIS network count if EPIS supervisor exists
-        $epis_network_count = 0;
-        if ($referrer['epis_supervisor_id']) {
-            $network_stats = epic_get_epis_network_stats($referrer['epis_supervisor_id']);
-            $epis_network_count = $network_stats['total_network'] ?? 0;
-        }
-        
         $referrer_info = [
             'id' => $referrer['id'],
             'name' => $referrer['name'],
@@ -75,14 +66,7 @@ if ($referral_code) {
             'status' => $referrer['status'],
             'role' => $referrer['role'],
             'tracking_source' => $tracking ? $tracking['source'] : 'url',
-            'tracking_time' => $tracking ? date('d/m/Y H:i', $tracking['timestamp']) : date('d/m/Y H:i'),
-            // EPIS Supervisor data
-            'epis_supervisor_id' => $referrer['epis_supervisor_id'] ?? null,
-            'epis_supervisor_name' => $referrer['epis_supervisor_name'] ?? null,
-            'epis_supervisor_email' => $referrer['epis_supervisor_email'] ?? null,
-            'epis_code' => $referrer['epis_code'] ?? null,
-            'territory_name' => $referrer['territory_name'] ?? null,
-            'epis_network_count' => $epis_network_count
+            'tracking_time' => $tracking ? date('d/m/Y H:i', $tracking['timestamp']) : date('d/m/Y H:i')
         ];
     } else {
         // Invalid referral code or not eligible
@@ -575,7 +559,6 @@ if ($referral_code) {
                 echo epic_csrf_field('register');
                 ?>
                 <input type="hidden" name="referral_code" value="<?= htmlspecialchars($referral_code) ?>">
-                <input type="hidden" name="epis_supervisor_id" id="episSupervisorId" value="<?= htmlspecialchars($referrer_info['epis_supervisor_id'] ?? '') ?>">
                 
                 <!-- Full Name Field -->
                 <div>
@@ -684,9 +667,9 @@ if ($referral_code) {
                                id="password" 
                                name="password" 
                                required 
-                               minlength="8"
+                               minlength="6"
                                class="w-full pl-10 pr-12 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
-                               placeholder="Buat password untuk login"
+                               placeholder="Minimal 6 karakter, harus ada huruf dan angka"
                                oninput="checkPasswordStrength()">
                         <button type="button" 
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -740,63 +723,7 @@ if ($referral_code) {
                 
 
                 
-                <!-- EPIC Supervisor Field (Locked) -->
-                <?php if ($referrer_info && !empty($referrer_info['epis_supervisor_id'])): ?>
-                <div class="epic-supervisor-field">
-                    <label class="block text-sm font-medium text-white text-opacity-90 mb-2">
-                        EPIC Supervisor *
-                    </label>
-                    <div class="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg p-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
-                                <div class="flex items-center mb-2">
-                                    <svg class="w-5 h-5 text-green-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <span class="text-white font-medium"><?= htmlspecialchars($referrer_info['epis_supervisor_name']) ?></span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <p class="text-white text-opacity-60">EPIS Code</p>
-                                        <p class="text-white font-mono"><?= htmlspecialchars($referrer_info['epis_code']) ?></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-white text-opacity-60">Territory</p>
-                                        <p class="text-white"><?= htmlspecialchars($referrer_info['territory_name']) ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="ml-4">
-                                <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="mt-3 pt-3 border-t border-white border-opacity-10">
-                            <div class="flex items-center text-xs text-white text-opacity-60">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span>Data EPIS terkunci otomatis dari EPIC Account referral</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php elseif ($epis_required): ?>
-                <div class="epic-supervisor-field">
-                    <label class="block text-sm font-medium text-white text-opacity-90 mb-2">
-                        EPIC Supervisor *
-                    </label>
-                    <div class="bg-red-500 bg-opacity-20 border border-red-500 border-opacity-30 rounded-lg p-4">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-red-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span class="text-red-300 text-sm">EPIS Supervisor diperlukan. Gunakan kode referral yang valid dari EPIC Account.</span>
-                        </div>
-                    </div>
-                </div>
-                <?php endif; ?>
+                <!-- EPIC Supervisor field removed - simplified registration -->
                 
                 <!-- Terms & Conditions -->
                 <div class="flex items-start">
@@ -927,26 +854,26 @@ if ($referral_code) {
                                     <span class="text-white font-bold text-lg"><?= strtoupper(substr($referrer_info['name'], 0, 2)) ?></span>
                                 </div>
                                 <div class="flex-1">
+                                    <p class="text-white text-opacity-60 text-xs mb-1">Nama Pereferal:</p>
                                     <p class="font-semibold text-white text-lg"><?= htmlspecialchars($referrer_info['name']) ?></p>
-                                    <p class="text-sm text-white text-opacity-70">Kode Referral: <?= htmlspecialchars($referral_code) ?></p>
-                                    <div class="flex items-center mt-1">
-                                        <span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                                        <span class="text-xs text-green-300 font-medium">EPI Channel Authorized</span>
-                                    </div>
+                                    <p class="text-sm text-white text-opacity-70 mt-1">Kode Referral: <?= htmlspecialchars($referral_code) ?></p>
                                 </div>
                             </div>
                             
-                            <!-- Data EPIS Account -->
-                            <div class="grid grid-cols-2 gap-3 text-xs">
-                                <div class="bg-white bg-opacity-5 rounded p-2">
-                                    <p class="text-white text-opacity-60 mb-1">Nama EPIS Account</p>
-                                    <p class="text-white font-medium"><?= htmlspecialchars($referrer_info['epis_supervisor_name'] ?? 'Tidak ada EPIS Supervisor') ?></p>
-                                    <p class="text-white text-opacity-60 text-xs mt-1">Territory: <?= htmlspecialchars($referrer_info['territory_name'] ?? 'Tidak ditentukan') ?></p>
-                                </div>
-                                <div class="bg-white bg-opacity-5 rounded p-2">
-                                    <p class="text-white text-opacity-60 mb-1">ID EPIS Account</p>
-                                    <p class="font-mono text-white font-medium"><?= htmlspecialchars($referrer_info['epis_code'] ?? 'N/A') ?></p>
-                                    <p class="text-white text-opacity-60 text-xs mt-1">Network: <?= number_format($referrer_info['epis_network_count'] ?? 0) ?> EPIC</p>
+                            <!-- Status Information -->
+                            <div class="bg-white bg-opacity-5 rounded p-3">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-white text-opacity-60 text-xs mb-1">Status:</p>
+                                        <div class="flex items-center">
+                                            <span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                                            <span class="text-green-300 font-medium">EPI Channel Authorized</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-white text-opacity-60 text-xs mb-1">Tracking:</p>
+                                        <p class="text-white text-opacity-80 text-xs"><?= $referrer_info['tracking_time'] ?></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1041,9 +968,6 @@ if ($referral_code) {
                     // Set referral cookie
                     setReferralCookie(code, result.referrer.name);
                     
-                    // Auto-fill EPIS supervisor data
-                    updateEpisSupervisorField(result.referrer);
-                    
                     // Reload page with referral parameter to show referrer info
                     if (!isAutoLoad) {
                         window.location.href = '<?= epic_url("register") ?>?ref=' + encodeURIComponent(code.trim());
@@ -1087,72 +1011,7 @@ if ($referral_code) {
             document.cookie = `epic_ref_name=${name}; expires=${expireDate.toUTCString()}; path=/; SameSite=Lax`;
         }
         
-        // Update EPIS Supervisor field with auto-filled data
-        function updateEpisSupervisorField(referrerData) {
-            // Update hidden field
-            const episSupervisorIdField = document.getElementById('episSupervisorId');
-            if (episSupervisorIdField && referrerData.epis_supervisor_id) {
-                episSupervisorIdField.value = referrerData.epis_supervisor_id;
-            }
-            
-            // Create or update EPIS supervisor display field
-            const existingField = document.querySelector('.epic-supervisor-field');
-            if (existingField) {
-                existingField.remove();
-            }
-            
-            if (referrerData.epis_supervisor_id && referrerData.epis_supervisor_name) {
-                // Create new EPIS supervisor field
-                const supervisorFieldHTML = `
-                    <div class="epic-supervisor-field">
-                        <label class="block text-sm font-medium text-white text-opacity-90 mb-2">
-                            EPIC Supervisor *
-                        </label>
-                        <div class="bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="flex-1">
-                                    <div class="flex items-center mb-2">
-                                        <svg class="w-5 h-5 text-green-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        <span class="text-white font-medium">${referrerData.epis_supervisor_name}</span>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-4 text-sm">
-                                        <div>
-                                            <p class="text-white text-opacity-60">EPIS Code</p>
-                                            <p class="text-white font-mono">${referrerData.epis_code || 'N/A'}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-white text-opacity-60">Territory</p>
-                                            <p class="text-white">${referrerData.territory_name || 'Tidak ditentukan'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="ml-4">
-                                    <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="mt-3 pt-3 border-t border-white border-opacity-10">
-                                <div class="flex items-center text-xs text-white text-opacity-60">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <span>Data EPIS terkunci otomatis dari EPIC Account referral</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Insert before terms & conditions
-                const termsField = document.querySelector('div:has(input[name="terms"])');
-                if (termsField) {
-                    termsField.insertAdjacentHTML('beforebegin', supervisorFieldHTML);
-                }
-            }
-        }
+        // EPIC Supervisor functionality removed - simplified registration
         
         // Show message function
         function showMessage(message, type = 'info') {
@@ -1235,26 +1094,34 @@ if ($referral_code) {
             let strength = 0;
             let feedback = '';
             
+            // Basic requirements check
+            const hasLetter = /[a-zA-Z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const minLength = password.length >= 6;
+            
             // Length check
-            if (password.length >= 8) strength++;
-            if (password.length >= 12) strength++;
+            if (password.length >= 6) strength++;
+            if (password.length >= 10) strength++;
             
             // Character variety checks
-            if (/[a-z]/.test(password)) strength++;
+            if (hasLetter) strength++;
+            if (hasNumber) strength++;
             if (/[A-Z]/.test(password)) strength++;
-            if (/[0-9]/.test(password)) strength++;
             if (/[^A-Za-z0-9]/.test(password)) strength++;
             
             // Update meter and text
             meter.className = 'strength-meter rounded-full';
             
-            if (strength <= 2) {
+            if (!minLength) {
                 meter.classList.add('strength-weak');
-                feedback = 'Password masih lemah';
-            } else if (strength <= 4) {
+                feedback = 'Minimal 6 karakter';
+            } else if (!hasLetter || !hasNumber) {
+                meter.classList.add('strength-weak');
+                feedback = 'Perlu huruf dan angka';
+            } else if (strength <= 3) {
                 meter.classList.add('strength-fair');
-                feedback = 'Password standar';
-            } else if (strength <= 5) {
+                feedback = 'Password memenuhi syarat';
+            } else if (strength <= 4) {
                 meter.classList.add('strength-good');
                 feedback = 'Password cukup kuat';
             } else {
@@ -1359,15 +1226,7 @@ if ($referral_code) {
                 return;
             }
             
-            // Validate EPIS supervisor if required
-            <?php if ($epis_required): ?>
-            const episSupervisorId = document.getElementById('episSupervisorId').value;
-            if (!episSupervisorId || episSupervisorId === '') {
-                e.preventDefault();
-                showMessage('EPIS Supervisor diperlukan. Silakan gunakan kode referral yang valid dari EPIC Account.', 'error');
-                return;
-            }
-            <?php endif; ?>
+            // Additional frontend validation can be added here if needed
             
             const btn = document.getElementById('registerBtn');
             const btnText = document.getElementById('registerBtnText');

@@ -24,11 +24,7 @@ $form_data = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // RATE LIMITING - Prevent registration spam
-        require_once EPIC_ROOT . '/core/rate-limiter.php';
-        epic_check_registration_rate_limit();
-        
-        // Get form data
+        // Get form data first
         $name = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $phone = trim($_POST['phone'] ?? '');
@@ -38,6 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $terms = isset($_POST['terms']);
         $marketing = isset($_POST['marketing']);
         $referral_code = trim($_POST['referral_code'] ?? '');
+        
+        // ENHANCED RATE LIMITING - Multi-layer protection
+        require_once EPIC_ROOT . '/core/rate-limiter.php';
+        epic_check_enhanced_registration_rate_limit($email);
         
         // Store form data for repopulation
         $form_data = [

@@ -59,6 +59,25 @@ if (file_exists(EPIC_ROOT . '/.env')) {
     }
 }
 
+// Define MAILKETING constants with fallbacks
+if (!defined('MAILKETING_FROM_NAME')) {
+    define('MAILKETING_FROM_NAME', defined('EPIC_MAIL_FROM_NAME') ? EPIC_MAIL_FROM_NAME : 'EPIC Hub');
+}
+if (!defined('MAILKETING_FROM_EMAIL')) {
+    define('MAILKETING_FROM_EMAIL', defined('EPIC_MAIL_FROM_EMAIL') ? EPIC_MAIL_FROM_EMAIL : 'noreply@epichub.local');
+}
+
+// Define REDIS constants with fallbacks
+if (!defined('REDIS_HOST')) {
+    define('REDIS_HOST', '127.0.0.1');
+}
+if (!defined('REDIS_PORT')) {
+    define('REDIS_PORT', 6379);
+}
+if (!defined('REDIS_PASSWORD')) {
+    define('REDIS_PASSWORD', '');
+}
+
 // Load configuration
 if (file_exists(EPIC_CONFIG_DIR . '/config.php')) {
     require_once EPIC_CONFIG_DIR . '/config.php';

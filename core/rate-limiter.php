@@ -8,23 +8,39 @@
  */
 
 class EpicRateLimiter {
-    private $redis;
-    private $use_redis;
+    /** @var Redis|null */
+    private $redis = null;
+    /** @var bool */
+    private $use_redis = false;
+    /** @var string */
     private $table_name = 'epi_rate_limits';
     
     public function __construct() {
         // Try to use Redis if available, fallback to database
-        $this->use_redis = extension_loaded('redis') && defined('REDIS_HOST');
+        $this->use_redis = extension_loaded('redis') && defined('REDIS_HOST') && class_exists('Redis');
         
         if ($this->use_redis) {
             try {
                 $this->redis = new Redis();
-                $this->redis->connect(REDIS_HOST ?? 'localhost', REDIS_PORT ?? 6379);
-                if (defined('REDIS_PASSWORD') && REDIS_PASSWORD) {
-                    $this->redis->auth(REDIS_PASSWORD);
+                $connection_result = $this->redis->connect(REDIS_HOST, (int)REDIS_PORT);
+                
+                if (!$connection_result) {
+                    throw new Exception('Failed to connect to Redis server');
                 }
+                
+                if (defined('REDIS_PASSWORD') && !empty(REDIS_PASSWORD)) {
+                    $auth_result = $this->redis->auth(REDIS_PASSWORD);
+                    if (!$auth_result) {
+                        throw new Exception('Redis authentication failed');
+                    }
+                }
+                
+                // Test Redis connection
+                $this->redis->ping();
+                
             } catch (Exception $e) {
                 $this->use_redis = false;
+                $this->redis = null;
                 error_log("Redis connection failed, falling back to database: " . $e->getMessage());
             }
         }
@@ -57,6 +73,11 @@ class EpicRateLimiter {
      * Redis-based rate limiting (preferred)
      */
     private function checkLimitRedis($key, $limit, $window, $current_time) {
+        // Ensure Redis is available
+        if ($this->redis === null) {
+            throw new Exception('Redis connection is not available');
+        }
+        
         try {
             // Use sliding window with Redis sorted sets
             $this->redis->zRemRangeByScore($key, 0, $current_time - $window);
@@ -316,4 +337,136 @@ function epic_check_api_rate_limit($action = 'api', $limit = 60, $window = 60) {
     }
     
     return $result;
+}
+
+/**
+ * Enhanced registration rate limit with multiple layers
+ */
+function epic_check_enhanced_registration_rate_limit($email = null) {
+    $limiter = new EpicRateLimiter();
+    $ip = EpicRateLimiter::getClientIdentifier();
+    
+    // Layer 1: IP-based rate limiting (5 attempts per hour)
+    $ip_result = $limiter->checkLimit('registration_ip', $ip, 5, 3600);
+    
+    if (!$ip_result['allowed']) {
+        $minutes = ceil($ip_result['retry_after'] / 60);
+        
+        epic_log_error('warning', 'IP registration rate limit exceeded', [
+            'ip' => $ip,
+            'remaining' => $ip_result['remaining'],
+            'retry_after' => $ip_result['retry_after']
+        ]);
+        
+        throw new Exception("Too many registration attempts from this IP. Please try again in {$minutes} minutes.");
+    }
+    
+    // Layer 2: Email-based rate limiting (3 attempts per hour)
+    if ($email) {
+        $email_hash = md5(strtolower(trim($email)));
+        $email_result = $limiter->checkLimit('registration_email', $email_hash, 3, 3600);
+        
+        if (!$email_result['allowed']) {
+            $minutes = ceil($email_result['retry_after'] / 60);
+            
+            epic_log_error('warning', 'Email registration rate limit exceeded', [
+                'email_hash' => $email_hash,
+                'remaining' => $email_result['remaining'],
+                'retry_after' => $email_result['retry_after']
+            ]);
+            
+            throw new Exception("Too many registration attempts with this email. Please try again in {$minutes} minutes.");
+        }
+    }
+    
+    // Layer 3: Device fingerprint rate limiting (10 attempts per day)
+    $device_fingerprint = epic_get_device_fingerprint();
+    if ($device_fingerprint) {
+        $device_result = $limiter->checkLimit('registration_device', $device_fingerprint, 10, 86400);
+        
+        if (!$device_result['allowed']) {
+            $hours = ceil($device_result['retry_after'] / 3600);
+            
+            epic_log_error('warning', 'Device registration rate limit exceeded', [
+                'device_fingerprint' => substr($device_fingerprint, 0, 8) . '...',
+                'remaining' => $device_result['remaining'],
+                'retry_after' => $device_result['retry_after']
+            ]);
+            
+            throw new Exception("Too many registration attempts from this device. Please try again in {$hours} hours.");
+        }
+    }
+    
+    // Send most restrictive headers
+    $most_restrictive = $ip_result;
+    if ($email && isset($email_result) && $email_result['remaining'] < $most_restrictive['remaining']) {
+        $most_restrictive = $email_result;
+    }
+    if ($device_fingerprint && isset($device_result) && $device_result['remaining'] < $most_restrictive['remaining']) {
+        $most_restrictive = $device_result;
+    }
+    
+    EpicRateLimiter::sendRateLimitHeaders($most_restrictive);
+    
+    return $most_restrictive;
+}
+
+/**
+ * Generate device fingerprint based on browser characteristics
+ */
+function epic_get_device_fingerprint() {
+    $components = [
+        $_SERVER['HTTP_USER_AGENT'] ?? '',
+        $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '',
+        $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '',
+        $_SERVER['HTTP_ACCEPT'] ?? '',
+        // Don't include screen resolution or timezone as they can change
+    ];
+    
+    $fingerprint = implode('|', $components);
+    return hash('sha256', $fingerprint);
+}
+
+/**
+ * Enhanced API rate limiting with burst protection
+ */
+function epic_check_enhanced_api_rate_limit($action = 'api', $limit = 60, $window = 60, $burst_limit = 10, $burst_window = 10) {
+    $limiter = new EpicRateLimiter();
+    $identifier = EpicRateLimiter::getClientIdentifier();
+    
+    // Check burst limit first (short window, low limit)
+    $burst_result = $limiter->checkLimit("{$action}_burst", $identifier, $burst_limit, $burst_window);
+    
+    if (!$burst_result['allowed']) {
+        epic_log_error('warning', 'API burst rate limit exceeded', [
+            'action' => $action,
+            'identifier' => $identifier,
+            'burst_limit' => $burst_limit,
+            'burst_window' => $burst_window
+        ]);
+        
+        throw new Exception("Too many requests. Please slow down.");
+    }
+    
+    // Check normal rate limit (longer window, higher limit)
+    $normal_result = $limiter->checkLimit($action, $identifier, $limit, $window);
+    
+    if (!$normal_result['allowed']) {
+        $minutes = ceil($normal_result['retry_after'] / 60);
+        
+        epic_log_error('warning', 'API rate limit exceeded', [
+            'action' => $action,
+            'identifier' => $identifier,
+            'limit' => $limit,
+            'window' => $window
+        ]);
+        
+        throw new Exception("Rate limit exceeded. Please try again in {$minutes} minutes.");
+    }
+    
+    // Send headers for the most restrictive limit
+    $most_restrictive = ($burst_result['remaining'] < $normal_result['remaining']) ? $burst_result : $normal_result;
+    EpicRateLimiter::sendRateLimitHeaders($most_restrictive);
+    
+    return $most_restrictive;
 }
