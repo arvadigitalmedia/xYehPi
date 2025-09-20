@@ -100,12 +100,7 @@ if (!$is_localhost) {
                     throw new Exception('Gagal menyimpan konfigurasi');
                 }
 
-                // Test Zoom Integration
-                require_once __DIR__ . '/bootstrap.php';
-                require_once __DIR__ . '/core/zoom-integration.php';
-
-                $zoom = new EpicZoomIntegration();
-                echo '<div class="alert alert-success">✅ Zoom Integration berhasil diinisialisasi!</div>';
+                // Zoom Integration removed
 
                 echo '<div class="info-box">';
                 echo '<h3>🎉 Setup Berhasil!</h3>';
@@ -113,7 +108,7 @@ if (!$is_localhost) {
                 echo '<ol>';
                 echo '<li>Hapus file setup-cpanel.php untuk keamanan</li>';
                 echo '<li>Akses halaman admin: <a href="' . $site_url . '/admin">' . $site_url . '/admin</a></li>';
-                echo '<li>Setup Zoom API credentials di halaman admin</li>';
+                echo '<li>Setup API credentials di halaman admin</li>';
                 echo '</ol>';
                 echo '</div>';
 

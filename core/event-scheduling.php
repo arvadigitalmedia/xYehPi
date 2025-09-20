@@ -171,11 +171,7 @@ class EpicEventScheduling {
             $stmt->execute([$id]);
             $schedule_count = $stmt->fetchColumn();
             
-            $stmt = $this->db->prepare("SELECT COUNT(*) FROM epic_zoom_events WHERE category_id = ?");
-            $stmt->execute([$id]);
-            $zoom_count = $stmt->fetchColumn();
-            
-            if ($schedule_count > 0 || $zoom_count > 0) {
+            if ($schedule_count > 0) {
                 error_log('Cannot delete category: Category has associated events');
                 return false; // Cannot delete category with events
             }

@@ -195,9 +195,7 @@ $affiliates = [
                         <a href="<?= epic_url('admin/integrasi/autoresponder-email') ?>" class="sidebar-submenu-item">
                             <span class="sidebar-submenu-text">Autoresponder Email</span>
                         </a>
-                        <a href="<?= epic_url('admin/zoom-integration') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Zoom Integration</span>
-                        </a>
+                        <!-- Zoom Integration removed -->
                     </div>
                 </div>
                 

@@ -34,10 +34,7 @@ extract($data ?? []);
             <i data-feather="send" class="settings-nav-icon"></i>
             <span>Autoresponder Email</span>
         </a>
-        <a href="<?= epic_url('admin/zoom-integration') ?>" class="settings-nav-item">
-            <i data-feather="video" class="settings-nav-icon"></i>
-            <span>Zoom Integration</span>
-        </a>
+        <!-- Zoom Integration removed -->
     </nav>
 </div>
 

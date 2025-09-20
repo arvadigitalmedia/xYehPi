@@ -852,6 +852,84 @@ function epic_route_home() {
 }
 
 function epic_route_login() {
+    // Redirect if already logged in
+    if (epic_is_logged_in()) {
+        epic_redirect(epic_get_user_redirect_url());
+    }
+    
+    $error = null;
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $email = epic_sanitize($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $remember = isset($_POST['remember']);
+        
+        if (empty($email) || empty($password)) {
+            $error = 'Email and password are required.';
+        } else {
+            $user = epic_get_user_by_email($email);
+            
+            if ($user && epic_verify_password($password, $user['password'])) {
+                if ($user['status'] === 'banned') {
+                    $error = 'Your account has been banned.';
+                } else {
+                    // Login user with error handling
+                    try {
+                        epic_login_user($user['id']);
+                        
+                        // Log activity (optional, skip if database issues)
+                        try {
+                            epic_log_activity($user['id'], 'login', 'User logged in');
+                        } catch (Exception $e) {
+                            // Silent fail for logging
+                            error_log('Login logging failed: ' . $e->getMessage());
+                        }
+                        
+                        // Determine redirect with error handling
+                        $redirect = $_GET['redirect'] ?? null;
+                        
+                        if (!$redirect) {
+                            try {
+                                $redirect_url = epic_get_user_redirect_url($user);
+                            } catch (Exception $e) {
+                                // Fallback redirect based on role
+                                if (in_array($user['role'], ['admin', 'super_admin'])) {
+                                    $redirect_url = epic_url('admin');
+                                } else {
+                                    $redirect_url = epic_url('dashboard');
+                                }
+                                error_log('Redirect URL error: ' . $e->getMessage());
+                            }
+                        } else {
+                            $redirect_url = epic_url($redirect);
+                        }
+                        
+                        // Safe redirect with JavaScript fallback
+                        if (!headers_sent()) {
+                            header('Location: ' . $redirect_url);
+                            exit;
+                        } else {
+                            echo '<script>window.location.href="' . htmlspecialchars($redirect_url) . '";</script>';
+                            echo '<noscript><meta http-equiv="refresh" content="0;url=' . htmlspecialchars($redirect_url) . '"></noscript>';
+                            exit;
+                        }
+                        
+                    } catch (Exception $e) {
+                        error_log('Login process error: ' . $e->getMessage());
+                        $error = 'Login successful but redirect failed. Please try accessing your dashboard manually.';
+                    }
+                }
+            } else {
+                $error = 'Invalid email or password.';
+            }
+        }
+    }
+    
+    $data = [
+        'page_title' => 'Login - ' . epic_setting('site_name'),
+        'error' => $error
+    ];
+    
     require_once EPIC_THEME_DIR . '/modern/auth/login.php';
 }
 

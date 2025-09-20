@@ -43,8 +43,7 @@ $manage_submenu = [
 
 // Integrasi submenu
 $integrasi_submenu = [
-    ['path' => '/admin/integrasi/autoresponder-email', 'text' => 'Autoresponder Email'],
-    ['path' => '/admin/zoom-integration', 'text' => 'Zoom Integration']
+    ['path' => '/admin/integrasi/autoresponder-email', 'text' => 'Autoresponder Email']
 ];
 
 $dashboard_member_submenu = [

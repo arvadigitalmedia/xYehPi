@@ -116,13 +116,7 @@ if (file_exists(EPIC_CORE_DIR . '/mailketing.php')) {
     require_once EPIC_CORE_DIR . '/mailketing.php';
 }
 
-// Load Zoom Integration if available
-if (file_exists(EPIC_CORE_DIR . '/zoom-integration.php')) {
-    require_once EPIC_CORE_DIR . '/zoom-integration.php';
-}
-if (file_exists(EPIC_CORE_DIR . '/zoom-routes.php')) {
-    require_once EPIC_CORE_DIR . '/zoom-routes.php';
-}
+// Zoom Integration removed
 
 // Load Event Scheduling if available
 if (file_exists(EPIC_CORE_DIR . '/event-scheduling.php')) {
