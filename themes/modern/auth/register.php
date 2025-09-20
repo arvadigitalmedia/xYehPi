@@ -517,57 +517,53 @@ if ($referral_code) {
     </div>
     
     <!-- Registration Container -->
-    <div class="w-full max-w-lg">
-        
-
+    <div class="w-full max-w-md">
         
         <!-- Registration Form -->
         <div class="glass-effect rounded-2xl p-8 shadow-2xl">
-            <!-- Logo Inside Card -->
-            <div class="text-center mb-8">
+            <!-- Logo Website -->
+            <div class="text-center mb-6">
                 <?php 
                 $site_logo = epic_setting('site_logo');
-                if ($site_logo && file_exists(EPIC_ROOT . '/uploads/logos/' . $site_logo)): 
+                if (!empty($site_logo) && file_exists(EPIC_ROOT . '/uploads/logos/' . $site_logo)): 
                 ?>
-                    <div class="inline-flex items-center justify-center mb-6">
+                    <div class="mb-4">
                         <img src="<?= epic_url('uploads/logos/' . $site_logo) ?>" 
                              alt="<?= htmlspecialchars(epic_setting('site_name', 'EPIC HUB - Bisnis Emas Perak Indonesia')) ?>" 
-                             class="h-20 w-auto">
+                             class="mx-auto" 
+                             style="max-height: 80px; max-width: 200px; object-fit: contain;">
                     </div>
                 <?php else: ?>
-                    <div class="inline-flex items-center justify-center w-20 h-20 bg-white bg-opacity-20 rounded-full mb-6">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-white bg-opacity-20 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                     </div>
                 <?php endif; ?>
-            </div>
-            
-            <div class="text-center mb-6">
                 <h2 class="text-2xl font-semibold text-white mb-2">Buat Akun Baru</h2>
-                <p class="text-white text-opacity-70">Mulai Bisnis Emas dan Perak Hari Ini</p>
+                <p class="text-white text-opacity-70">Bergabung dengan EPI Partner Network</p>
             </div>
             
             <!-- Error Message -->
             <?php if ($error): ?>
-                <div class="bg-red-500 bg-opacity-20 border border-red-500 border-opacity-30 rounded-lg p-4 mb-6 error-shake">
+                <div class="error-message rounded-lg p-4 mb-6 error-shake">
                     <div class="flex items-center">
                         <svg class="w-5 h-5 text-red-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span class="text-red-300 text-sm"><?= htmlspecialchars($error) ?></span>
+                        <span class="text-red-300 text-sm font-medium"><?= htmlspecialchars($error) ?></span>
                     </div>
                 </div>
             <?php endif; ?>
             
             <!-- Success Message -->
             <?php if ($success): ?>
-                <div class="bg-green-500 bg-opacity-20 border border-green-500 border-opacity-30 rounded-lg p-4 mb-6">
+                <div class="success-message rounded-lg p-4 mb-6">
                     <div class="flex items-center">
                         <svg class="w-5 h-5 text-green-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span class="text-green-300 text-sm"><?= htmlspecialchars($success) ?></span>
+                        <span class="text-green-300 text-sm font-medium"><?= htmlspecialchars($success) ?></span>
                     </div>
                 </div>
             <?php endif; ?>
@@ -644,12 +640,9 @@ if ($referral_code) {
                         <input type="tel" 
                                id="phone" 
                                name="phone" 
-                               required
-                               pattern="[0-9]{10,15}"
-                               class="w-full pl-10 pr-12 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
-                               placeholder="628123456789 (format internasional)"
-                               value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>"
-                               oninput="validateWhatsAppNumber(this)">
+                               class="w-full pl-10 pr-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
+                               placeholder="Masukkan nomor whatsapp aktif"
+                               value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
                         <div id="whatsappValidation" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center">
                             <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -693,7 +686,7 @@ if ($referral_code) {
                                required 
                                minlength="8"
                                class="w-full pl-10 pr-12 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
-                               placeholder="Buat password untuk login
+                               placeholder="Buat password untuk login"
                                oninput="checkPasswordStrength()">
                         <button type="button" 
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -811,8 +804,8 @@ if ($referral_code) {
                            id="terms" 
                            name="terms" 
                            required
-                           class="w-4 h-4 mt-1 text-blue-600 bg-white bg-opacity-10 border-white border-opacity-20 rounded focus:ring-blue-500 focus:ring-2">
-                    <label for="terms" class="ml-3 text-sm text-white text-opacity-80 leading-relaxed">
+                           class="w-4 h-4 mt-1 text-blue-600 bg-white bg-opacity-10 border border-white border-opacity-20 rounded focus:ring-blue-500 focus:ring-2">
+                    <label for="terms" class="ml-3 text-sm text-white text-opacity-90 leading-relaxed">
                         Saya setuju dengan 
                         <a href="#" onclick="openModal('termsModal')" class="text-blue-300 hover:text-blue-200 underline cursor-pointer">Ketentuan Layanan</a> 
                         dan 
@@ -825,8 +818,8 @@ if ($referral_code) {
                     <input type="checkbox" 
                            id="marketing" 
                            name="marketing" 
-                           class="w-4 h-4 mt-1 text-blue-600 bg-white bg-opacity-10 border-white border-opacity-20 rounded focus:ring-blue-500 focus:ring-2">
-                    <label for="marketing" class="ml-3 text-sm text-white text-opacity-80 leading-relaxed">
+                           class="w-4 h-4 mt-1 text-blue-600 bg-white bg-opacity-10 border border-white border-opacity-20 rounded focus:ring-blue-500 focus:ring-2">
+                    <label for="marketing" class="ml-3 text-sm text-white text-opacity-90 leading-relaxed">
                         Saya bersedia menerima email pemasaran tentang peluang bisnis dan pembaruan platform
                     </label>
                 </div>
@@ -847,20 +840,20 @@ if ($referral_code) {
             <div class="mt-8 mb-6">
                 <div class="relative">
                     <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-white border-opacity-20"></div>
+                        <div class="w-full border-t border-ink-600"></div>
                     </div>
                 </div>
             </div>
             
             <!-- Sudah Punya Akun Text -->
             <div class="text-center" style="margin-top: 40px; margin-bottom: 20px;">
-                <span class="text-sm text-white text-opacity-60">Sudah punya akun terdaftar?</span>
+                <span class="text-sm text-ink-300">Sudah punya akun terdaftar?</span>
             </div>
             
             <!-- Login Link -->
             <div class="text-center">
                 <a href="<?= epic_url('login') ?>" 
-                   class="inline-flex items-center justify-center w-full py-3 px-4 border border-white border-opacity-30 rounded-lg text-white text-opacity-90 hover:bg-white hover:bg-opacity-10 transition-all duration-300">
+                   class="inline-flex items-center justify-center w-full py-3 px-4 border border-ink-600 rounded-lg text-ink-100 hover:bg-surface-2 transition-all duration-300">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                     </svg>
@@ -985,13 +978,13 @@ if ($referral_code) {
         
         <!-- Footer Links -->
         <div class="text-center mt-8">
-            <div class="flex justify-center space-x-6 text-sm text-white text-opacity-60">
-                <a href="<?= epic_url() ?>" class="hover:text-opacity-100 transition-colors">Home</a>
-                <a href="<?= epic_url('about') ?>" class="hover:text-opacity-100 transition-colors">About</a>
-                <a href="<?= epic_url('contact') ?>" class="hover:text-opacity-100 transition-colors">Contact</a>
-                <a href="<?= epic_url('privacy') ?>" class="hover:text-opacity-100 transition-colors">Privacy</a>
+            <div class="flex justify-center space-x-6 text-sm text-ink-300">
+                <a href="<?= epic_url() ?>" class="hover:text-ink-100 transition-colors">Home</a>
+                <a href="<?= epic_url('about') ?>" class="hover:text-ink-100 transition-colors">About</a>
+                <a href="<?= epic_url('contact') ?>" class="hover:text-ink-100 transition-colors">Contact</a>
+                <a href="<?= epic_url('privacy') ?>" class="hover:text-ink-100 transition-colors">Privacy</a>
             </div>
-            <p class="mt-4 text-xs text-white text-opacity-50">
+            <p class="mt-4 text-xs text-ink-400">
                 © <?= date('Y') ?> EPIC HUB - Bisnis Emas Perak Indonesia. All rights reserved.
             </p>
         </div>

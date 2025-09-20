@@ -157,37 +157,198 @@ if (!empty($_GET['ref'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EPIC Account Registration - <?= epic_setting('site_name', 'EPIC Hub') ?></title>
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Custom Styles -->
     <style>
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        :root {
+            /* Gold Palette - Admin Consistent */
+            --gold-500: #CFA84E;
+            --gold-400: #DDB966;
+            --gold-300: #E6CD8B;
+            --gold-200: #F0D9A8;
+            --gold-100: #F8EDD0;
+            
+            /* Ink/Dark Palette */
+            --ink-900: #0B0B0F;
+            --ink-800: #141419;
+            --ink-700: #1D1D25;
+            --ink-600: #262732;
+            --ink-500: #3A3B47;
+            --ink-400: #52535F;
+            --ink-300: #6B6C78;
+            --ink-200: #9B9CA8;
+            --ink-100: #D1D2D9;
+            
+            /* Surface Layers */
+            --surface-1: #0F0F14;
+            --surface-2: #15161C;
+            --surface-3: #1C1D24;
+            --surface-4: #23242C;
+            
+            /* Status Colors */
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            
+            /* Gold Gradient */
+            --gradient-gold: linear-gradient(135deg, #F3E5BE 0%, #D7B965 50%, #B88A2C 100%);
+            --gradient-gold-subtle: linear-gradient(135deg, rgba(243, 229, 190, 0.1) 0%, rgba(215, 185, 101, 0.1) 50%, rgba(184, 138, 44, 0.1) 100%);
         }
         
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--ink-900) 0%, var(--ink-800) 30%, var(--ink-700) 70%, var(--surface-2) 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Elegant Gold Shimmer Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(207, 168, 78, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(221, 185, 102, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(230, 205, 139, 0.04) 0%, transparent 50%);
+            animation: shimmer 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -2;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        .glass-effect {
+            background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--ink-600);
+            box-shadow: 
+                0 8px 32px rgba(11, 11, 15, 0.3),
+                inset 0 1px 0 rgba(207, 168, 78, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-effect::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                transparent 35%,
+                rgba(255, 215, 0, 0.08) 45%,
+                rgba(255, 255, 255, 0.12) 50%,
+                rgba(192, 192, 192, 0.08) 52%,
+                rgba(255, 215, 0, 0.06) 55%,
+                transparent 65%,
+                transparent 100%
+            );
+            animation: shimmer-glow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .glass-effect > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        @keyframes shimmer-glow {
+            0% {
+                transform: translateX(-150%) translateY(-150%) rotate(45deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            25% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+                transform: translateX(0%) translateY(0%) rotate(45deg);
+            }
+            75% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateX(150%) translateY(150%) rotate(45deg);
+                opacity: 0;
+            }
         }
         
         .epic-gradient {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: var(--gradient-gold);
         }
         
         .epis-gradient {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
         
+        .input-focus:focus {
+            border-color: var(--gold-400);
+            box-shadow: 0 0 0 3px rgba(207, 168, 78, 0.15);
+            background: var(--surface-3);
+        }
+        
+        .btn-primary {
+            background: var(--gradient-gold);
+            color: var(--ink-900);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(207, 168, 78, 0.4);
+        }
+        
         .error-shake {
-            animation: shake 0.5s ease-in-out;
+            animation: shake 0.6s ease-in-out;
         }
         
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
         }
         
         .epis-card {
@@ -200,13 +361,105 @@ if (!empty($_GET['ref'])) {
         }
         
         .epis-card.selected {
-            border-color: #f093fb;
-            box-shadow: 0 0 20px rgba(240, 147, 251, 0.3);
+            border-color: var(--gold-400);
+            box-shadow: 0 0 20px rgba(207, 168, 78, 0.3);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(207, 168, 78, 0.1), rgba(221, 185, 102, 0.05));
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+            backdrop-filter: blur(2px);
+        }
+        
+        .shape:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 15%;
+            left: 8%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 55%;
+            right: 8%;
+            animation-delay: 2s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 15%;
+            left: 15%;
+            animation-delay: 4s;
+        }
+        
+        .shape:nth-child(4) {
+            width: 60px;
+            height: 60px;
+            top: 30%;
+            right: 25%;
+            animation-delay: 1s;
+        }
+        
+        .shape:nth-child(5) {
+            width: 120px;
+            height: 120px;
+            bottom: 40%;
+            right: 40%;
+            animation-delay: 3s;
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg) scale(1); 
+                opacity: 0.6;
+            }
+            33% { 
+                transform: translateY(-30px) rotate(120deg) scale(1.1); 
+                opacity: 0.8;
+            }
+            66% { 
+                transform: translateY(-15px) rotate(240deg) scale(0.9); 
+                opacity: 0.4;
+            }
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), var(--surface-3));
+            border: 1px solid var(--success);
+            backdrop-filter: blur(10px);
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), var(--surface-3));
+            border: 1px solid var(--danger);
+            backdrop-filter: blur(10px);
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen">
-    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+<body class="min-h-screen flex items-center justify-center p-4 relative">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
         <div class="max-w-4xl w-full space-y-8">
             <!-- Header -->
             <div class="text-center">
@@ -286,7 +539,7 @@ if (!empty($_GET['ref'])) {
                         
                         <!-- Error Message -->
                         <?php if ($error): ?>
-                            <div class="bg-red-500 bg-opacity-20 border border-red-500 border-opacity-30 rounded-lg p-4 mb-6 error-shake">
+                            <div class="error-message rounded-lg p-4 mb-6 error-shake">
                                 <div class="flex items-center">
                                     <svg class="w-5 h-5 text-red-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -298,7 +551,7 @@ if (!empty($_GET['ref'])) {
                         
                         <!-- Success Message -->
                         <?php if ($success): ?>
-                            <div class="bg-green-500 bg-opacity-20 border border-green-500 border-opacity-30 rounded-lg p-4 mb-6">
+                            <div class="success-message rounded-lg p-4 mb-6">
                                 <div class="flex items-center">
                                     <svg class="w-5 h-5 text-green-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -321,7 +574,7 @@ if (!empty($_GET['ref'])) {
                                     </label>
                                     <input type="text" id="name" name="name" required 
                                            value="<?= htmlspecialchars($form_data['name'] ?? '') ?>"
-                                           class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                                           class="input-focus w-full px-4 py-3 bg-surface-2 border border-ink-600 rounded-lg text-ink-100 placeholder-ink-400 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400">
                                 </div>
                                 
                                 <div>
@@ -330,7 +583,7 @@ if (!empty($_GET['ref'])) {
                                     </label>
                                     <input type="email" id="email" name="email" required 
                                            value="<?= htmlspecialchars($form_data['email'] ?? '') ?>"
-                                           class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                                           class="input-focus w-full px-4 py-3 bg-surface-2 border border-ink-600 rounded-lg text-ink-100 placeholder-ink-400 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400">
                                 </div>
                             </div>
                             
@@ -341,7 +594,7 @@ if (!empty($_GET['ref'])) {
                                 <input type="tel" id="phone" name="phone" 
                                        value="<?= htmlspecialchars($form_data['phone'] ?? '') ?>"
                                        placeholder="+62812345678"
-                                       class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                                       class="input-focus w-full px-4 py-3 bg-surface-2 border border-ink-600 rounded-lg text-ink-100 placeholder-ink-400 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400">
                             </div>
                             
                             <!-- Password Fields -->
@@ -352,7 +605,7 @@ if (!empty($_GET['ref'])) {
                                     </label>
                                     <input type="password" id="password" name="password" required 
                                            minlength="6"
-                                           class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                                           class="input-focus w-full px-4 py-3 bg-surface-2 border border-ink-600 rounded-lg text-ink-100 placeholder-ink-400 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400">
                                 </div>
                                 
                                 <div>
@@ -361,13 +614,13 @@ if (!empty($_GET['ref'])) {
                                     </label>
                                     <input type="password" id="confirm_password" name="confirm_password" required 
                                            minlength="6"
-                                           class="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                                           class="input-focus w-full px-4 py-3 bg-surface-2 border border-ink-600 rounded-lg text-ink-100 placeholder-ink-400 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400">
                                 </div>
                             </div>
                             
                             <!-- EPIS Supervisor Selection Status -->
                             <?php if ($epis_enabled && !empty($available_epis)): ?>
-                            <div id="episSelectionStatus" class="bg-yellow-500 bg-opacity-20 border border-yellow-500 border-opacity-30 rounded-lg p-4">
+                            <div id="episSelectionStatus" class="bg-warning bg-opacity-20 border border-warning border-opacity-30 rounded-lg p-4">
                                 <div class="flex items-center">
                                     <svg class="w-5 h-5 text-yellow-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
@@ -381,18 +634,18 @@ if (!empty($_GET['ref'])) {
                             <div class="space-y-4">
                                 <div class="flex items-start">
                                     <input type="checkbox" id="terms" name="terms" required 
-                                           class="mt-1 h-4 w-4 text-pink-500 focus:ring-pink-500 border-white border-opacity-30 rounded">
-                                    <label for="terms" class="ml-3 text-sm text-white text-opacity-90">
-                                        I agree to the <a href="#" class="text-pink-300 hover:text-pink-200 underline">Terms of Service</a> 
-                                        and <a href="#" class="text-pink-300 hover:text-pink-200 underline">Privacy Policy</a> *
+                                           class="mt-1 h-4 w-4 text-gold-400 focus:ring-gold-400 bg-surface-2 border border-ink-600 rounded">
+                                    <label for="terms" class="ml-3 text-sm text-ink-100">
+                                        I agree to the <a href="#" class="text-gold-400 hover:text-gold-300 underline">Terms of Service</a> 
+                                        and <a href="#" class="text-gold-400 hover:text-gold-300 underline">Privacy Policy</a> *
                                     </label>
                                 </div>
                                 
                                 <div class="flex items-start">
                                     <input type="checkbox" id="marketing" name="marketing" 
                                            <?= ($form_data['marketing'] ?? false) ? 'checked' : '' ?>
-                                           class="mt-1 h-4 w-4 text-pink-500 focus:ring-pink-500 border-white border-opacity-30 rounded">
-                                    <label for="marketing" class="ml-3 text-sm text-white text-opacity-90">
+                                           class="mt-1 h-4 w-4 text-gold-400 focus:ring-gold-400 bg-surface-2 border border-ink-600 rounded">
+                                    <label for="marketing" class="ml-3 text-sm text-ink-100">
                                         I agree to receive marketing communications and updates
                                     </label>
                                 </div>
@@ -400,9 +653,9 @@ if (!empty($_GET['ref'])) {
                             
                             <!-- Submit Button -->
                             <button type="submit" id="registerBtn" 
-                                    class="w-full epic-gradient text-white font-semibold py-4 px-6 rounded-lg hover:opacity-90 transition-opacity duration-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-transparent">
+                                    class="btn-primary w-full text-ink-900 font-semibold py-4 px-6 rounded-lg bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-500 hover:to-gold-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:ring-offset-2 focus:ring-offset-transparent">
                                 <span id="registerBtnText">Create EPIC Account</span>
-                                <svg id="registerSpinner" class="hidden animate-spin -mr-1 ml-3 h-5 w-5 text-white inline" fill="none" viewBox="0 0 24 24">
+                                <svg id="registerSpinner" class="hidden animate-spin -mr-1 ml-3 h-5 w-5 text-ink-900 inline" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
@@ -411,9 +664,9 @@ if (!empty($_GET['ref'])) {
                         
                         <!-- Login Link -->
                         <div class="text-center mt-6">
-                            <p class="text-white text-opacity-70 text-sm">
+                            <p class="text-ink-300 text-sm">
                                 Already have an account? 
-                                <a href="<?= epic_url('login') ?>" class="text-pink-300 hover:text-pink-200 font-medium">Sign in here</a>
+                                <a href="<?= epic_url('login') ?>" class="text-gold-400 hover:text-gold-300 font-medium">Sign in here</a>
                             </p>
                         </div>
                     </div>
@@ -461,7 +714,7 @@ if (!empty($_GET['ref'])) {
                         <span class="text-green-300 text-sm">EPIS supervisor selected successfully</span>
                     </div>
                 `;
-                statusDiv.className = 'bg-green-500 bg-opacity-20 border border-green-500 border-opacity-30 rounded-lg p-4';
+                statusDiv.className = 'bg-success bg-opacity-20 border border-success border-opacity-30 rounded-lg p-4';
             }
         }
         
