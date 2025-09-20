@@ -66,11 +66,22 @@ if (file_exists(EPIC_CONFIG_DIR . '/config.php')) {
     die('Configuration file not found. Please run the installer.');
 }
 
-// Load database configuration
+// Load database configuration FIRST
 if (file_exists(EPIC_CONFIG_DIR . '/database.php')) {
     require_once EPIC_CONFIG_DIR . '/database.php';
 } else {
     die('Database configuration file not found. Please run the installer.');
+}
+
+// Ensure $epic_db is available globally
+global $epic_db;
+if (!isset($epic_db) || !$epic_db) {
+    try {
+        $epic_db = db()->getConnection();
+    } catch (Exception $e) {
+        error_log('Bootstrap: Failed to initialize database connection: ' . $e->getMessage());
+        // Continue loading but log the error
+    }
 }
 
 // Load core functions
@@ -118,9 +129,14 @@ if (file_exists(EPIC_CORE_DIR . '/mailketing.php')) {
 
 // Zoom Integration removed
 
-// Load Event Scheduling if available
+// Load Event Scheduling if available (AFTER database is initialized)
 if (file_exists(EPIC_CORE_DIR . '/event-scheduling.php')) {
-    require_once EPIC_CORE_DIR . '/event-scheduling.php';
+    try {
+        require_once EPIC_CORE_DIR . '/event-scheduling.php';
+    } catch (Exception $e) {
+        error_log('Bootstrap: Failed to load event-scheduling.php: ' . $e->getMessage());
+        // Continue loading but log the error
+    }
 }
 
 // Initialize application

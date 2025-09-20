@@ -19,16 +19,32 @@ class EpicEventScheduling {
         global $epic_db;
         $this->db = $epic_db;
         
-        // Validate database connection
+        // Validate database connection with better error handling
         if (!$this->db) {
-            throw new Exception('Database connection not available');
+            // Try to initialize database connection if not available
+            try {
+                if (function_exists('db')) {
+                    $this->db = db()->getConnection();
+                    $epic_db = $this->db; // Update global variable
+                } else {
+                    error_log('EpicEventScheduling: Database function not available');
+                    throw new Exception('Database connection not available - db() function not found');
+                }
+            } catch (Exception $e) {
+                error_log('EpicEventScheduling: Failed to initialize database: ' . $e->getMessage());
+                throw new Exception('Database connection not available: ' . $e->getMessage());
+            }
         }
         
         // Test database connection
         try {
             $this->db->query('SELECT 1');
         } catch (PDOException $e) {
+            error_log('EpicEventScheduling: Database connection test failed: ' . $e->getMessage());
             throw new Exception('Database connection failed: ' . $e->getMessage());
+        } catch (Exception $e) {
+            error_log('EpicEventScheduling: Database connection error: ' . $e->getMessage());
+            throw new Exception('Database connection error: ' . $e->getMessage());
         }
     }
     
