@@ -38,13 +38,9 @@ if (!defined('EPIC_INIT')) {
                 <i data-feather="globe" class="settings-nav-icon"></i>
                 <span>General</span>
             </a>
-            <a href="<?= epic_url('admin/settings/form-registrasi') ?>" class="settings-nav-item">
-                <i data-feather="file-text" class="settings-nav-icon"></i>
-                <span>Form Registrasi</span>
-            </a>
-            <a href="<?= epic_url('admin/settings/email-notification') ?>" class="settings-nav-item">
+            <a href="<?= epic_url('admin/settings/mailketing') ?>" class="settings-nav-item">
                 <i data-feather="mail" class="settings-nav-icon"></i>
-                <span>Email Notification</span>
+                <span>Mailketing</span>
             </a>
             <a href="<?= epic_url('admin/settings/whatsapp-notification') ?>" class="settings-nav-item active">
                 <i data-feather="message-circle" class="settings-nav-icon"></i>

@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $whatsapp = trim($_POST['whatsapp'] ?? '');
         $status = trim($_POST['status'] ?? '');
         $role = trim($_POST['role'] ?? '');
+        $epis_supervisor = trim($_POST['epis_supervisor'] ?? '');
         
         // Store form data for repopulation
         $form_data = [
@@ -37,7 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'email' => $email,
             'whatsapp' => $whatsapp,
             'status' => $status,
-            'role' => $role
+            'role' => $role,
+            'epis_supervisor' => $epis_supervisor
         ];
         
         // Validation
@@ -79,6 +81,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors['role'] = 'Role pengguna tidak valid';
         }
         
+        // Validate Sponsor Code (now required for all registrations)
+        if (empty($sponsor_code)) {
+            $errors['sponsor_code'] = 'Kode Sponsor wajib diisi';
+        } elseif (strlen($sponsor_code) < 3) {
+            $errors['sponsor_code'] = 'Kode Sponsor minimal 3 karakter';
+        }
+        
+        // EPIS Supervisor will be auto-populated from sponsor data, no manual validation needed
+        
         // Check for duplicates
         if (empty($errors)) {
             // Check email duplicate
@@ -107,15 +118,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        // Check sponsor exists
+        // Check sponsor exists and get EPIS Supervisor data
+        $sponsor_data = null;
         if (empty($errors)) {
-            $sponsor = db()->selectOne(
-                "SELECT id, name FROM users WHERE referral_code = ?",
+            $sponsor_data = db()->selectOne(
+                "SELECT u.id, u.name, u.email, u.referral_code, u.status,
+                        supervisor.id as epis_supervisor_id,
+                        supervisor.name as epis_supervisor_name,
+                        supervisor.email as epis_supervisor_email
+                 FROM " . db()->table('users') . " u
+                 LEFT JOIN " . db()->table('users') . " supervisor ON u.epis_supervisor_id = supervisor.id
+                 WHERE u.referral_code = ? AND u.status IN ('active', 'epic', 'epis')",
                 [$sponsor_code]
             );
             
-            if (!$sponsor) {
-                $errors['sponsor_code'] = 'Kode Sponsor tidak ditemukan';
+            if (!$sponsor_data) {
+                $errors['sponsor_code'] = 'Kode Sponsor tidak ditemukan atau tidak aktif';
             }
         }
         
@@ -163,8 +181,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             db()->beginTransaction();
             
             try {
-                // Insert new member with auto-generated ID
-                $member_id = db()->insert('users', [
+                // Prepare insert data
+                $insert_data = [
                     'id' => $auto_sponsor_id,
                     'name' => $full_name,
                     'email' => strtolower($email),
@@ -173,10 +191,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'status' => $status,
                     'role' => $role,
                     'referral_code' => $referral_code,
-                    'sponsor_id' => $sponsor['id'],
+                    'sponsor_id' => $sponsor_data['id'],
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
-                ]);
+                ];
+                
+                // Auto-populate EPIS Supervisor from sponsor data
+                if (!empty($sponsor_data['epis_supervisor_id'])) {
+                    $insert_data['epis_supervisor_id'] = $sponsor_data['epis_supervisor_id'];
+                    $insert_data['epis_supervisor_name'] = $sponsor_data['epis_supervisor_name'];
+                }
+                
+                // Insert new member with auto-generated ID
+                $member_id = db()->insert('users', $insert_data);
                 
                 // Log activity
                 db()->insert('epic_activity_logs', [
@@ -239,8 +266,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
+<?php
+// Set current page untuk sidebar navigation
+$current_page = 'member-add';
+$current_url = $_SERVER['REQUEST_URI'] ?? '';
+?>
 <!DOCTYPE html>
-<html lang="id" x-data="{ sidebarCollapsed: false }">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -431,50 +463,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: var(--spacing-1);
         }
         
-        /* Sidebar functionality styles */
-        .sidebar-nav-parent {
-            cursor: pointer;
-            user-select: none;
-            transition: all var(--transition-fast);
+        /* Locked field styling */
+        .locked-field {
+            background-color: var(--surface-2) !important;
+            color: var(--ink-500) !important;
+            cursor: not-allowed !important;
+            opacity: 0.6;
         }
         
-        .sidebar-nav-parent:hover {
-            background-color: var(--surface-3);
+        .locked-field:focus {
+            box-shadow: none !important;
+            border-color: var(--surface-4) !important;
         }
         
-        .sidebar-nav-arrow {
-            transition: transform var(--transition-fast);
+        /* Auto-filled field styling */
+        .auto-filled {
+            background-color: var(--surface-1) !important;
+            color: var(--ink-300) !important;
+            cursor: default !important;
+            border-color: var(--surface-4) !important;
         }
         
-        .sidebar-submenu {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height var(--transition-normal);
+        /* Sponsor validation styling */
+        .sponsor-input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
         
-        .sidebar-submenu.show {
-            max-height: 300px;
+        .sponsor-validation-status {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
         }
         
-        .sidebar-submenu-item:hover {
-            background-color: var(--surface-4);
-            padding-left: calc(var(--spacing-5) + 4px);
+        .validation-icon {
+            width: 20px;
+            height: 20px;
         }
         
-        .sidebar-separator {
-            height: 1px;
-            background: var(--surface-3);
-            margin: var(--spacing-4) var(--spacing-4);
+        .validation-icon.loading {
+            color: var(--ink-400);
+            animation: spin 1s linear infinite;
         }
         
-        .sidebar-logout {
-            color: var(--danger-light) !important;
+        .validation-icon.success {
+            color: var(--success);
         }
         
-        .sidebar-logout:hover {
-            background-color: rgba(239, 68, 68, 0.1) !important;
-            color: var(--danger) !important;
+        .validation-icon.error {
+            color: var(--danger);
         }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Sponsor info box */
+        .sponsor-info {
+            margin-top: var(--spacing-3);
+            padding: var(--spacing-3);
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            border-radius: var(--radius-md);
+        }
+        
+        .sponsor-details {
+            font-size: var(--font-size-sm);
+            color: var(--success-light);
+        }
+        
+        .sponsor-details strong {
+            color: var(--success);
+        }
+        
+        /* Submit button disabled state */
+        #submit-btn:disabled {
+            background-color: var(--surface-3) !important;
+            color: var(--ink-500) !important;
+            cursor: not-allowed !important;
+            opacity: 0.6;
+        }
+        
+        #submit-btn:disabled:hover {
+            background-color: var(--surface-3) !important;
+            transform: none !important;
+        }
+        
+        /* Sidebar styles sudah ada di komponen global */
         
         /* Breadcrumb links styling */
         .topbar-breadcrumb a {
@@ -528,116 +607,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="admin-body">
     <div class="admin-layout">
         <!-- Sidebar -->
-        <aside class="admin-sidebar" :class="{ 'collapsed': sidebarCollapsed }">
-            <div class="sidebar-header">
-                <a href="<?= epic_url('admin') ?>" class="sidebar-logo">
-                    <div class="sidebar-logo-icon">EH</div>
-                    <span class="sidebar-logo-text">EPIC Hub</span>
-                </a>
-            </div>
-            
-            <nav class="sidebar-nav">
-                <!-- 1. Home -->
-                <a href="<?= epic_url('admin') ?>" class="sidebar-nav-item">
-                    <i data-feather="home" class="sidebar-nav-icon"></i>
-                    <span class="sidebar-nav-text">Home</span>
-                </a>
-                
-                <!-- 2. Edit Profile -->
-                <a href="<?= epic_url('admin/edit-profile') ?>" class="sidebar-nav-item">
-                    <i data-feather="user" class="sidebar-nav-icon"></i>
-                    <span class="sidebar-nav-text">Edit Profile</span>
-                </a>
-                
-                <!-- 3. Dashboard Member -->
-                <div class="sidebar-nav-group">
-                    <div class="sidebar-nav-item sidebar-nav-parent">
-                        <i data-feather="users" class="sidebar-nav-icon"></i>
-                        <span class="sidebar-nav-text">Dashboard Member</span>
-                        <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
-                    </div>
-                    <div class="sidebar-submenu">
-                        <a href="<?= epic_url('admin/dashboard-member/prospek') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Prospek</span>
-                        </a>
-                        <a href="<?= epic_url('admin/dashboard-member/bonus-cash') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Bonus Cash</span>
-                        </a>
-                        <a href="<?= epic_url('admin/dashboard-member/akses-produk') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Akses Produk</span>
-                        </a>
-                        <a href="<?= epic_url('admin/dashboard-member/history-order') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">History Order</span>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- 4. Manage -->
-                <div class="sidebar-nav-group">
-                    <div class="sidebar-nav-item sidebar-nav-parent expanded">
-                        <i data-feather="settings" class="sidebar-nav-icon"></i>
-                        <span class="sidebar-nav-text">Manage</span>
-                        <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
-                    </div>
-                    <div class="sidebar-submenu show">
-                        <a href="<?= epic_url('admin/manage/member') ?>" class="sidebar-submenu-item active">
-                            <span class="sidebar-submenu-text">Member</span>
-                        </a>
-                        <a href="<?= epic_url('admin/manage/order') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Order</span>
-                        </a>
-                        <a href="<?= epic_url('admin/manage/product') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Product</span>
-                        </a>
-                        <a href="<?= epic_url('admin/manage/landing-page') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Landing Page</span>
-                        </a>
-                        <a href="<?= epic_url('admin/manage/payout') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Payout</span>
-                        </a>
-                        <a href="<?= epic_url('admin/manage/finance') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Finance</span>
-                        </a>
-                        <a href="<?= epic_url('admin/manage/update-price') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Update Price</span>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- 5. Integrasi -->
-                <a href="<?= epic_url('admin/integrasi/autoresponder-email') ?>" class="sidebar-nav-item">
-                    <i data-feather="zap" class="sidebar-nav-icon"></i>
-                    <span class="sidebar-nav-text">Integrasi</span>
-                </a>
-                
-                <!-- 6. Blog -->
-                <a href="<?= epic_url('admin/blog') ?>" class="sidebar-nav-item">
-                    <i data-feather="edit-3" class="sidebar-nav-icon"></i>
-                    <span class="sidebar-nav-text">Blog</span>
-                </a>
-                
-                <!-- 7. Settings -->
-                <a href="<?= epic_url('admin/settings/general') ?>" class="sidebar-nav-item">
-                    <i data-feather="sliders" class="sidebar-nav-icon"></i>
-                    <span class="sidebar-nav-text">Settings</span>
-                </a>
-                
-                <!-- Separator -->
-                <div class="sidebar-separator"></div>
-                
-                <!-- 9. Logout -->
-                <a href="<?= epic_url('logout') ?>" class="sidebar-nav-item sidebar-logout" onclick="return confirm('Apakah Anda yakin ingin logout?')">
-                    <i data-feather="log-out" class="sidebar-nav-icon"></i>
-                    <span class="sidebar-nav-text">Logout</span>
-                </a>
-            </nav>
-            
-            <!-- Collapse Button -->
-            <button class="sidebar-collapse-btn" @click="sidebarCollapsed = !sidebarCollapsed">
-                <i data-feather="chevron-left" x-show="!sidebarCollapsed"></i>
-                <i data-feather="chevron-right" x-show="sidebarCollapsed"></i>
-            </button>
-        </aside>
+        <?php include __DIR__ . '/components/sidebar.php'; ?>
         
         <!-- Main Content -->
         <main class="admin-main">
@@ -727,17 +697,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="form-grid">
                     <div class="form-group">
                             <label for="sponsor_code" class="form-label required">Kode Sponsor</label>
-                            <input type="text" 
-                                   id="sponsor_code" 
-                                   name="sponsor_code" 
-                                   class="form-input <?= isset($errors['sponsor_code']) ? 'error' : '' ?>" 
-                                   placeholder="Masukkan kode referral sponsor"
-                                   value="<?= htmlspecialchars($form_data['sponsor_code'] ?? '') ?>"
-                                   required>
+                            <div class="sponsor-input-group">
+                                <input type="text" 
+                                       id="sponsor_code" 
+                                       name="sponsor_code" 
+                                       class="form-input <?= isset($errors['sponsor_code']) ? 'error' : '' ?>" 
+                                       placeholder="Masukkan kode referral sponsor"
+                                       value="<?= htmlspecialchars($form_data['sponsor_code'] ?? '') ?>"
+                                       required>
+                                <div class="sponsor-validation-status" id="sponsor-validation-status">
+                                    <i data-feather="loader" class="validation-icon loading" style="display: none;"></i>
+                                    <i data-feather="check-circle" class="validation-icon success" style="display: none;"></i>
+                                    <i data-feather="x-circle" class="validation-icon error" style="display: none;"></i>
+                                </div>
+                            </div>
                             <?php if (isset($errors['sponsor_code'])): ?>
                                 <div class="form-error server-error"><?= $errors['sponsor_code'] ?></div>
                             <?php endif; ?>
-                            <div class="form-help">Kode referral dari sponsor yang mengundang member ini (ID akan di-generate otomatis)</div>
+                            <div class="form-help">Kode referral dari sponsor yang mengundang member ini (wajib diisi terlebih dahulu)</div>
+                            <div class="sponsor-info" id="sponsor-info" style="display: none;">
+                                <div class="sponsor-details">
+                                    <strong>Sponsor:</strong> <span id="sponsor-name"></span><br>
+                                    <strong>Email:</strong> <span id="sponsor-email"></span><br>
+                                    <strong>Status:</strong> <span id="sponsor-status"></span>
+                                </div>
+                            </div>
                         </div>
                     
                     <div class="form-group">
@@ -745,13 +729,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="text" 
                                id="full_name" 
                                name="full_name" 
-                               class="form-input <?= isset($errors['full_name']) ? 'error' : '' ?>" 
+                               class="form-input locked-field <?= isset($errors['full_name']) ? 'error' : '' ?>" 
                                placeholder="Masukkan nama lengkap member"
                                value="<?= htmlspecialchars($form_data['full_name'] ?? '') ?>"
+                               disabled
                                required>
                         <?php if (isset($errors['full_name'])): ?>
                             <div class="form-error server-error"><?= $errors['full_name'] ?></div>
                         <?php endif; ?>
+                        <div class="form-help">Nama lengkap sesuai identitas resmi (akan aktif setelah kode sponsor valid)</div>
                     </div>
                     
                     <div class="form-group">
@@ -759,14 +745,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="email" 
                                id="email" 
                                name="email" 
-                               class="form-input <?= isset($errors['email']) ? 'error' : '' ?>" 
+                               class="form-input locked-field <?= isset($errors['email']) ? 'error' : '' ?>" 
                                placeholder="contoh@email.com"
                                value="<?= htmlspecialchars($form_data['email'] ?? '') ?>"
+                               disabled
                                required>
                         <?php if (isset($errors['email'])): ?>
                             <div class="form-error server-error"><?= $errors['email'] ?></div>
                         <?php endif; ?>
-                        <div class="form-help">Email akan digunakan untuk login dan komunikasi</div>
+                        <div class="form-help">Email akan digunakan untuk login dan komunikasi (akan aktif setelah kode sponsor valid)</div>
                     </div>
                     
                     <div class="form-group">
@@ -774,21 +761,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="tel" 
                                id="whatsapp" 
                                name="whatsapp" 
-                               class="form-input <?= isset($errors['whatsapp']) ? 'error' : '' ?>" 
+                               class="form-input locked-field <?= isset($errors['whatsapp']) ? 'error' : '' ?>" 
                                placeholder="628xxxxxxxxxx"
                                value="<?= htmlspecialchars($form_data['whatsapp'] ?? '') ?>"
+                               disabled
                                required>
                         <?php if (isset($errors['whatsapp'])): ?>
                             <div class="form-error server-error"><?= $errors['whatsapp'] ?></div>
                         <?php endif; ?>
-                        <div class="form-help">Format: 628xxxxxxxxxx (tanpa spasi atau tanda hubung)</div>
+                        <div class="form-help">Format: 628xxxxxxxxxx (akan aktif setelah kode sponsor valid)</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="status" class="form-label required">Status Member</label>
                         <select id="status" 
                                 name="status" 
-                                class="form-select <?= isset($errors['status']) ? 'error' : '' ?>" 
+                                class="form-select locked-field <?= isset($errors['status']) ? 'error' : '' ?>" 
+                                disabled
                                 required>
                             <option value="">Pilih Status Member</option>
                             <option value="pending" <?= ($form_data['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Pending - Menunggu aktivasi</option>
@@ -798,14 +787,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php if (isset($errors['status'])): ?>
                             <div class="form-error server-error"><?= $errors['status'] ?></div>
                         <?php endif; ?>
-                        <div class="form-help">Status menentukan level akses member di sistem</div>
+                        <div class="form-help">Status menentukan level akses member di sistem (akan aktif setelah kode sponsor valid)</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="role" class="form-label required">Role Pengguna</label>
                         <select id="role" 
                                 name="role" 
-                                class="form-select <?= isset($errors['role']) ? 'error' : '' ?>" 
+                                class="form-select locked-field <?= isset($errors['role']) ? 'error' : '' ?>" 
+                                disabled
                                 required>
                             <option value="">Pilih Role Pengguna</option>
                             <option value="user" <?= ($form_data['role'] ?? '') === 'user' ? 'selected' : '' ?>>User - Member biasa</option>
@@ -814,7 +804,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php if (isset($errors['role'])): ?>
                             <div class="form-error server-error"><?= $errors['role'] ?></div>
                         <?php endif; ?>
-                        <div class="form-help">Role menentukan hak akses dan fitur yang tersedia</div>
+                        <div class="form-help">Role menentukan hak akses dan fitur yang tersedia (akan aktif setelah kode sponsor valid)</div>
+                    </div>
+                    
+                    <div class="form-group epis-supervisor-group" id="epis-supervisor-group" style="display: none;">
+                        <label for="epis_supervisor_name" class="form-label">EPIS Supervisor</label>
+                        <input type="text" 
+                               id="epis_supervisor_name" 
+                               name="epis_supervisor_name" 
+                               class="form-input auto-filled <?= isset($errors['epis_supervisor_name']) ? 'error' : '' ?>" 
+                               placeholder="Akan diisi otomatis berdasarkan sponsor"
+                               value="<?= htmlspecialchars($form_data['epis_supervisor_name'] ?? '') ?>"
+                               readonly>
+                        <?php if (isset($errors['epis_supervisor_name'])): ?>
+                            <div class="form-error server-error"><?= $errors['epis_supervisor_name'] ?></div>
+                        <?php endif; ?>
+                        <div class="form-help epis-help">EPIS Supervisor akan diisi otomatis berdasarkan sponsor yang dipilih</div>
                     </div>
                 </div>
                 
@@ -823,9 +828,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <i data-feather="x" width="16" height="16"></i>
                         <span>Batal</span>
                     </a>
-                    <button type="submit" class="topbar-btn">
+                    <button type="submit" id="submit-btn" class="topbar-btn" disabled>
                         <i data-feather="save" width="16" height="16"></i>
-                        <span>Simpan Member</span>
+                        <span id="submit-text">Menunggu Validasi Sponsor</span>
                     </button>
                 </div>
             </form>
@@ -859,7 +864,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const parentText = parent?.querySelector('.sidebar-nav-text')?.textContent;
                 
                 if (parentText === 'Manage' && submenu) {
-                    submenu.classList.add('show');
+                    submenu.classList.add('expanded');
                     parent.classList.add('expanded');
                     const arrow = parent.querySelector('.sidebar-nav-arrow');
                     if (arrow) {
@@ -870,6 +875,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Initialize form validation
             initFormValidation();
+            
+            // Initialize sponsor validation system
+            initSponsorValidation();
+            
+            // Initialize EPIS Supervisor field behavior
+            initEpisSupervisorField();
         });
         
         function toggleSubmenu(element) {
@@ -878,9 +889,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (submenu && submenu.classList.contains('sidebar-submenu')) {
                 // Close other submenus
-                document.querySelectorAll('.sidebar-submenu.show').forEach(menu => {
+                document.querySelectorAll('.sidebar-submenu.expanded').forEach(menu => {
                     if (menu !== submenu) {
-                        menu.classList.remove('show');
+                        menu.classList.remove('expanded');
                         const parentArrow = menu.previousElementSibling?.querySelector('.sidebar-nav-arrow');
                         if (parentArrow) {
                             parentArrow.style.transform = 'rotate(0deg)';
@@ -890,13 +901,201 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
                 
                 // Toggle current submenu
-                submenu.classList.toggle('show');
+                submenu.classList.toggle('expanded');
                 element.classList.toggle('expanded');
                 
                 if (arrow) {
-                    arrow.style.transform = submenu.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+                    arrow.style.transform = submenu.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
                 }
             }
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('admin-sidebar');
+            const body = document.body;
+            const collapseBtn = document.querySelector('.sidebar-collapse-btn');
+            const leftIcon = collapseBtn?.querySelector('.collapse-icon-left');
+            const rightIcon = collapseBtn?.querySelector('.collapse-icon-right');
+            
+            if (sidebar && body) {
+                sidebar.classList.toggle('collapsed');
+                body.classList.toggle('sidebar-collapsed');
+                
+                // Toggle collapse button icons
+                if (leftIcon && rightIcon) {
+                    if (sidebar.classList.contains('collapsed')) {
+                        leftIcon.style.display = 'none';
+                        rightIcon.style.display = 'block';
+                    } else {
+                        leftIcon.style.display = 'block';
+                        rightIcon.style.display = 'none';
+                    }
+                }
+            }
+        }
+        
+        // Initialize sponsor validation system
+        function initSponsorValidation() {
+            const sponsorCodeInput = document.getElementById('sponsor_code');
+            const sponsorValidationStatus = document.getElementById('sponsor-validation-status');
+            const sponsorInfo = document.getElementById('sponsor-info');
+            const submitBtn = document.getElementById('submit-btn');
+            const submitText = document.getElementById('submit-text');
+            
+            // Get all locked fields
+            const lockedFields = document.querySelectorAll('.locked-field');
+            const episSupervisorGroup = document.getElementById('epis-supervisor-group');
+            const episSupervisorInput = document.getElementById('epis_supervisor_name');
+            
+            let validationTimeout;
+            let currentSponsorData = null;
+            
+            // Function to show validation status
+            function showValidationStatus(type) {
+                const icons = sponsorValidationStatus.querySelectorAll('.validation-icon');
+                icons.forEach(icon => icon.style.display = 'none');
+                
+                const targetIcon = sponsorValidationStatus.querySelector(`.validation-icon.${type}`);
+                if (targetIcon) {
+                    targetIcon.style.display = 'block';
+                }
+            }
+            
+            // Function to unlock fields
+            function unlockFields() {
+                lockedFields.forEach(field => {
+                    field.disabled = false;
+                    field.classList.remove('locked-field');
+                });
+                
+                submitBtn.disabled = false;
+                submitText.textContent = 'Simpan Member';
+            }
+            
+            // Function to lock fields
+            function lockFields() {
+                lockedFields.forEach(field => {
+                    field.disabled = true;
+                    field.classList.add('locked-field');
+                });
+                
+                submitBtn.disabled = true;
+                submitText.textContent = 'Menunggu Validasi Sponsor';
+                
+                // Hide EPIS Supervisor field
+                episSupervisorGroup.style.display = 'none';
+                episSupervisorInput.value = '';
+            }
+            
+            // Function to validate sponsor code
+            async function validateSponsorCode(code) {
+                if (!code || code.length < 3) {
+                    showValidationStatus('error');
+                    sponsorInfo.style.display = 'none';
+                    lockFields();
+                    return;
+                }
+                
+                showValidationStatus('loading');
+                
+                try {
+                    const response = await fetch('<?= epic_url("api/check-referral.php") ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ referral_code: code })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.data && data.data.sponsor) {
+                        // Sponsor valid
+                        showValidationStatus('success');
+                        currentSponsorData = data.data.sponsor;
+                        
+                        // Show sponsor info
+                        document.getElementById('sponsor-name').textContent = data.data.sponsor.name || 'N/A';
+                        document.getElementById('sponsor-email').textContent = data.data.sponsor.email || 'N/A';
+                        document.getElementById('sponsor-status').textContent = data.data.sponsor.status || 'N/A';
+                        sponsorInfo.style.display = 'block';
+                        
+                        // Auto-populate EPIS Supervisor if available
+                        if (data.data.epis_supervisor && data.data.epis_supervisor.name) {
+                            episSupervisorInput.value = data.data.epis_supervisor.name;
+                            episSupervisorGroup.style.display = 'block';
+                        } else {
+                            episSupervisorInput.value = '';
+                            episSupervisorGroup.style.display = 'none';
+                        }
+                        
+                        // Unlock other fields
+                        unlockFields();
+                        
+                    } else {
+                        // Sponsor tidak valid
+                        showValidationStatus('error');
+                        sponsorInfo.style.display = 'none';
+                        currentSponsorData = null;
+                        lockFields();
+                    }
+                    
+                } catch (error) {
+                    console.error('Error validating sponsor:', error);
+                    showValidationStatus('error');
+                    sponsorInfo.style.display = 'none';
+                    currentSponsorData = null;
+                    lockFields();
+                }
+            }
+            
+            // Event listener for sponsor code input
+            sponsorCodeInput.addEventListener('input', function() {
+                const code = this.value.trim();
+                
+                // Clear previous timeout
+                if (validationTimeout) {
+                    clearTimeout(validationTimeout);
+                }
+                
+                // Set new timeout for validation (debounce)
+                validationTimeout = setTimeout(() => {
+                    validateSponsorCode(code);
+                }, 500);
+            });
+            
+            // Initial state - lock all fields
+            lockFields();
+            
+            // If there's already a value in sponsor code, validate it
+            if (sponsorCodeInput.value.trim()) {
+                validateSponsorCode(sponsorCodeInput.value.trim());
+            }
+        }
+        
+        // Initialize EPIS Supervisor field behavior
+        function initEpisSupervisorField() {
+            const statusSelect = document.getElementById('status');
+            const episSupervisorGroup = document.getElementById('epis-supervisor-group');
+            const episSupervisorInput = document.getElementById('epis_supervisor_name');
+            
+            function updateEpisSupervisorField() {
+                const selectedStatus = statusSelect.value;
+                
+                // EPIS Supervisor field is now auto-populated based on sponsor
+                // Only show if sponsor has EPIS Supervisor data
+                if (selectedStatus === 'epic' && episSupervisorInput.value) {
+                    episSupervisorGroup.style.display = 'block';
+                } else {
+                    episSupervisorGroup.style.display = 'none';
+                }
+            }
+            
+            // Update field on status change
+            statusSelect.addEventListener('change', updateEpisSupervisorField);
+            
+            // Initialize field state
+            updateEpisSupervisorField();
         }
         
         // Initialize form validation
@@ -978,6 +1177,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 showFieldError(field, 'Nama lengkap minimal 2 karakter');
                             }
                             break;
+                            
+                        case 'epis_supervisor':
+                            const statusField = document.getElementById('status');
+                            const isEpicAccount = statusField && statusField.value === 'epic';
+                            
+                            if (isEpicAccount && !value) {
+                                isValid = false;
+                                showFieldError(field, 'EPIS Supervisor wajib diisi untuk EPIC Account');
+                            } else if (value && value.length < 3) {
+                                isValid = false;
+                                showFieldError(field, 'EPIS Supervisor minimal 3 karakter');
+                            } else if (value && value.length > 100) {
+                                isValid = false;
+                                showFieldError(field, 'EPIS Supervisor maksimal 100 karakter');
+                            }
+                            break;
                     }
                 }
             }
@@ -995,6 +1210,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  }
              }
          }
+         
+         // Initialize all functions when DOM is loaded
+         document.addEventListener('DOMContentLoaded', function() {
+             initSponsorValidation();
+             initEpisSupervisorField();
+         });
     </script>
 </body>
 </html>

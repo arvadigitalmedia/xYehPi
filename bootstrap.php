@@ -43,6 +43,22 @@ if (strpos($current_domain, 'localhost') !== false ||
     define('EPIC_DEBUG', false);
 }
 
+// Load .env file if exists
+if (file_exists(EPIC_ROOT . '/.env')) {
+    $env_lines = file(EPIC_ROOT . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($env_lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue; // Skip comments
+        if (strpos($line, '=') !== false) {
+            list($key, $value) = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            if (!empty($key) && !defined($key)) {
+                define($key, $value);
+            }
+        }
+    }
+}
+
 // Load configuration
 if (file_exists(EPIC_CONFIG_DIR . '/config.php')) {
     require_once EPIC_CONFIG_DIR . '/config.php';
@@ -90,6 +106,14 @@ if (file_exists(EPIC_CORE_DIR . '/starsender-triggers.php')) {
 }
 if (file_exists(EPIC_CORE_DIR . '/epis-functions.php')) {
     require_once EPIC_CORE_DIR . '/epis-functions.php';
+}
+if (file_exists(EPIC_CORE_DIR . '/monitoring.php')) {
+    require_once EPIC_CORE_DIR . '/monitoring.php';
+}
+
+// Load Mailketing Integration
+if (file_exists(EPIC_CORE_DIR . '/mailketing.php')) {
+    require_once EPIC_CORE_DIR . '/mailketing.php';
 }
 
 // Load Zoom Integration if available

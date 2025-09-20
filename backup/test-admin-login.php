@@ -3,11 +3,12 @@ session_start();
 require_once 'bootstrap.php';
 
 // Login admin otomatis
-$admin_email = 'arifin@emasperak.id';
+$admin_email = 'email@bisnisemasperak.com';
 $admin = db()->selectOne('SELECT * FROM epic_users WHERE email = ?', [$admin_email]);
 
 if ($admin) {
     // Set session
+    $_SESSION['epic_user_id'] = $admin['id'];
     $_SESSION['user_id'] = $admin['id'];
     $_SESSION['user_email'] = $admin['email'];
     $_SESSION['user_name'] = $admin['name'];

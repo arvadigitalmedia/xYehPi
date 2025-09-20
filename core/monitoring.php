@@ -403,6 +403,104 @@ function epic_cleanup_monitoring_data($days_to_keep = 90) {
 }
 
 /**
+ * Record registration metrics
+ */
+function epic_record_registration_metrics($type, $processing_time = null) {
+    $date = date('Y-m-d');
+    $hour = date('H');
+    
+    try {
+        // Get or create metrics record for this hour
+        $existing = db()->selectOne(
+            "SELECT * FROM `epi_registration_metrics` WHERE `date` = ? AND `hour` = ?",
+            [$date, $hour]
+        );
+        
+        if ($existing) {
+            // Update existing record
+            $sql = "UPDATE `epi_registration_metrics` SET 
+                `total_attempts` = `total_attempts` + 1,
+                " . ($type === 'success' ? "`successful_registrations` = `successful_registrations` + 1," : "`failed_attempts` = `failed_attempts` + 1,") . "
+                `avg_processing_time` = " . ($processing_time ? "?" : "`avg_processing_time`") . ",
+                `updated_at` = NOW()
+                WHERE `id` = ?";
+            
+            $params = $processing_time ? [$processing_time, $existing['id']] : [$existing['id']];
+            db()->query($sql, $params);
+        } else {
+            // Create new record
+            $sql = "INSERT INTO `epi_registration_metrics` 
+                (`date`, `hour`, `total_attempts`, `successful_registrations`, `failed_attempts`, `avg_processing_time`) 
+                VALUES (?, ?, 1, ?, ?, ?)";
+            
+            $params = [
+                $date, 
+                $hour, 
+                $type === 'success' ? 1 : 0,
+                $type === 'success' ? 0 : 1,
+                $processing_time
+            ];
+            db()->query($sql, $params);
+        }
+        
+        return true;
+    } catch (Exception $e) {
+        error_log("Failed to record registration metrics: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Record registration error
+ */
+function epic_record_registration_error($error_type, $error_message, $error_data = null) {
+    try {
+        $sql = "INSERT INTO `epi_registration_errors` 
+            (`error_type`, `error_message`, `error_data`, `ip_address`, `user_agent`) 
+            VALUES (?, ?, ?, ?, ?)";
+        
+        $params = [
+            $error_type,
+            $error_message,
+            $error_data ? json_encode($error_data) : null,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null
+        ];
+        
+        db()->query($sql, $params);
+        return true;
+    } catch (Exception $e) {
+        error_log("Failed to record registration error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Record performance metrics
+ */
+function epic_record_performance($action, $processing_time, $memory_usage = null, $query_count = null) {
+    try {
+        $sql = "INSERT INTO `epi_performance_logs` 
+            (`action`, `processing_time`, `memory_usage`, `query_count`, `ip_address`) 
+            VALUES (?, ?, ?, ?, ?)";
+        
+        $params = [
+            $action,
+            $processing_time,
+            $memory_usage,
+            $query_count,
+            $_SERVER['REMOTE_ADDR'] ?? null
+        ];
+        
+        db()->query($sql, $params);
+        return true;
+    } catch (Exception $e) {
+        error_log("Failed to record performance: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
  * Initialize monitoring system
  */
 function epic_init_monitoring() {

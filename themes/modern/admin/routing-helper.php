@@ -98,8 +98,7 @@ function epic_validate_system_requirements() {
     $required_functions = [
         'epic_current_user',
         'epic_url',
-        'epic_redirect',
-        'epic_render_admin_page'
+        'epic_redirect'
     ];
     
     foreach ($required_functions as $func) {
@@ -108,16 +107,12 @@ function epic_validate_system_requirements() {
         }
     }
     
-    // Check if database constants are defined
-    $required_constants = [
-        'TABLE_USERS',
-        'TABLE_TRANSACTIONS'
-    ];
-    
-    foreach ($required_constants as $const) {
-        if (!defined($const)) {
-            $errors[] = "Required constant '{$const}' not defined";
-        }
+    // Test database connection
+    try {
+        $db = db();
+        $db->selectValue("SELECT 1");
+    } catch (Exception $e) {
+        $errors[] = "Database connection failed: " . $e->getMessage();
     }
     
     if (!empty($errors)) {

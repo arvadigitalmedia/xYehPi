@@ -239,11 +239,36 @@
         const commissionFields = form.querySelectorAll('input[name*="commission_rate"]');
         commissionFields.forEach(field => {
             const value = parseFloat(field.value);
-            if (isNaN(value) || value < 0 || value > 100) {
+            if (field.value && (isNaN(value) || value < 0 || value > 100)) {
                 showFieldError(field, 'Commission rate must be between 0 and 100');
                 isValid = false;
             }
         });
+        
+        // Validate territory name length
+        const territoryName = form.querySelector('input[name="territory_name"]');
+        if (territoryName && territoryName.value.trim()) {
+            if (territoryName.value.trim().length < 3) {
+                showFieldError(territoryName, 'Territory name must be at least 3 characters');
+                isValid = false;
+            } else if (territoryName.value.trim().length > 100) {
+                showFieldError(territoryName, 'Territory name must not exceed 100 characters');
+                isValid = false;
+            }
+        }
+        
+        // Validate max epic recruits
+        const maxRecruits = form.querySelector('input[name="max_epic_recruits"]');
+        if (maxRecruits && maxRecruits.value) {
+            const value = parseInt(maxRecruits.value);
+            if (isNaN(value) || value < 0) {
+                showFieldError(maxRecruits, 'Max EPIC recruits must be a positive number');
+                isValid = false;
+            } else if (value > 1000000) {
+                showFieldError(maxRecruits, 'Max EPIC recruits cannot exceed 1,000,000');
+                isValid = false;
+            }
+        }
         
         return isValid;
     }

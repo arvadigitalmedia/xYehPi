@@ -106,18 +106,19 @@ $page = $page ?? 1;
             <thead>
                 <tr>
                     <th>EPIS Account</th>
+                    <th>Kontak</th>
                     <th>Territory</th>
                     <th>Network Size</th>
-                    <th>Commission Rates</th>
+                    <th>Total Commissions</th>
                     <th>Status</th>
                     <th>Created</th>
-                    <th>Actions</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($epis_accounts)): ?>
                     <tr>
-                        <td colspan="7" class="text-center py-8">
+                        <td colspan="8" class="text-center py-8">
                             <i data-feather="users" width="48" height="48" class="text-gray-400 mb-4"></i>
                             <p class="text-gray-500">No EPIS accounts found</p>
                             <button onclick="showCreateModal()" class="topbar-btn mt-4">
@@ -129,6 +130,7 @@ $page = $page ?? 1;
                 <?php else: ?>
                     <?php foreach ($epis_accounts as $epis): ?>
                         <tr>
+                            <!-- EPIS Account: Nama dan ID -->
                             <td>
                                 <div class="member-info">
                                     <div class="member-name">
@@ -140,16 +142,26 @@ $page = $page ?? 1;
                                         </span>
                                     </div>
                                     <div class="member-details">
-                                        <div class="member-email">
-                                            <i data-feather="mail" width="12" height="12"></i>
-                                            <?= htmlspecialchars($epis['email']) ?>
-                                        </div>
                                         <div class="text-xs text-gray-400">
-                                            Code: <?= htmlspecialchars($epis['epis_code']) ?>
+                                            ID: <?= $epis['id'] ?> | Code: <?= htmlspecialchars($epis['epis_code']) ?>
                                         </div>
                                     </div>
                                 </div>
                             </td>
+                            
+                            <!-- Kontak: Email dan No. Telpon/WhatsApp -->
+                            <td>
+                                <div class="table-cell-main">
+                                    <i data-feather="mail" width="12" height="12"></i>
+                                    <?= htmlspecialchars($epis['email']) ?>
+                                </div>
+                                <div class="table-cell-sub">
+                                    <i data-feather="phone" width="12" height="12"></i>
+                                    <?= htmlspecialchars($epis['phone'] ?: 'Tidak ada') ?>
+                                </div>
+                            </td>
+                            
+                            <!-- Territory: Keterangan wilayah -->
                             <td>
                                 <div class="table-cell-main"><?= htmlspecialchars($epis['territory_name'] ?: '-') ?></div>
                                 <?php if ($epis['max_epic_recruits'] > 0): ?>
@@ -160,6 +172,8 @@ $page = $page ?? 1;
                                     <div class="table-cell-sub">Unlimited recruits</div>
                                 <?php endif; ?>
                             </td>
+                            
+                            <!-- Network Size: Jumlah user dibawah EPIS Account -->
                             <td>
                                 <div class="table-cell-main"><?= number_format($epis['network_size']) ?> EPIC</div>
                                 <div class="table-cell-sub">
@@ -169,14 +183,18 @@ $page = $page ?? 1;
                                     </a>
                                 </div>
                             </td>
+                            
+                            <!-- Total Commissions: Jumlah total komisi yang sudah diperoleh -->
                             <td>
                                 <div class="table-cell-main">
-                                    Direct: <?= number_format($epis['recruitment_commission_rate'], 1) ?>%
+                                    Rp <?= number_format($epis['total_commissions'], 0, ',', '.') ?>
                                 </div>
                                 <div class="table-cell-sub">
-                                    Indirect: <?= number_format($epis['indirect_commission_rate'], 1) ?>%
+                                    Rate: <?= number_format($epis['recruitment_commission_rate'], 1) ?>% / <?= number_format($epis['indirect_commission_rate'], 1) ?>%
                                 </div>
                             </td>
+                            
+                            <!-- Status: Aktif/Inactive -->
                             <td>
                                 <?php 
                                 $status_classes = [
@@ -185,40 +203,47 @@ $page = $page ?? 1;
                                     'terminated' => 'badge-danger'
                                 ];
                                 $status_class = $status_classes[$epis['status']] ?? 'badge-secondary';
+                                $status_text = $epis['status'] === 'active' ? 'Aktif' : 
+                                              ($epis['status'] === 'suspended' ? 'Inactive' : ucfirst($epis['status']));
                                 ?>
                                 <span class="badge <?= $status_class ?>">
-                                    <?= ucfirst($epis['status']) ?>
+                                    <?= $status_text ?>
                                 </span>
                             </td>
+                            
+                            <!-- Created: Waktu pembuatan akun EPIS Account -->
                             <td>
-                                <span class="date-text"><?= date('M j, Y', strtotime($epis['created_at'])) ?></span>
+                                <span class="date-text">
+                                    <?= $epis['formatted_created_at'] ?? date('d M Y H:i', strtotime($epis['created_at'])) ?>
+                                </span>
                             </td>
+                            
+                            <!-- Action: Icon Edit - Active/Nonaktifkan -->
                             <td>
                                 <div class="action-buttons">
-                                    <a href="<?= epic_url('admin/manage/epis/view/' . $epis['user_id']) ?>" 
-                                       class="action-btn action-view" title="View Details">
-                                        <i data-feather="eye" width="14" height="14"></i>
-                                    </a>
+                                    <!-- Icon Edit -->
                                     <button onclick="showEditModal(<?= htmlspecialchars(json_encode($epis)) ?>)" 
-                                            class="action-btn action-edit" title="Edit">
+                                            class="action-btn action-edit" title="Edit EPIS Account">
                                         <i data-feather="edit" width="14" height="14"></i>
                                     </button>
+                                    
+                                    <!-- Active/Nonaktifkan -->
                                     <?php if ($epis['status'] === 'active'): ?>
                                         <form method="POST" style="display: inline;" 
-                                              onsubmit="return confirm('Are you sure you want to suspend this EPIS account?')">
+                                              onsubmit="return confirm('Yakin ingin menonaktifkan akun EPIS ini?')">
                                             <input type="hidden" name="action" value="suspend_epis">
                                             <input type="hidden" name="epis_user_id" value="<?= $epis['user_id'] ?>">
-                                            <button type="submit" class="action-btn action-suspend" title="Suspend">
-                                                <i data-feather="pause" width="14" height="14"></i>
+                                            <button type="submit" class="action-btn action-suspend" title="Nonaktifkan">
+                                                <i data-feather="user-x" width="14" height="14"></i>
                                             </button>
                                         </form>
                                     <?php else: ?>
                                         <form method="POST" style="display: inline;" 
-                                              onsubmit="return confirm('Are you sure you want to activate this EPIS account?')">
+                                              onsubmit="return confirm('Yakin ingin mengaktifkan akun EPIS ini?')">
                                             <input type="hidden" name="action" value="activate_epis">
                                             <input type="hidden" name="epis_user_id" value="<?= $epis['user_id'] ?>">
-                                            <button type="submit" class="action-btn action-activate" title="Activate">
-                                                <i data-feather="play" width="14" height="14"></i>
+                                            <button type="submit" class="action-btn action-activate" title="Aktifkan">
+                                                <i data-feather="user-check" width="14" height="14"></i>
                                             </button>
                                         </form>
                                     <?php endif; ?>
@@ -270,26 +295,33 @@ $page = $page ?? 1;
                           placeholder="Describe the territory coverage and responsibilities..."></textarea>
             </div>
             
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="max_epic_recruits" class="form-label">Max EPIC Recruits</label>
-                    <input type="number" name="max_epic_recruits" id="max_epic_recruits" class="form-input" 
-                           value="0" min="0">
-                    <small class="form-help">0 = unlimited</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="recruitment_commission_rate" class="form-label">Direct Commission Rate (%)</label>
-                    <input type="number" name="recruitment_commission_rate" id="recruitment_commission_rate" 
-                           class="form-input" value="10.00" min="0" max="100" step="0.01" required>
-                </div>
+            <div class="form-group">
+                <label for="max_epic_recruits" class="form-label">Max EPIC Recruits</label>
+                <input type="number" name="max_epic_recruits" id="max_epic_recruits" class="form-input" 
+                       value="0" min="0">
+                <small class="form-help">0 = unlimited</small>
             </div>
             
-            <div class="form-group">
-                <label for="indirect_commission_rate" class="form-label">Indirect Commission Rate (%)</label>
-                <input type="number" name="indirect_commission_rate" id="indirect_commission_rate" 
-                       class="form-input" value="5.00" min="0" max="100" step="0.01" required>
-                <small class="form-help">Commission rate when EPIC recruits through their network</small>
+            <!-- Global Commission Information -->
+            <div class="form-section">
+                <h4 class="section-subtitle">Commission Information</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Direct Commission Rate</div>
+                        <div class="info-value"><?= epic_setting('epis_direct_commission_rate', '10.00') ?>%</div>
+                        <small class="info-help">Applied when EPIS directly recruits EPIC accounts</small>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Indirect Commission Rate</div>
+                        <div class="info-value"><?= epic_setting('epis_indirect_commission_rate', '5.00') ?>%</div>
+                        <small class="info-help">Applied when EPIC recruits through EPIS network</small>
+                    </div>
+                </div>
+                <div class="commission-note">
+                    <i data-feather="info" width="16" height="16"></i>
+                    <span>Commission rates are managed globally. To modify these rates, go to 
+                    <a href="<?= epic_url('admin/settings/commission') ?>" class="link">Commission Settings</a>.</span>
+                </div>
             </div>
             
             <div class="modal-actions">
@@ -336,21 +368,34 @@ $page = $page ?? 1;
                 <div class="form-group">
                     <label for="edit_max_epic_recruits" class="form-label">Max EPIC Recruits</label>
                     <input type="number" name="max_epic_recruits" id="edit_max_epic_recruits" 
-                           class="form-input" min="0">
+                           class="form-input" min="0" max="1000000">
                     <small class="form-help">0 = unlimited</small>
                 </div>
                 
                 <div class="form-group">
-                    <label for="edit_recruitment_commission_rate" class="form-label">Direct Commission Rate (%)</label>
+                    <label for="edit_recruitment_commission_rate" class="form-label">Recruitment Commission (%)</label>
                     <input type="number" name="recruitment_commission_rate" id="edit_recruitment_commission_rate" 
-                           class="form-input" min="0" max="100" step="0.01" required>
+                           class="form-input" min="0" max="100" step="0.1">
+                    <small class="form-help">Commission for direct EPIC recruitment</small>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label for="edit_indirect_commission_rate" class="form-label">Indirect Commission Rate (%)</label>
-                <input type="number" name="indirect_commission_rate" id="edit_indirect_commission_rate" 
-                       class="form-input" min="0" max="100" step="0.01" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit_indirect_commission_rate" class="form-label">Indirect Commission (%)</label>
+                    <input type="number" name="indirect_commission_rate" id="edit_indirect_commission_rate" 
+                           class="form-input" min="0" max="100" step="0.1">
+                    <small class="form-help">Commission for network recruitment</small>
+                </div>
+            </div>
+            
+            <!-- Commission Information -->
+            <div class="form-section">
+                <h4 class="section-subtitle">Commission Information</h4>
+                <div class="commission-note">
+                    <i data-feather="info" width="16" height="16"></i>
+                    <span>Commission rates can be customized per EPIS account. Leave empty to use global defaults.</span>
+                </div>
             </div>
             
             <div class="modal-actions">

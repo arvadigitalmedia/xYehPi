@@ -60,14 +60,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                 case 'update_epis':
                     $epis_user_id = (int)$_POST['epis_user_id'];
+                    
+                    // Validation
+                    $validation_errors = [];
+                    
+                    // Validate territory name
+                    $territory_name = trim(epic_sanitize($_POST['territory_name']));
+                    if (empty($territory_name)) {
+                        $validation_errors[] = 'Territory name is required';
+                    } elseif (strlen($territory_name) < 3) {
+                        $validation_errors[] = 'Territory name must be at least 3 characters';
+                    } elseif (strlen($territory_name) > 100) {
+                        $validation_errors[] = 'Territory name must not exceed 100 characters';
+                    }
+                    
+                    // Validate max epic recruits
+                    $max_epic_recruits = (int)$_POST['max_epic_recruits'];
+                    if ($max_epic_recruits < 0) {
+                        $validation_errors[] = 'Max EPIC recruits must be a positive number';
+                    } elseif ($max_epic_recruits > 1000000) {
+                        $validation_errors[] = 'Max EPIC recruits cannot exceed 1,000,000';
+                    }
+                    
+                    // Validate commission rates
+                    $recruitment_rate = (float)$_POST['recruitment_commission_rate'];
+                    $indirect_rate = (float)$_POST['indirect_commission_rate'];
+                    
+                    if (!empty($_POST['recruitment_commission_rate']) && ($recruitment_rate < 0 || $recruitment_rate > 100)) {
+                        $validation_errors[] = 'Recruitment commission rate must be between 0 and 100';
+                    }
+                    
+                    if (!empty($_POST['indirect_commission_rate']) && ($indirect_rate < 0 || $indirect_rate > 100)) {
+                        $validation_errors[] = 'Indirect commission rate must be between 0 and 100';
+                    }
+                    
+                    // Check if EPIS account exists
+                    $existing_epis = db()->selectOne("SELECT * FROM epic_epis_accounts WHERE user_id = ?", [$epis_user_id]);
+                    if (!$existing_epis) {
+                        $validation_errors[] = 'EPIS account not found';
+                    }
+                    
+                    if (!empty($validation_errors)) {
+                        throw new Exception(implode(', ', $validation_errors));
+                    }
+                    
                     $update_data = [
-                        'territory_name' => epic_sanitize($_POST['territory_name']),
+                        'territory_name' => $territory_name,
                         'territory_description' => epic_sanitize($_POST['territory_description']),
-                        'max_epic_recruits' => (int)$_POST['max_epic_recruits'],
-                        'recruitment_commission_rate' => (float)$_POST['recruitment_commission_rate'],
-                        'indirect_commission_rate' => (float)$_POST['indirect_commission_rate'],
+                        'max_epic_recruits' => $max_epic_recruits,
                         'updated_at' => date('Y-m-d H:i:s')
                     ];
+                    
+                    // Only update commission rates if provided
+                    if (!empty($_POST['recruitment_commission_rate'])) {
+                        $update_data['recruitment_commission_rate'] = $recruitment_rate;
+                    }
+                    if (!empty($_POST['indirect_commission_rate'])) {
+                        $update_data['indirect_commission_rate'] = $indirect_rate;
+                    }
                     
                     $updated = db()->update('epic_epis_accounts', $update_data, 'user_id = ?', [$epis_user_id]);
                     if ($updated) {
@@ -87,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     if ($updated) {
                         // Also update user status
-                        db()->update('users', 
+                        db()->update('epic_users', 
                             ['status' => 'suspended', 'updated_at' => date('Y-m-d H:i:s')], 
                             'id = ?', 
                             [$epis_user_id]
@@ -108,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     if ($updated) {
                         // Also update user status
-                        db()->update('users', 
+                        db()->update('epic_users', 
                             ['status' => 'epis', 'updated_at' => date('Y-m-d H:i:s')], 
                             'id = ?', 
                             [$epis_user_id]
@@ -155,7 +205,7 @@ $stats = [
 // Get eligible EPIC users for promotion
 $eligible_epic_users = db()->select(
     "SELECT u.id, u.name, u.email, u.created_at
-     FROM users u
+     FROM epic_users u
      LEFT JOIN epic_epis_accounts ea ON u.id = ea.user_id
      WHERE u.status = 'epic' AND ea.id IS NULL
      ORDER BY u.name ASC
@@ -175,11 +225,11 @@ $layout_data = [
     ],
     'page_actions' => [
         [
-            'type' => 'button',
+            'type' => 'link',
             'text' => 'Create EPIS Account',
+            'url' => epic_url('admin/manage/epis/add'),
             'icon' => 'plus',
-            'class' => 'btn-primary',
-            'onclick' => 'showCreateModal()'
+            'class' => 'btn-primary'
         ],
         [
             'type' => 'link',

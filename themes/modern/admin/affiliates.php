@@ -218,11 +218,8 @@ $affiliates = [
                         <a href="<?= epic_url('admin/settings/general') ?>" class="sidebar-submenu-item">
                             <span class="sidebar-submenu-text">General</span>
                         </a>
-                        <a href="<?= epic_url('admin/settings/form-registrasi') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Form Registrasi</span>
-                        </a>
-                        <a href="<?= epic_url('admin/settings/email-notification') ?>" class="sidebar-submenu-item">
-                            <span class="sidebar-submenu-text">Email Notification</span>
+                        <a href="<?= epic_url('admin/settings/mailketing') ?>" class="sidebar-submenu-item">
+                            <span class="sidebar-submenu-text">Mailketing</span>
                         </a>
                         <a href="<?= epic_url('admin/settings/whatsapp-notification') ?>" class="sidebar-submenu-item">
                             <span class="sidebar-submenu-text">WhatsApp Notification</span>

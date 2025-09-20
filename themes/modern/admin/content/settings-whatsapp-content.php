@@ -34,10 +34,6 @@ extract($data ?? []);
             <i data-feather="globe" class="settings-nav-icon"></i>
             <span>General</span>
         </a>
-        <a href="<?= epic_url('admin/settings/form-registrasi') ?>" class="settings-nav-item">
-            <i data-feather="file-text" class="settings-nav-icon"></i>
-            <span>Form Registrasi</span>
-        </a>
         <a href="<?= epic_url('admin/settings/email-notification') ?>" class="settings-nav-item">
             <i data-feather="mail" class="settings-nav-icon"></i>
             <span>Email Notification</span>

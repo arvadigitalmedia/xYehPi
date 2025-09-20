@@ -1,0 +1,432 @@
+/**
+ * EPIS Account Creation Page - Additional Styles
+ * Extends admin.css with specific styling for Create EPIS Account page
+ * 
+ * @version 1.0.0
+ * @author EPIC Hub Team
+ */
+
+/* ===== EPIS ADD PAGE SPECIFIC STYLES ===== */
+
+/* Form Enhancements */
+.epis-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: var(--surface-2);
+    border: 1px solid var(--ink-600);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    margin-bottom: var(--spacing-6);
+    transition: var(--transition-normal);
+}
+
+.form-section:hover {
+    border-color: var(--gold-500);
+    box-shadow: var(--shadow-gold);
+}
+
+.form-section-title {
+    color: var(--gold-400);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-4);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.form-section-title i {
+    color: var(--gold-500);
+}
+
+.form-section-description {
+    color: var(--ink-200);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-5);
+    line-height: 1.5;
+}
+
+/* Form Row Layout */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+}
+
+.form-row.single {
+    grid-template-columns: 1fr;
+}
+
+.form-row.triple {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* Single Column Layout for Cards */
+.form-single-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-6);
+}
+
+.form-single-column .form-group {
+    width: 100%;
+}
+
+.form-single-column .form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-single-column .info-grid.single-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.form-single-column .info-grid.single-column .info-item {
+    width: 100%;
+}
+
+.form-single-column .info-item.full-width {
+    width: 100%;
+}
+
+/* Card Spacing and Consistency */
+.admin-content + .admin-content {
+    margin-top: 2rem;
+}
+
+.form-card {
+    background: var(--surface-2);
+    border: 1px solid var(--ink-600);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    transition: var(--transition-normal);
+}
+
+.form-card:hover {
+    border-color: var(--gold-500);
+    box-shadow: var(--shadow-gold);
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-single-column {
+        gap: var(--spacing-4);
+    }
+    
+    .admin-content + .admin-content {
+        margin-top: 1.5rem;
+    }
+}
+
+/* Enhanced Form Groups */
+.form-group.required label::after {
+    content: ' *';
+    color: var(--danger);
+    font-weight: var(--font-weight-bold);
+}
+
+.form-group label {
+    color: var(--ink-100);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--spacing-2);
+    display: block;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    background: var(--surface-3);
+    border: 1px solid var(--ink-500);
+    border-radius: var(--radius-md);
+    color: var(--ink-100);
+    padding: var(--spacing-3) var(--spacing-4);
+    width: 100%;
+    transition: var(--transition-normal);
+    font-size: var(--font-size-sm);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--gold-500);
+    box-shadow: 0 0 0 3px rgba(207, 168, 78, 0.1);
+}
+
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-group .field-error {
+    color: var(--danger);
+    font-size: var(--font-size-xs);
+    margin-top: var(--spacing-1);
+    display: block;
+}
+
+.form-group .field-help {
+    color: var(--ink-300);
+    font-size: var(--font-size-xs);
+    margin-top: var(--spacing-1);
+    display: block;
+}
+
+/* Character Counter */
+.char-counter {
+    font-size: var(--font-size-xs);
+    color: var(--ink-300);
+    margin-top: var(--spacing-1);
+}
+
+/* Info Cards */
+.info-card {
+    background: var(--surface-3);
+    border: 1px solid var(--ink-600);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+}
+
+.info-card.highlight {
+    border-color: var(--gold-500);
+    background: linear-gradient(135deg, rgba(207, 168, 78, 0.05) 0%, rgba(207, 168, 78, 0.02) 100%);
+}
+
+.info-card-title {
+    color: var(--gold-400);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-2);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.info-card-content {
+    color: var(--ink-200);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.info-card-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-card-list li {
+    padding: var(--spacing-1) 0;
+    border-bottom: 1px solid var(--ink-600);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-card-list li:last-child {
+    border-bottom: none;
+}
+
+.info-card-list .label {
+    color: var(--ink-300);
+    font-size: var(--font-size-sm);
+}
+
+.info-card-list .value {
+    color: var(--ink-100);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: flex-end;
+    padding-top: var(--spacing-6);
+    border-top: 1px solid var(--ink-600);
+    margin-top: var(--spacing-6);
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+
+/* Enhanced Buttons */
+.btn-create {
+    background: var(--gradient-gold);
+    color: var(--ink-900);
+    border: none;
+    font-weight: var(--font-weight-semibold);
+    box-shadow: var(--shadow-gold);
+}
+
+.btn-create:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-gold-lg);
+}
+
+.btn-create:active {
+    transform: translateY(0);
+}
+
+/* Loading States */
+.btn.loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* Tooltips */
+.tooltip {
+    position: absolute;
+    background: var(--ink-800);
+    color: var(--ink-100);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--ink-600);
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--ink-800);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+    .epis-form-container {
+        max-width: 100%;
+        padding: 0 var(--spacing-4);
+    }
+}
+
+@media (max-width: 768px) {
+    .form-section {
+        padding: var(--spacing-4);
+        margin-bottom: var(--spacing-4);
+    }
+    
+    .form-section-title {
+        font-size: var(--font-size-base);
+    }
+}
+
+/* Card Focus States */
+.form-card.card-focused {
+    border-color: var(--gold-400);
+    box-shadow: 0 0 0 3px rgba(207, 168, 78, 0.1);
+}
+
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: var(--spacing-4);
+    right: var(--spacing-4);
+    background: var(--surface-1);
+    border: 1px solid var(--ink-600);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-4);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1002;
+    min-width: 300px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all var(--transition-normal);
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    color: var(--ink-200);
+    font-size: var(--font-size-sm);
+}
+
+.notification-success {
+    border-color: var(--green-500);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(34, 197, 94, 0.02) 100%);
+}
+
+.notification-success .notification-content {
+    color: var(--green-400);
+}
+
+.notification-error {
+    border-color: var(--red-500);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.02) 100%);
+}
+
+.notification-error .notification-content {
+    color: var(--red-400);
+}
+
+.notification-info {
+    border-color: var(--blue-500);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.02) 100%);
+}
+
+.notification-info .notification-content {
+    color: var(--blue-400);
+}
+
+/* Print Styles */
+@media print {
+    .form-actions,
+    .btn,
+    .notification {
+        display: none;
+    }
+    
+    .form-section {
+        border: 1px solid #ccc;
+        break-inside: avoid;
+    }
+}

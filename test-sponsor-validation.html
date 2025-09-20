@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sponsor Validation</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 300px; }
+        .validation-status { margin-left: 10px; }
+        .validation-icon { display: none; }
+        .validation-icon.loading { color: orange; }
+        .validation-icon.success { color: green; }
+        .validation-icon.error { color: red; }
+        .sponsor-info { margin-top: 10px; padding: 10px; background: #f0f8ff; border-radius: 4px; display: none; }
+        .locked-field { background-color: #f5f5f5; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <h1>Test Validasi Sponsor Code</h1>
+    
+    <form id="test-form">
+        <div class="form-group">
+            <label for="sponsor_code">Kode Sponsor:</label>
+            <input type="text" id="sponsor_code" name="sponsor_code" placeholder="Masukkan kode sponsor (coba: ADMIN001)">
+            <span id="sponsor-validation-status" class="validation-status">
+                <span class="validation-icon loading">⏳ Memvalidasi...</span>
+                <span class="validation-icon success">✅ Valid</span>
+                <span class="validation-icon error">❌ Tidak valid</span>
+            </span>
+        </div>
+        
+        <div id="sponsor-info" class="sponsor-info">
+            <h4>Informasi Sponsor:</h4>
+            <p><strong>Nama:</strong> <span id="sponsor-name"></span></p>
+            <p><strong>Email:</strong> <span id="sponsor-email"></span></p>
+            <p><strong>Status:</strong> <span id="sponsor-status"></span></p>
+        </div>
+        
+        <div class="form-group">
+            <label for="full_name">Nama Lengkap:</label>
+            <input type="text" id="full_name" name="full_name" class="locked-field" disabled placeholder="Field akan aktif setelah sponsor valid">
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" class="locked-field" disabled placeholder="Field akan aktif setelah sponsor valid">
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" id="submit-btn" disabled>
+                <span id="submit-text">Menunggu Validasi Sponsor</span>
+            </button>
+        </div>
+    </form>
+
+    <script>
+        // Initialize sponsor validation system
+        function initSponsorValidation() {
+            const sponsorCodeInput = document.getElementById('sponsor_code');
+            const sponsorValidationStatus = document.getElementById('sponsor-validation-status');
+            const sponsorInfo = document.getElementById('sponsor-info');
+            const submitBtn = document.getElementById('submit-btn');
+            const submitText = document.getElementById('submit-text');
+            
+            // Get all locked fields
+            const lockedFields = document.querySelectorAll('.locked-field');
+            
+            let validationTimeout;
+            let currentSponsorData = null;
+            
+            // Function to show validation status
+            function showValidationStatus(type) {
+                const icons = sponsorValidationStatus.querySelectorAll('.validation-icon');
+                icons.forEach(icon => icon.style.display = 'none');
+                
+                const targetIcon = sponsorValidationStatus.querySelector(`.validation-icon.${type}`);
+                if (targetIcon) {
+                    targetIcon.style.display = 'inline';
+                }
+            }
+            
+            // Function to unlock fields
+            function unlockFields() {
+                lockedFields.forEach(field => {
+                    field.disabled = false;
+                    field.classList.remove('locked-field');
+                });
+                
+                submitBtn.disabled = false;
+                submitText.textContent = 'Simpan Member';
+            }
+            
+            // Function to lock fields
+            function lockFields() {
+                lockedFields.forEach(field => {
+                    field.disabled = true;
+                    field.classList.add('locked-field');
+                });
+                
+                submitBtn.disabled = true;
+                submitText.textContent = 'Menunggu Validasi Sponsor';
+            }
+            
+            // Function to validate sponsor code
+            async function validateSponsorCode(code) {
+                if (!code || code.length < 3) {
+                    showValidationStatus('error');
+                    sponsorInfo.style.display = 'none';
+                    lockFields();
+                    return;
+                }
+                
+                showValidationStatus('loading');
+                
+                try {
+                    const response = await fetch('/api/check-referral.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ referral_code: code })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.data && data.data.sponsor) {
+                        // Sponsor valid
+                        showValidationStatus('success');
+                        currentSponsorData = data.data.sponsor;
+                        
+                        // Show sponsor info
+                        document.getElementById('sponsor-name').textContent = data.data.sponsor.name || 'N/A';
+                        document.getElementById('sponsor-email').textContent = data.data.sponsor.email || 'N/A';
+                        document.getElementById('sponsor-status').textContent = data.data.sponsor.status || 'N/A';
+                        sponsorInfo.style.display = 'block';
+                        
+                        // Unlock other fields
+                        unlockFields();
+                        
+                    } else {
+                        // Sponsor tidak valid
+                        showValidationStatus('error');
+                        sponsorInfo.style.display = 'none';
+                        currentSponsorData = null;
+                        lockFields();
+                    }
+                    
+                } catch (error) {
+                    console.error('Error validating sponsor:', error);
+                    showValidationStatus('error');
+                    sponsorInfo.style.display = 'none';
+                    currentSponsorData = null;
+                    lockFields();
+                }
+            }
+            
+            // Event listener for sponsor code input
+            sponsorCodeInput.addEventListener('input', function() {
+                const code = this.value.trim();
+                
+                // Clear previous timeout
+                if (validationTimeout) {
+                    clearTimeout(validationTimeout);
+                }
+                
+                // Set new timeout for validation (debounce)
+                validationTimeout = setTimeout(() => {
+                    validateSponsorCode(code);
+                }, 500);
+            });
+            
+            // Initial state - lock all fields
+            lockFields();
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initSponsorValidation();
+        });
+        
+        // Handle form submission
+        document.getElementById('test-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Form submission test - validasi sponsor berhasil!');
+        });
+    </script>
+</body>
+</html>

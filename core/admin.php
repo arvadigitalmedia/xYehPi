@@ -890,13 +890,12 @@ function epic_admin_settings($segments) {
     $subsection = $segments[2] ?? '';
     
     switch ($subsection) {
-        case 'form':
-        case 'form-registrasi':
-            epic_admin_settings_form();
-            break;
         case 'email':
         case 'email-notification':
             epic_admin_settings_email();
+            break;
+        case 'mailketing':
+            epic_admin_settings_mailketing();
             break;
         case 'whatsapp':
         case 'whatsapp-notification':
@@ -923,19 +922,19 @@ function epic_admin_settings_general() {
 }
 
 /**
- * Form Registration Settings
- */
-function epic_admin_settings_form() {
-    // Use new layout system
-    include __DIR__ . '/../themes/modern/admin/settings-form.php';
-}
-
-/**
  * Email Notification Settings
  */
 function epic_admin_settings_email() {
     // Use new layout system
     include __DIR__ . '/../themes/modern/admin/settings-email.php';
+}
+
+/**
+ * Mailketing Settings
+ */
+function epic_admin_settings_mailketing() {
+    // Use new layout system
+    include __DIR__ . '/../themes/modern/admin/settings-mailketing.php';
 }
 
 /**
@@ -3608,6 +3607,11 @@ function epic_admin_epis($segments) {
     $action = $segments[3] ?? '';
     
     switch ($action) {
+        case 'add':
+            // Handle Create EPIS Account page using new layout system
+            include __DIR__ . '/../themes/modern/admin/epis-add.php';
+            break;
+            
         case 'view':
             $epis_id = $segments[4] ?? null;
             if (!$epis_id || !is_numeric($epis_id)) {

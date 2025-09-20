@@ -4,6 +4,10 @@
  * Path: /api/check-referral
  */
 
+// Define constants to allow bootstrap access
+if (!defined('EPIC_INIT')) define('EPIC_INIT', true);
+if (!defined('EPIC_LOADED')) define('EPIC_LOADED', true);
+
 // Set headers untuk JSON response
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -24,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Include required files
-require_once '../config.php';
-require_once '../functions.php';
+require_once '../config/config.php';
+require_once '../bootstrap.php';
 require_once '../core/rate-limiter.php';
 
 try {
@@ -53,40 +57,44 @@ try {
         exit;
     }
     
-    // Validate referral code using existing function
-    $referrer_info = epic_get_referrer_info($referral_code);
+    // Query database untuk mendapatkan data sponsor
+    $sponsor = db()->selectOne(
+        "SELECT u.id, u.name, u.email, u.referral_code, u.status,
+                supervisor.id as epis_supervisor_id,
+                supervisor.name as epis_supervisor_name,
+                supervisor.email as epis_supervisor_email
+         FROM " . db()->table('users') . " u
+         LEFT JOIN " . db()->table('users') . " supervisor ON u.epis_supervisor_id = supervisor.id
+         WHERE u.referral_code = ? AND u.status IN ('active', 'epic', 'epis')",
+        [$referral_code]
+    );
     
-    if (!$referrer_info) {
+    if (!$sponsor) {
+        http_response_code(404);
         echo json_encode([
             'success' => false,
-            'message' => 'Kode referral tidak valid atau tidak ditemukan'
+            'message' => 'Kode sponsor tidak ditemukan atau tidak aktif'
         ]);
         exit;
     }
     
-    // Check if referrer is active and eligible
-    if (!isset($referrer_info['status']) || $referrer_info['status'] !== 'active') {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Akun referrer tidak aktif atau tidak memenuhi syarat'
-        ]);
-        exit;
-    }
-    
-    // Return success response with referrer info
+    // Response sukses dengan data sponsor dan EPIS Supervisor
     echo json_encode([
         'success' => true,
-        'message' => 'Kode referral valid',
-        'referrer' => [
-            'id' => $referrer_info['id'] ?? '',
-            'name' => $referrer_info['name'] ?? '',
-            'username' => $referrer_info['username'] ?? '',
-            'email' => $referrer_info['email'] ?? '',
-            'phone' => $referrer_info['phone'] ?? '',
-            'referral_code' => $referral_code,
-            'join_date' => $referrer_info['join_date'] ?? '',
-            'total_referrals' => $referrer_info['total_referrals'] ?? 0,
-            'status' => $referrer_info['status'] ?? 'active'
+        'message' => 'Sponsor ditemukan',
+        'data' => [
+            'sponsor' => [
+                'id' => $sponsor['id'],
+                'name' => $sponsor['name'],
+                'email' => $sponsor['email'],
+                'referral_code' => $sponsor['referral_code'],
+                'status' => $sponsor['status']
+            ],
+            'epis_supervisor' => $sponsor['epis_supervisor_id'] ? [
+                'id' => $sponsor['epis_supervisor_id'],
+                'name' => $sponsor['epis_supervisor_name'],
+                'email' => $sponsor['epis_supervisor_email']
+            ] : null
         ]
     ]);
     

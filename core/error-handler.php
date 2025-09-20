@@ -206,15 +206,15 @@ function epic_update_registration_metrics($type) {
             // Database fallback
             epic_create_metrics_table();
             
-            $existing = db()->select('epi_metrics', 'value', 'metric_key = ? AND date = ?', [$metric_key, $today]);
+            $existing = db()->selectOne('SELECT value FROM metrics WHERE metric_key = ? AND date = ?', [$metric_key, $today]);
             
             if ($existing) {
-                db()->update('epi_metrics', [
+                db()->update('metrics', [
                     'value' => $existing['value'] + 1,
                     'updated_at' => date('Y-m-d H:i:s')
                 ], 'metric_key = ? AND date = ?', [$metric_key, $today]);
             } else {
-                db()->insert('epi_metrics', [
+                db()->insert('metrics', [
                     'metric_key' => $metric_key,
                     'value' => 1,
                     'date' => $today,
@@ -232,7 +232,7 @@ function epic_update_registration_metrics($type) {
  * Create metrics table
  */
 function epic_create_metrics_table() {
-    $sql = "CREATE TABLE IF NOT EXISTS `epi_metrics` (
+    $sql = "CREATE TABLE IF NOT EXISTS `epic_metrics` (
         `id` int(11) NOT NULL AUTO_INCREMENT,
         `metric_key` varchar(100) NOT NULL,
         `value` int(11) NOT NULL DEFAULT 0,
@@ -247,47 +247,43 @@ function epic_create_metrics_table() {
     db()->query($sql);
 }
 
+// Fungsi epic_get_registration_success_rate dipindahkan ke monitoring.php untuk menghindari duplikasi
+
 /**
- * Get registration success rate for monitoring
+ * Handle route errors
  */
-function epic_get_registration_success_rate($days = 7) {
-    try {
-        $start_date = date('Y-m-d', strtotime("-{$days} days"));
-        $end_date = date('Y-m-d');
-        
-        $success_count = 0;
-        $error_count = 0;
-        
-        if (class_exists('Redis') && epic_setting('redis_enabled', '0') === '1') {
-            $redis = new Redis();
-            $redis->connect(epic_setting('redis_host', '127.0.0.1'), epic_setting('redis_port', 6379));
-            
-            for ($i = 0; $i < $days; $i++) {
-                $date = date('Y-m-d', strtotime("-{$i} days"));
-                $success_count += (int)$redis->get("registration_success_{$date}") ?: 0;
-                $error_count += (int)$redis->get("registration_error_{$date}") ?: 0;
-            }
-        } else {
-            // Database fallback
-            $success_result = db()->query("SELECT SUM(value) as total FROM epi_metrics WHERE metric_key LIKE 'registration_success_%' AND date BETWEEN ? AND ?", [$start_date, $end_date]);
-            $error_result = db()->query("SELECT SUM(value) as total FROM epi_metrics WHERE metric_key LIKE 'registration_error_%' AND date BETWEEN ? AND ?", [$start_date, $end_date]);
-            
-            $success_count = $success_result[0]['total'] ?? 0;
-            $error_count = $error_result[0]['total'] ?? 0;
-        }
-        
-        $total = $success_count + $error_count;
-        $success_rate = $total > 0 ? ($success_count / $total) * 100 : 0;
-        
-        return [
-            'success_count' => $success_count,
-            'error_count' => $error_count,
-            'total_attempts' => $total,
-            'success_rate' => round($success_rate, 2)
-        ];
-    } catch (Exception $e) {
-        error_log("Failed to get registration success rate: " . $e->getMessage());
-        return null;
+function epic_handle_route_error($exception) {
+    // Log the error
+    $correlation_id = epic_log_error('error', $exception->getMessage(), [
+        'file' => $exception->getFile(),
+        'line' => $exception->getLine(),
+        'trace' => $exception->getTraceAsString()
+    ]);
+    
+    // Set error response code
+    http_response_code(500);
+    
+    // Check if we're in debug mode
+    $debug_mode = defined('EPIC_DEBUG') && EPIC_DEBUG;
+    
+    if ($debug_mode) {
+        // Show detailed error in debug mode
+        echo '<div style="padding: 20px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin: 20px;">';
+        echo '<h3>Error (Debug Mode)</h3>';
+        echo '<p><strong>Message:</strong> ' . htmlspecialchars($exception->getMessage()) . '</p>';
+        echo '<p><strong>File:</strong> ' . htmlspecialchars($exception->getFile()) . '</p>';
+        echo '<p><strong>Line:</strong> ' . $exception->getLine() . '</p>';
+        echo '<p><strong>Correlation ID:</strong> ' . $correlation_id . '</p>';
+        echo '<details><summary>Stack Trace</summary><pre>' . htmlspecialchars($exception->getTraceAsString()) . '</pre></details>';
+        echo '</div>';
+    } else {
+        // Show generic error page in production
+        echo '<div style="padding: 20px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin: 20px;">';
+        echo '<h3>500 - Internal Server Error</h3>';
+        echo '<p>An internal server error occurred. Please try again later.</p>';
+        echo '<p>Error ID: ' . $correlation_id . '</p>';
+        echo '<p><a href="' . (function_exists('epic_url') ? epic_url() : '/') . '">Return to Home</a></p>';
+        echo '</div>';
     }
 }
 

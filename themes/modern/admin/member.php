@@ -17,6 +17,11 @@ $user = epic_current_user();
 $success = '';
 $error = '';
 
+// Handle success message from redirect
+if (isset($_GET['success'])) {
+    $success = $_GET['success'];
+}
+
 // Handle member actions
 if (isset($_GET['action']) && isset($_GET['id']) && is_numeric($_GET['id'])) {
     $member_id = (int)$_GET['id'];
@@ -25,26 +30,41 @@ if (isset($_GET['action']) && isset($_GET['id']) && is_numeric($_GET['id'])) {
     try {
         switch ($action) {
             case 'activate':
+                // Log before update
+                error_log("Attempting to activate member ID: {$member_id}");
+                
                 $result = db()->update(TABLE_USERS, 
                     ['status' => 'active', 'updated_at' => date('Y-m-d H:i:s')], 
                     'id = ?', [$member_id]
                 );
+                
+                // Log result and verify
+                error_log("Update result: " . ($result ? 'SUCCESS' : 'FAILED'));
+                
                 if ($result) {
-                    $success = 'Member berhasil diaktivasi.';
+                    // Verify the update actually happened
+                    $updated_member = db()->selectOne(
+                        "SELECT status FROM " . db()->table('users') . " WHERE id = ?",
+                        [$member_id]
+                    );
+                    error_log("Member status after update: " . ($updated_member['status'] ?? 'NOT_FOUND'));
+                    
                     epic_log_activity($user['id'], 'member_activated', "Member ID {$member_id} activated", 'user', $member_id);
+                    epic_redirect(epic_url('admin/manage/member?success=' . urlencode('Member berhasil diaktivasi.')));
                 } else {
+                    error_log("Failed to activate member ID: {$member_id}");
                     $error = 'Gagal mengaktivasi member.';
                 }
                 break;
                 
             case 'deactivate':
                 $result = db()->update(TABLE_USERS, 
-                    ['status' => 'inactive', 'updated_at' => date('Y-m-d H:i:s')], 
+                    ['status' => 'suspended', 'updated_at' => date('Y-m-d H:i:s')], 
                     'id = ?', [$member_id]
                 );
                 if ($result) {
-                    $success = 'Member berhasil dinonaktifkan.';
                     epic_log_activity($user['id'], 'member_deactivated', "Member ID {$member_id} deactivated", 'user', $member_id);
+                    epic_redirect(epic_url('admin/manage/member?success=' . urlencode('Member berhasil dinonaktifkan.')));
                 } else {
                     $error = 'Gagal menonaktifkan member.';
                 }
@@ -55,7 +75,7 @@ if (isset($_GET['action']) && isset($_GET['id']) && is_numeric($_GET['id'])) {
                 $upgrade_result = epic_safe_upgrade_to_epic($member_id, $user['id']);
                 
                 if ($upgrade_result['success']) {
-                    $success = $upgrade_result['message'];
+                    $success_message = $upgrade_result['message'];
                     
                     // Add details about preserved data
                     $details = [];
@@ -67,8 +87,10 @@ if (isset($_GET['action']) && isset($_GET['id']) && is_numeric($_GET['id'])) {
                     }
                     
                     if (!empty($details)) {
-                        $success .= ' (' . implode(', ', $details) . ')';
+                        $success_message .= ' (' . implode(', ', $details) . ')';
                     }
+                    
+                    epic_redirect(epic_url('admin/manage/member?success=' . urlencode($success_message)));
                 } else {
                     $error = $upgrade_result['message'];
                 }
@@ -93,8 +115,8 @@ if (isset($_GET['action']) && isset($_GET['id']) && is_numeric($_GET['id'])) {
                     // Delete from database
                     db()->delete('users', 'id = ?', [$member_id]);
                     
-                    $success = 'Member berhasil dihapus.';
                     epic_log_activity($user['id'], 'member_deleted', "Member {$member['name']} (ID: {$member_id}) deleted", 'user', $member_id);
+                    epic_redirect(epic_url('admin/manage/member?success=' . urlencode('Member berhasil dihapus.')));
                 } else {
                     $error = 'Member tidak ditemukan.';
                 }

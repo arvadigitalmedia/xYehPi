@@ -8,7 +8,9 @@ if (!defined('EPIC_INIT')) {
     die('Direct access not allowed');
 }
 
+require_once EPIC_ROOT . '/core/functions.php';
 require_once EPIC_ROOT . '/core/epis-functions.php';
+require_once EPIC_ROOT . '/core/sponsor.php';
 
 /**
  * Handle referral tracking and EPIS auto-assignment for landing pages

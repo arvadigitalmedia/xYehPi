@@ -362,6 +362,30 @@
     gap: var(--spacing-4);
 }
 
+/* EPIS Info Display */
+.epis-info-display {
+    margin-bottom: var(--spacing-6);
+    padding: var(--spacing-4);
+    background: var(--surface-3);
+    border: 1px solid var(--ink-600);
+    border-radius: var(--radius-md);
+}
+
+.epis-info {
+    color: var(--ink-200);
+    line-height: 1.5;
+}
+
+.epis-info strong {
+    color: var(--ink-100);
+    font-weight: var(--font-weight-semibold);
+}
+
+.epis-info small {
+    color: var(--ink-400);
+    font-size: var(--font-size-sm);
+}
+
 .form-static {
     padding: var(--spacing-3);
     background: var(--surface-3);

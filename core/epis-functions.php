@@ -134,7 +134,7 @@ function epic_get_all_epis_accounts($filters = []) {
     }
     
     if (!empty($filters['search'])) {
-        $where .= ' AND (u.name LIKE ? OR u.email LIKE ? OR ea.epis_code LIKE ?)';
+        $where .= ' AND (COALESCE(u.name, "Unknown User") LIKE ? OR COALESCE(u.email, "") LIKE ? OR ea.epis_code LIKE ?)';
         $search = '%' . $filters['search'] . '%';
         $params[] = $search;
         $params[] = $search;
@@ -142,13 +142,20 @@ function epic_get_all_epis_accounts($filters = []) {
     }
     
     return db()->select(
-        "SELECT ea.*, u.name, u.email, u.status as user_status,
-                COUNT(en.epic_user_id) as network_size
+        "SELECT ea.*, 
+                COALESCE(u.name, 'Unknown User') as name, 
+                COALESCE(u.email, 'no-email@invalid.com') as email, 
+                COALESCE(u.phone, '-') as phone, 
+                COALESCE(u.status, 'invalid') as user_status,
+                COUNT(en.epic_user_id) as network_size,
+                COALESCE(SUM(en.total_commissions_earned), 0) as total_commissions,
+                DATE_FORMAT(ea.created_at, '%d %b %Y %H:%i') as formatted_created_at
          FROM epic_epis_accounts ea
-         JOIN epic_users u ON ea.user_id = u.id
+         LEFT JOIN epic_users u ON ea.user_id = u.id AND ea.user_id > 0
          LEFT JOIN epic_epis_networks en ON ea.user_id = en.epis_id AND en.status = 'active'
          WHERE {$where}
-         GROUP BY ea.id
+         GROUP BY ea.id, ea.user_id, ea.epis_code, ea.territory_name, ea.status, ea.created_at, 
+                  u.name, u.email, u.phone, u.status
          ORDER BY ea.created_at DESC",
         $params
     );
@@ -268,13 +275,14 @@ function epic_get_epis_network($epis_id, $filters = []) {
 function epic_get_epis_network_stats($epis_id) {
     return db()->selectOne(
         "SELECT 
-            COUNT(*) as total_network,
-            COUNT(CASE WHEN recruitment_type = 'direct' THEN 1 END) as direct_recruits,
-            COUNT(CASE WHEN recruitment_type = 'indirect' THEN 1 END) as indirect_recruits,
-            SUM(total_commissions_earned) as total_commissions,
-            AVG(commission_rate) as avg_commission_rate
-         FROM epic_epis_networks 
-         WHERE epis_id = ? AND status = 'active'",
+            COUNT(en.epic_user_id) as total_network,
+            COUNT(CASE WHEN en.recruitment_type = 'direct' THEN 1 END) as direct_recruits,
+            COUNT(CASE WHEN en.recruitment_type = 'indirect' THEN 1 END) as indirect_recruits,
+            SUM(en.total_commissions_earned) as total_commissions,
+            AVG(en.commission_rate) as avg_commission_rate
+         FROM epic_epis_networks en
+         JOIN epic_users u ON en.epic_user_id = u.id
+         WHERE en.epis_id = ? AND en.status = 'active' AND u.status = 'epic'",
         [$epis_id]
     );
 }
