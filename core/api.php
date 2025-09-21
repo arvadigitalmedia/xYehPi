@@ -140,8 +140,13 @@ function epic_api_auth_login() {
         return;
     }
     
-    if ($user['status'] === 'banned') {
+    if (strtoupper($user['status']) === 'BANNED') {
         epic_api_response(['error' => 'Account is banned'], 403);
+        return;
+    }
+    
+    if (strtoupper($user['status']) === 'PENDING') {
+        epic_api_response(['error' => 'Silakan lakukan konfirmasi email Anda terlebih dahulu'], 403);
         return;
     }
     

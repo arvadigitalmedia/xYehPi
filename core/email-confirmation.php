@@ -126,9 +126,9 @@ function epic_confirm_email_token($token) {
             ];
         }
         
-        // Mark email as verified - use 'free' status instead of 'active'
+        // Mark email as verified and set status to ACTIVE
         db()->query(
-            "UPDATE epic_users SET email_verified_at = NOW(), status = 'free' WHERE id = ?",
+            "UPDATE epic_users SET email_verified_at = NOW(), status = 'ACTIVE' WHERE id = ?",
             [$confirmation['user_id']]
         );
         

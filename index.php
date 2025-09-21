@@ -162,8 +162,10 @@ function epic_route_login() {
             $user = epic_get_user_by_email($email);
             
             if ($user && epic_verify_password($password, $user['password'])) {
-                if ($user['status'] === 'banned') {
-                    $error = 'Your account has been banned.';
+                if (strtoupper($user['status']) === 'BANNED') {
+                    $error = 'Akun Anda telah diblokir. Silakan hubungi administrator.';
+                } elseif (strtoupper($user['status']) === 'PENDING') {
+                    $error = 'Silakan lakukan konfirmasi email Anda terlebih dahulu.';
                 } else {
                     // Login user with error handling
                     try {
