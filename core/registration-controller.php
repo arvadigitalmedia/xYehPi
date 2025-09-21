@@ -124,11 +124,45 @@ class EpicRegistrationController {
             exit;
         }
         
-        // Set error messages for display
-        foreach ($errors as $field => $message) {
-            $_SESSION['error_' . $field] = $message;
+        // Set specific error messages for each field
+        $error_messages = [];
+        foreach ($errors as $field => $field_errors) {
+            if (is_array($field_errors)) {
+                // Take the first error message for each field
+                $error_message = $field_errors[0];
+                $_SESSION['error_' . $field] = $error_message;
+                $error_messages[] = $error_message;
+            } else {
+                $_SESSION['error_' . $field] = $field_errors;
+                $error_messages[] = $field_errors;
+            }
         }
-        $this->error = 'Terdapat kesalahan pada form. Silakan periksa kembali.';
+        
+        // Set main error message based on specific errors
+        if (!empty($error_messages)) {
+            // If there's only one error, use it directly
+            if (count($error_messages) === 1) {
+                $this->error = $error_messages[0];
+            } else {
+                // Multiple errors - show the most critical ones first
+                $critical_errors = [];
+                foreach ($error_messages as $msg) {
+                    if (strpos($msg, 'sudah terdaftar') !== false || 
+                        strpos($msg, 'tidak cocok') !== false ||
+                        strpos($msg, 'wajib diisi') !== false) {
+                        $critical_errors[] = $msg;
+                    }
+                }
+                
+                if (!empty($critical_errors)) {
+                    $this->error = implode('. ', array_slice($critical_errors, 0, 2));
+                } else {
+                    $this->error = 'Terdapat kesalahan pada form. Silakan periksa kembali.';
+                }
+            }
+        } else {
+            $this->error = 'Terdapat kesalahan pada form. Silakan periksa kembali.';
+        }
     }
     
     /**

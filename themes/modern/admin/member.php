@@ -181,18 +181,54 @@ $total_count = db()->selectValue(
 
 $total_pages = ceil($total_count / $per_page);
 
-// Get members data with supervisor info
-$members = db()->select(
-    "SELECT u.*, 
-                 supervisor.name as supervisor_name,
-                 supervisor.referral_code as supervisor_code
-          FROM " . db()->table('users') . " u
-          LEFT JOIN " . db()->table('users') . " supervisor ON u.epis_supervisor_id = supervisor.id
-     {$where_clause}
-     ORDER BY u.created_at DESC
-     LIMIT {$per_page} OFFSET {$offset}",
-    $params
-);
+// Get members data with supervisor and sponsor info
+// Check if sponsor_id column exists first
+$sponsor_column_exists = false;
+try {
+    $columns = db()->select("DESCRIBE " . db()->table('users'));
+    foreach ($columns as $column) {
+        if ($column['Field'] === 'sponsor_id') {
+            $sponsor_column_exists = true;
+            break;
+        }
+    }
+} catch (Exception $e) {
+    // If describe fails, assume column doesn't exist
+    $sponsor_column_exists = false;
+}
+
+if ($sponsor_column_exists) {
+    // Query with sponsor_id column
+    $members = db()->select(
+        "SELECT u.*, 
+                     supervisor.name as supervisor_name,
+                     supervisor.referral_code as supervisor_code,
+                     sponsor_user.name as sponsor_name,
+                     sponsor_user.referral_code as sponsor_code
+              FROM " . db()->table('users') . " u
+              LEFT JOIN " . db()->table('users') . " supervisor ON u.epis_supervisor_id = supervisor.id
+              LEFT JOIN " . db()->table('users') . " sponsor_user ON u.sponsor_id = sponsor_user.id
+         {$where_clause}
+         ORDER BY u.created_at DESC
+         LIMIT {$per_page} OFFSET {$offset}",
+        $params
+    );
+} else {
+    // Fallback query without sponsor_id column
+    $members = db()->select(
+        "SELECT u.*, 
+                     supervisor.name as supervisor_name,
+                     supervisor.referral_code as supervisor_code,
+                     NULL as sponsor_name,
+                     NULL as sponsor_code
+              FROM " . db()->table('users') . " u
+              LEFT JOIN " . db()->table('users') . " supervisor ON u.epis_supervisor_id = supervisor.id
+         {$where_clause}
+         ORDER BY u.created_at DESC
+         LIMIT {$per_page} OFFSET {$offset}",
+        $params
+    );
+}
 
 // Statistik berdasarkan hierarchy level dan status
 $stats = [

@@ -154,8 +154,8 @@
                 <thead>
                     <tr>
                         <th>Member</th>
-                        <th>Email</th>
-                        <th>WhatsApp</th>
+                        <th>Kontak</th>
+                        <th>Sponsor</th>
                         <th>Supervisor</th>
                         <th>Level</th>
                         <th>Status</th>
@@ -166,7 +166,7 @@
             <tbody>
                 <?php if (empty($members)): ?>
                     <tr>
-                        <td colspan="7" class="text-center py-8">
+                        <td colspan="8" class="text-center py-8">
                             <i data-feather="users" width="48" height="48" class="text-gray-400 mb-4"></i>
                             <p class="text-gray-500">No members found</p>
                             <a href="<?= epic_url('admin/manage/member/add') ?>" class="topbar-btn mt-4">
@@ -195,7 +195,6 @@
                                     
                                     <div class="member-info">
                                         <div class="table-cell-main"><?= htmlspecialchars($member['name']) ?></div>
-                                        <div class="table-cell-sub"><?= htmlspecialchars($member['email']) ?></div>
                                         
                                         <?php if (!empty($member['referral_code'])): ?>
                                             <div class="referral-code">
@@ -212,8 +211,28 @@
                                 </div>
                             </td>
                             
-                            <!-- 2. Phone -->
-                            <td><?= htmlspecialchars($member['phone'] ?? '-') ?></td>
+                            <!-- 2. Kontak (Email & WhatsApp) -->
+                            <td>
+                                <div class="contact-info">
+                                    <?php if (!empty($member['email'])): ?>
+                                        <div class="contact-item">
+                                            <i data-feather="mail" width="14" height="14" class="contact-icon"></i>
+                                            <span><?= htmlspecialchars($member['email']) ?></span>
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($member['phone'])): ?>
+                                        <div class="contact-item">
+                                            <i data-feather="phone" width="14" height="14" class="contact-icon"></i>
+                                            <span><?= htmlspecialchars($member['phone']) ?></span>
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (empty($member['email']) && empty($member['phone'])): ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
                             
                             <!-- 3. Sponsor -->
                             <td>
@@ -227,7 +246,7 @@
                                 <?php endif; ?>
                             </td>
                             
-                            <!-- 4. EPIS Supervisor -->
+                            <!-- 4. Supervisor -->
                             <td>
                                 <?php if (!empty($member['supervisor_name'])): ?>
                                     <div class="supervisor-info">
@@ -872,6 +891,29 @@ function initializeTooltips() {
  </script>
 
 <style>
+/* Contact Info Styling */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.contact-icon {
+    color: var(--ink-400);
+    flex-shrink: 0;
+}
+
+.contact-item span {
+    color: var(--ink-200);
+}
+
 /* Row Level Styling - Pewarnaan Baris Berdasarkan Level Akun */
 .member-row.level-free {
     background-color: rgba(108, 117, 125, 0.05) !important; /* Soft gray untuk Free Account */

@@ -374,10 +374,7 @@ if ($referral_code) {
             border: 1px solid var(--gold-400);
         }
         
-        .referral-form .input-focus:focus {
-            border-color: var(--gold-400);
-            box-shadow: 0 0 0 3px rgba(207, 168, 78, 0.15);
-        }
+
         
         .brand-logo {
             background: var(--gradient-gold);
@@ -581,6 +578,17 @@ if ($referral_code) {
                                placeholder="Masukkan Nama Anda"
                                value="<?= htmlspecialchars($_POST['name'] ?? '') ?>">
                     </div>
+                    <?php if (isset($_SESSION['error_name'])): ?>
+                        <div class="mt-1 text-xs text-red-300">
+                            <div class="flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span><?= htmlspecialchars($_SESSION['error_name']) ?></span>
+                            </div>
+                        </div>
+                        <?php unset($_SESSION['error_name']); ?>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Email Field -->
@@ -607,6 +615,17 @@ if ($referral_code) {
                             </svg>
                         </div>
                     </div>
+                    <?php if (isset($_SESSION['error_email'])): ?>
+                        <div class="mt-1 text-xs text-red-300">
+                            <div class="flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span><?= htmlspecialchars($_SESSION['error_email']) ?></span>
+                            </div>
+                        </div>
+                        <?php unset($_SESSION['error_email']); ?>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- WhatsApp Number Field -->
@@ -648,6 +667,17 @@ if ($referral_code) {
                             <span id="whatsappErrorText">Format nomor tidak valid</span>
                         </div>
                     </div>
+                    <?php if (isset($_SESSION['error_phone'])): ?>
+                        <div class="mt-1 text-xs text-red-300">
+                            <div class="flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span><?= htmlspecialchars($_SESSION['error_phone']) ?></span>
+                            </div>
+                        </div>
+                        <?php unset($_SESSION['error_phone']); ?>
+                    <?php endif; ?>
                 </div>
                 
 
@@ -687,6 +717,17 @@ if ($referral_code) {
                         </div>
                         <div id="strengthText" class="text-xs text-white text-opacity-60 mt-1">Password strength</div>
                     </div>
+                    <?php if (isset($_SESSION['error_password'])): ?>
+                        <div class="mt-1 text-xs text-red-300">
+                            <div class="flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span><?= htmlspecialchars($_SESSION['error_password']) ?></span>
+                            </div>
+                        </div>
+                        <?php unset($_SESSION['error_password']); ?>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Confirm Password Field -->
@@ -719,6 +760,17 @@ if ($referral_code) {
                     <div id="passwordMatch" class="hidden text-xs mt-1">
                         <span class="text-red-300">Maaf password tidak cocok</span>
                     </div>
+                    <?php if (isset($_SESSION['error_confirm_password'])): ?>
+                        <div class="mt-1 text-xs text-red-300">
+                            <div class="flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span><?= htmlspecialchars($_SESSION['error_confirm_password']) ?></span>
+                            </div>
+                        </div>
+                        <?php unset($_SESSION['error_confirm_password']); ?>
+                    <?php endif; ?>
                 </div>
                 
 
@@ -739,6 +791,17 @@ if ($referral_code) {
                         <a href="#" onclick="openModal('privacyModal')" class="text-blue-300 hover:text-blue-200 underline cursor-pointer">Kebijakan Privasi</a>
                     </label>
                 </div>
+                <?php if (isset($_SESSION['error_terms'])): ?>
+                    <div class="mt-1 text-xs text-red-300">
+                        <div class="flex items-center">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span><?= htmlspecialchars($_SESSION['error_terms']) ?></span>
+                        </div>
+                    </div>
+                    <?php unset($_SESSION['error_terms']); ?>
+                <?php endif; ?>
                 
                 <!-- Marketing Consent -->
                 <div class="flex items-start">
@@ -774,13 +837,13 @@ if ($referral_code) {
             
             <!-- Sudah Punya Akun Text -->
             <div class="text-center" style="margin-top: 40px; margin-bottom: 20px;">
-                <span class="text-sm text-ink-300">Sudah punya akun terdaftar?</span>
+                <span class="text-sm text-white">Sudah punya akun terdaftar?</span>
             </div>
             
             <!-- Login Link -->
             <div class="text-center">
                 <a href="<?= epic_url('login') ?>" 
-                   class="inline-flex items-center justify-center w-full py-3 px-4 border border-ink-600 rounded-lg text-ink-100 hover:bg-surface-2 transition-all duration-300">
+                   class="inline-flex items-center justify-center w-full py-3 px-4 border border-gray-400 border-opacity-30 rounded-lg text-white bg-gray-300 bg-opacity-20 backdrop-blur-sm hover:bg-gray-200 hover:bg-opacity-30 transition-all duration-300 shadow-sm">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                     </svg>
@@ -793,205 +856,107 @@ if ($referral_code) {
         
         <!-- Referral Cards Section (Moved to Bottom) -->
         <div class="w-full max-w-lg mt-8">
-            <!-- Referral Input Card (if no referrer and input is enabled) -->
-            <?php if (!$referrer_info && $show_referral_input): ?>
-                <div class="referral-input-card rounded-2xl p-6 mb-6 shadow-lg">
-                    <div class="flex items-center mb-3">
-                        <svg class="w-6 h-6 text-blue-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                        </svg>
-                        <h3 class="text-lg font-semibold text-white">Kode Referral</h3>
-                    </div>
-                    <div class="text-white text-opacity-90 mb-4">
-                        <p class="text-sm">Masukkan kode referral dari EPI Channel untuk mendapatkan sponsor, atau klik melalui link refferalnya</p>
-                    </div>
-                    
-                    <form method="GET" action="<?= epic_url('register') ?>" class="referral-form">
-                        <div class="flex gap-3">
-                            <input type="text" 
-                                   name="ref" 
-                                   class="flex-1 px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
-                                   placeholder="Masukkan kode referral"
-                                   value="<?= htmlspecialchars($_GET['ref'] ?? '') ?>">
-                            <button type="submit" 
-                                    class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors duration-300">
-                                Cek
-                            </button>
-                        </div>
-                    </form>
-                    
-                    <?php if ($require_referral): ?>
-                        <div class="mt-3 text-sm text-yellow-300">
-                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                            </svg>
-                            Kode referral wajib untuk melanjutkan registrasi
-                        </div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-            
-            <!-- Referrer Info Card -->
+            <!-- Informasi Pereferal -->
             <?php if ($referrer_info): ?>
-                <div class="referrer-card rounded-2xl p-6 mb-6 shadow-lg">
+                <div class="referral-stats-card rounded-2xl p-6 mb-6 shadow-lg">
                     <div class="flex items-center mb-4">
-                        <svg class="w-6 h-6 text-green-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <svg class="w-6 h-6 text-blue-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
-                        <h3 class="text-lg font-semibold text-white">Referral Terdeteksi</h3>
-                        <span class="ml-auto px-3 py-1 bg-green-500 text-white text-xs rounded-full font-medium">
-                            EPI Channel Authorized
-                        </span>
+                        <h3 class="text-lg font-semibold text-white">Informasi Pereferal</h3>
                     </div>
                     
                     <div class="text-white text-opacity-90 mb-4">
-                        <p class="text-sm mb-3">Anda akan terdaftar sebagai referral dari:</p>
-                        
-                        <!-- Referrer Profile -->
+                        <!-- Nama Pereferal -->
                         <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-3">
                             <div class="flex items-center mb-3">
                                 <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mr-4">
                                     <span class="text-white font-bold text-lg"><?= strtoupper(substr($referrer_info['name'], 0, 2)) ?></span>
                                 </div>
                                 <div class="flex-1">
-                                    <p class="text-white text-opacity-60 text-xs mb-1">Nama Pereferal:</p>
+                                    <p class="text-white text-opacity-60 text-xs mb-1">Nama Pereferal</p>
                                     <p class="font-semibold text-white text-lg"><?= htmlspecialchars($referrer_info['name']) ?></p>
-                                    <p class="text-sm text-white text-opacity-70 mt-1">Kode Referral: <?= htmlspecialchars($referral_code) ?></p>
                                 </div>
                             </div>
                             
-                            <!-- Status Information -->
+                            <!-- EPIS Supervisor -->
                             <div class="bg-white bg-opacity-5 rounded p-3">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <p class="text-white text-opacity-60 text-xs mb-1">Status:</p>
-                                        <div class="flex items-center">
-                                            <span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                                            <span class="text-green-300 font-medium">EPI Channel Authorized</span>
-                                        </div>
+                                        <p class="text-white text-opacity-60 text-xs mb-1">Supervisor</p>
+                                        <p class="text-blue-300 font-medium"><?= htmlspecialchars($referrer_info['supervisor_name'] ?? 'Admin EPIS') ?></p>
+                                        <p class="text-white text-opacity-50 text-xs mt-1">EPIS Pembina <?= htmlspecialchars($referrer_info['name']) ?></p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-white text-opacity-60 text-xs mb-1">Tracking:</p>
-                                        <p class="text-white text-opacity-80 text-xs"><?= $referrer_info['tracking_time'] ?></p>
+                                        <p class="text-white text-opacity-60 text-xs mb-1">Kode Referral</p>
+                                        <p class="text-white font-medium"><?= htmlspecialchars($referral_code) ?></p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Tracking Info -->
+                        <!-- Info Otomatis -->
                         <div class="flex items-center justify-between text-xs text-white text-opacity-60">
-                            <span>🔒 Referral terkunci secara otomatis</span>
-                            <span>⏰ <?= $referrer_info['tracking_time'] ?></span>
+                            <span>🔒 Terdeteksi otomatis dari link referral</span>
+                            <span>⏰ <?= date('d M Y H:i') ?> WIB</span>
                         </div>
                     </div>
-                    
-                    <!-- Benefits Info -->
-                    <div class="bg-gradient-to-r from-blue-500 bg-opacity-20 to-purple-500 bg-opacity-20 rounded-lg p-3">
-                        <div class="flex items-center mb-2">
-                            <svg class="w-4 h-4 text-blue-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </div>
+            <?php elseif (!$referrer_info && $show_referral_input): ?>
+                <!-- Fallback Stats Card jika tidak ada referral -->
+                <div class="referral-stats-card rounded-2xl p-6 mb-6 shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-6 h-6 text-blue-300 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-white">Informasi Pereferal</h3>
+                    </div>
+                    <div class="text-white text-opacity-90 mb-4">
+                        <div class="bg-white bg-opacity-10 rounded-lg p-4 text-center">
+                            <svg class="w-12 h-12 text-white text-opacity-50 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
                             </svg>
-                            <span class="text-sm font-medium text-white">Keuntungan Bergabung</span>
+                            <p class="text-white text-opacity-70 text-sm mb-2">Tidak ada referral terdeteksi</p>
+                            <p class="text-white text-opacity-50 text-xs">Gunakan link referral dari EPI Channel untuk mendapatkan sponsor</p>
+                            
+                            <!-- Info untuk menggunakan link referral -->
+                            <div class="mt-4 p-3 bg-blue-500 bg-opacity-20 rounded-lg">
+                                <p class="text-blue-300 text-xs font-medium mb-1">Cara mendapatkan referral:</p>
+                                <p class="text-white text-opacity-70 text-xs">Klik link referral dari EPI Channel atau hubungi sponsor Anda</p>
+                            </div>
                         </div>
-                        <ul class="text-xs text-white text-opacity-80 space-y-1">
-                            <li>✓ Mendapatkan bimbingan dari mentor berpengalaman</li>
-                            <li>✓ Akses ke komunitas bisnis emas perak eksklusif</li>
-                            <li>✓ Support dan training dari EPI Store dan EPI Official</li>
-                        </ul>
                     </div>
                 </div>
             <?php endif; ?>
+
         </div>
         
         <!-- Footer Links -->
         <div class="text-center mt-8">
-            <div class="flex justify-center space-x-6 text-sm text-ink-300">
+            <div class="flex justify-center space-x-6 text-sm text-white">
                 <a href="<?= epic_url() ?>" class="hover:text-ink-100 transition-colors">Home</a>
                 <a href="<?= epic_url('about') ?>" class="hover:text-ink-100 transition-colors">About</a>
                 <a href="<?= epic_url('contact') ?>" class="hover:text-ink-100 transition-colors">Contact</a>
                 <a href="<?= epic_url('privacy') ?>" class="hover:text-ink-100 transition-colors">Privacy</a>
             </div>
-            <p class="mt-4 text-xs text-ink-400">
+            <p class="mt-4 text-xs text-white text-opacity-80">
                 © <?= date('Y') ?> EPIC HUB - Bisnis Emas Perak Indonesia. All rights reserved.
             </p>
         </div>
     </div>
     
     <script>
-        // Auto-load referral data on page load
+        // Auto-set referral cookie if present in URL (simplified - no manual checking)
         document.addEventListener('DOMContentLoaded', function() {
-            // Check for referral code in URL
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             
-            if (refCode && !document.querySelector('.referrer-card')) {
-                // Auto-load referral data if not already loaded
-                checkReferralCode(refCode, true);
-            }
-            
-            // Set referral cookie for future visits
-            if (refCode) {
+            // Set referral cookie for future visits if referral code exists
+            if (refCode && refCode.trim() !== '') {
                 setReferralCookie(refCode);
             }
         });
-        
-        // Check referral code function
-        async function checkReferralCode(code, isAutoLoad = false) {
-            if (!code || code.trim() === '') {
-                if (!isAutoLoad) {
-                    showMessage('Masukkan kode referral terlebih dahulu', 'error');
-                }
-                return;
-            }
-            
-            try {
-                // Show loading state
-                const checkBtn = document.querySelector('.referral-form button[type="submit"]');
-                if (checkBtn && !isAutoLoad) {
-                    checkBtn.disabled = true;
-                    checkBtn.innerHTML = '<svg class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Checking...';
-                }
-                
-                // Make AJAX request to validate referral
-                const response = await fetch('<?= epic_url("api/check-referral") ?>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({ referral_code: code.trim() })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success && result.referrer) {
-                    // Set referral cookie
-                    setReferralCookie(code, result.referrer.name);
-                    
-                    // Reload page with referral parameter to show referrer info
-                    if (!isAutoLoad) {
-                        window.location.href = '<?= epic_url("register") ?>?ref=' + encodeURIComponent(code.trim());
-                    }
-                } else {
-                    if (!isAutoLoad) {
-                        showMessage(result.message || 'Kode referral tidak valid atau tidak memenuhi syarat', 'error');
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Error checking referral:', error);
-                if (!isAutoLoad) {
-                    showMessage('Terjadi kesalahan saat memvalidasi kode referral', 'error');
-                }
-            } finally {
-                // Reset button state
-                const checkBtn = document.querySelector('.referral-form button[type="submit"]');
-                if (checkBtn && !isAutoLoad) {
-                    checkBtn.disabled = false;
-                    checkBtn.innerHTML = 'Cek';
-                }
-            }
-        }
+
         
         // Set referral cookie
         function setReferralCookie(code, name = '') {

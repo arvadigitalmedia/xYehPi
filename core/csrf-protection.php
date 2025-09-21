@@ -400,6 +400,36 @@ function epic_get_registration_validation_rules() {
                 return true;
             }
         ],
+        'phone' => [
+            'required' => true,
+            'type' => 'string',
+            'min_length' => 10,
+            'max_length' => 15,
+            'pattern' => '/^(\+?62|0)[0-9]{9,13}$/',
+            'required_message' => 'Nomor WhatsApp wajib diisi',
+            'min_length_message' => 'Nomor WhatsApp minimal 10 digit',
+            'max_length_message' => 'Nomor WhatsApp maksimal 15 digit',
+            'pattern_message' => 'Format nomor WhatsApp tidak valid (contoh: 628xxxxxxxxxx atau 08xxxxxxxxxx)',
+            'custom' => function($phone) {
+                // Normalize phone number
+                $phone = preg_replace('/[^0-9]/', '', $phone);
+                if (substr($phone, 0, 1) === '0') {
+                    $phone = '62' . substr($phone, 1);
+                }
+                
+                // Check if phone already exists
+                try {
+                     $stmt = db()->getConnection()->prepare("SELECT id FROM epic_users WHERE phone = ?");
+                     $stmt->execute([$phone]);
+                     if ($stmt->fetch()) {
+                         return 'Nomor WhatsApp sudah terdaftar';
+                     }
+                 } catch (Exception $e) {
+                     error_log('Phone validation error: ' . $e->getMessage());
+                 }
+                return true;
+            }
+        ],
         'referral_code' => [
             'required' => false,
             'type' => 'string',
