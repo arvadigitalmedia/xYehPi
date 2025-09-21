@@ -33,16 +33,14 @@ function epic_starsender_on_registration($user_data, $sponsor_data = []) {
     
     // Notifikasi ke sponsor jika ada
     if (!empty($sponsor_data) && !empty($sponsor_data['phone'])) {
-        $sponsor_level = $sponsor_data['account_type'] ?? 'free';
-        $sponsor_message_key = 'starsender_new_referral_' . $sponsor_level . '_message';
-        $sponsor_message = epic_setting($sponsor_message_key, '');
+        $sponsor_message = epic_setting('starsender_registration_referral_message', '');
         
         if (!empty($sponsor_message)) {
             epic_send_starsender_notification(
                 $sponsor_data['phone'],
                 $sponsor_message,
-                epic_setting('starsender_new_referral_image', ''),
-                epic_setting('starsender_new_referral_button', '')
+                epic_setting('starsender_registration_image', ''),
+                epic_setting('starsender_registration_button', '')
             );
         }
     }

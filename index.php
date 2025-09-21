@@ -152,16 +152,23 @@ function epic_route_login() {
     $error = null;
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $email = epic_sanitize($_POST['email'] ?? '');
+        $email = strtolower(trim(epic_sanitize($_POST['email'] ?? '')));
         $password = $_POST['password'] ?? '';
         $remember = isset($_POST['remember']);
         
         if (empty($email) || empty($password)) {
             $error = 'Email and password are required.';
+            error_log('Login failed: Empty email or password for ' . $email);
         } else {
             $user = epic_get_user_by_email($email);
             
-            if ($user && epic_verify_password($password, $user['password'])) {
+            if (!$user) {
+                $error = 'Invalid email or password.';
+                error_log('Login failed: User not found for email ' . $email);
+            } elseif (!epic_verify_password($password, $user['password'])) {
+                $error = 'Invalid email or password.';
+                error_log('Login failed: Invalid password for user ' . $user['id'] . ' (' . $email . ')');
+            } else {
                 if (strtoupper($user['status']) === 'BANNED') {
                     $error = 'Akun Anda telah diblokir. Silakan hubungi administrator.';
                 } elseif (strtoupper($user['status']) === 'PENDING') {
@@ -213,8 +220,6 @@ function epic_route_login() {
                         $error = 'Login successful but redirect failed. Please try accessing your dashboard manually.';
                     }
                 }
-            } else {
-                $error = 'Invalid email or password.';
             }
         }
     }

@@ -23,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $phone = trim($_POST['phone'] ?? '');
-        $address = trim($_POST['address'] ?? '');
         
         // Validate required fields
         if (empty($name)) {
@@ -40,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Check if email is already taken by another user
         $existing_user = db()->selectOne(
-            "SELECT id FROM " . db()->table('users') . " WHERE email = ? AND id != ?",
+            "SELECT id FROM " . db()->table('epic_users') . " WHERE email = ? AND id != ?",
             [$email, $user['id']]
         );
         
@@ -48,32 +47,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception('Email is already taken by another user.');
         }
         
-        // Validate phone number format for WhatsApp
+        // Validate and process WhatsApp phone number
         if (!empty($phone)) {
-            // Remove any non-digit characters for validation
-            $phone_digits = preg_replace('/\D/', '', $phone);
+            // Remove all non-digit characters
+            $phone = preg_replace('/[^0-9]/', '', $phone);
             
-            // Check if phone number is valid (10-15 digits)
-            if (strlen($phone_digits) < 10 || strlen($phone_digits) > 15) {
-                throw new Exception('Nomor telepon harus antara 10-15 digit.');
+            // Check length (10-15 digits)
+            if (strlen($phone) < 10 || strlen($phone) > 15) {
+                throw new Exception('Nomor telepon harus terdiri dari 10-15 digit.');
             }
             
-            // Check if starts with valid country code
-            $valid_country_codes = ['62', '1', '44', '91', '86', '81', '33', '49', '39', '34'];
-            $starts_with_valid_code = false;
-            foreach ($valid_country_codes as $code) {
-                if (strpos($phone_digits, $code) === 0) {
-                    $starts_with_valid_code = true;
+            // Check if already has valid country code
+        $valid_country_codes = ['1', '7', '20', '27', '30', '31', '32', '33', '34', '36', '39', '40', '41', '43', '44', '45', '46', '47', '48', '49', '51', '52', '53', '54', '55', '56', '57', '58', '60', '61', '62', '63', '64', '65', '66', '81', '82', '84', '86', '90', '91', '92', '93', '94', '95', '98', '212', '213', '216', '218', '220', '221', '222', '223', '224', '225', '226', '227', '228', '229', '230', '231', '232', '233', '234', '235', '236', '237', '238', '239', '240', '241', '242', '243', '244', '245', '246', '248', '249', '250', '251', '252', '253', '254', '255', '256', '257', '258', '260', '261', '262', '263', '264', '265', '266', '267', '268', '269', '290', '291', '297', '298', '299', '350', '351', '352', '353', '354', '355', '356', '357', '358', '359', '370', '371', '372', '373', '374', '375', '376', '377', '378', '380', '381', '382', '383', '385', '386', '387', '389', '420', '421', '423', '500', '501', '502', '503', '504', '505', '506', '507', '508', '509', '590', '591', '592', '593', '594', '595', '596', '597', '598', '599', '670', '672', '673', '674', '675', '676', '677', '678', '679', '680', '681', '682', '683', '684', '685', '686', '687', '688', '689', '690', '691', '692', '850', '852', '853', '855', '856', '880', '886', '960', '961', '962', '963', '964', '965', '966', '967', '968', '970', '971', '972', '973', '974', '975', '976', '977', '992', '993', '994', '995', '996', '998'];
+        $has_valid_country_code = false;
+        foreach ($valid_country_codes as $code) {
+            if (strpos($phone, $code) === 0) {
+                $has_valid_country_code = true;
+                break;
+            }
+        }
+        
+        // If doesn't have valid country code, try to auto-add Indonesia country code
+        if (!$has_valid_country_code) {
+            // Cek apakah ini nomor lokal Indonesia (dimulai dengan 0 atau 8)
+            $is_indonesian_local = false;
+            if (preg_match('/^[08]/', $phone)) {
+                $is_indonesian_local = true;
+            }
+            
+            // Cek pola yang jelas invalid (00 prefix atau 4+ digit country code)
+            $invalid_patterns = ['/^00/', '/^[0-9]{4,}$/'];
+            $has_invalid_pattern = false;
+            foreach ($invalid_patterns as $pattern) {
+                if (preg_match($pattern, $phone)) {
+                    $has_invalid_pattern = true;
                     break;
                 }
             }
             
-            if (!$starts_with_valid_code) {
-                throw new Exception('Nomor telepon harus dimulai dengan kode negara yang valid (contoh: 62 untuk Indonesia).');
+            // Cek apakah dimulai dengan kode negara invalid (2-3 digit yang bukan valid)
+            $possible_invalid_code = false;
+            if (!$is_indonesian_local && preg_match('/^([0-9]{2,3})/', $phone, $matches)) {
+                $potential_code = $matches[1];
+                // Jika 2-3 digit pertama bukan kode negara valid, anggap invalid
+                if (!in_array($potential_code, $valid_country_codes)) {
+                    $possible_invalid_code = true;
+                }
             }
             
-            // Store phone number with digits only
-            $phone = $phone_digits;
+            // Auto-add prefix Indonesia jika nomor lokal atau tidak ada pola invalid
+            if ($is_indonesian_local || (!$has_invalid_pattern && !$possible_invalid_code)) {
+                $phone = '62' . ltrim($phone, '0'); // Hapus 0 di depan jika ada
+                $has_valid_country_code = true;
+            }
+        }
+        
+        // Final validation - hanya tolak jika benar-benar invalid
+        if (!$has_valid_country_code) {
+            throw new Exception('Nomor telepon harus dimulai dengan kode negara yang valid (contoh: 62 untuk Indonesia).');
+        }
+            
+            // Store only digits
+            $phone = $phone;
         }
         
         // Handle profile photo upload
@@ -127,7 +162,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'name' => $name,
             'email' => $email,
             'phone' => $phone,
-            'address' => $address,
             'profile_photo' => $profile_photo,
             'updated_at' => date('Y-m-d H:i:s')
         ];
@@ -172,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Update user data
-        db()->update('users', $update_data, 'id = ?', [$user['id']]);
+        db()->update('epic_users', $update_data, 'id = ?', [$user['id']]);
         
         // Update session data
         $_SESSION['user'] = array_merge($user, $update_data);

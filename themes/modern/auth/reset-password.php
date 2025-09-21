@@ -44,11 +44,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $token_data) {
             epic_reset_password($token, $password);
             $success = 'Password berhasil direset! Anda akan diarahkan ke halaman login.';
             
+            // Clear any existing session to prevent conflicts
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                session_regenerate_id(true);
+                if (isset($_SESSION['epic_user_id'])) {
+                    unset($_SESSION['epic_user_id']);
+                }
+            }
+            
+            // Log successful reset
+            error_log('Password reset successful, redirecting to login');
+            
             // Redirect to login after 3 seconds
             header('refresh:3;url=' . epic_url('login'));
             
         } catch (Exception $e) {
             $error = 'Gagal mereset password: ' . $e->getMessage();
+            error_log('Password reset failed: ' . $e->getMessage());
         }
     }
 }

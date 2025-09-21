@@ -106,6 +106,11 @@ if (!isset($epic_db) || !$epic_db) {
 // Load core functions
 require_once EPIC_CORE_DIR . '/functions.php';
 
+// Load CSRF protection (required for security)
+if (file_exists(EPIC_CORE_DIR . '/csrf-protection.php')) {
+    require_once EPIC_CORE_DIR . '/csrf-protection.php';
+}
+
 // Load additional core files if they exist
 if (file_exists(EPIC_CORE_DIR . '/auth.php')) {
     require_once EPIC_CORE_DIR . '/auth.php';
@@ -326,11 +331,31 @@ function epic_user() {
 
 // Helper functions moved to core/functions.php to avoid duplication
 
-function epic_csrf_token() {
-    if (!isset($_SESSION['epic_csrf_token'])) {
-        $_SESSION['epic_csrf_token'] = bin2hex(random_bytes(32));
+function epic_csrf_token($action = 'default') {
+    // Gunakan fungsi dari csrf-protection.php jika tersedia
+    if (function_exists('epic_generate_csrf_token')) {
+        return epic_generate_csrf_token($action);
     }
-    return $_SESSION['epic_csrf_token'];
+    
+    // Fallback untuk kompatibilitas
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    if (!isset($_SESSION['csrf_tokens'])) {
+        $_SESSION['csrf_tokens'] = [];
+    }
+    
+    if (!isset($_SESSION['csrf_tokens'][$action]) || 
+        (time() - $_SESSION['csrf_tokens'][$action]['timestamp']) > 3600) {
+        $_SESSION['csrf_tokens'][$action] = [
+            'token' => bin2hex(random_bytes(32)),
+            'timestamp' => time(),
+            'used' => false
+        ];
+    }
+    
+    return $_SESSION['csrf_tokens'][$action]['token'];
 }
 
 // Legacy CSRF functions removed - using new implementation from csrf-protection.php

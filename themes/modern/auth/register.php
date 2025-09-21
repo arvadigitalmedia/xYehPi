@@ -36,6 +36,10 @@ $require_referral = epic_setting('require_referral', '0') == '1';
 $show_referral_input = epic_setting('show_referral_input', '1') == '1';
 $default_sponsor_ids = epic_setting('default_sponsor_ids', '1');
 
+// Check if user has valid referral code for button state
+$has_valid_referral = !empty($referral_code);
+$button_disabled = !$has_valid_referral;
+
 // Check if registration requires referral
 if ($require_referral && empty($referral_code)) {
     // If no referral code and it's required, assign random default sponsor
@@ -798,13 +802,21 @@ if ($referral_code) {
                 
                 <!-- Register Button -->
                 <button type="submit" 
-                        class="w-full btn-primary text-white font-semibold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent"
-                        id="registerBtn">
-                    <span id="registerBtnText">BUAT AKUN SEKARANG</span>
-                    <svg id="registerSpinner" class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                        class="w-full font-semibold py-3 px-4 rounded-lg focus:outline-none transition-all duration-300 <?= $button_disabled ? 'bg-gray-500 bg-opacity-50 text-gray-300 cursor-not-allowed border border-gray-400 border-opacity-30' : 'btn-primary text-white focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent' ?>"
+                        id="registerBtn"
+                        <?= $button_disabled ? 'disabled' : '' ?>>
+                    <div class="flex items-center justify-center">
+                        <?php if ($button_disabled): ?>
+                            <svg class="w-5 h-5 mr-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        <?php endif; ?>
+                        <span id="registerBtnText"><?= $button_disabled ? 'MEMERLUKAN LINK REFERRAL' : 'BUAT AKUN SEKARANG' ?></span>
+                        <svg id="registerSpinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
                 </button>
             </form>
             
@@ -1164,6 +1176,16 @@ if ($referral_code) {
         
         // Form submission with loading state
         document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('registerBtn');
+            
+            // Prevent submission if button is disabled (no referral)
+            if (btn.disabled && btn.classList.contains('cursor-not-allowed')) {
+                e.preventDefault();
+                // Show alert about needing referral link
+                alert('Untuk mendaftar, Anda perlu menggunakan link referral dari partner kami.');
+                return;
+            }
+            
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
             
@@ -1175,7 +1197,6 @@ if ($referral_code) {
             
             // Additional frontend validation can be added here if needed
             
-            const btn = document.getElementById('registerBtn');
             const btnText = document.getElementById('registerBtnText');
             const spinner = document.getElementById('registerSpinner');
             

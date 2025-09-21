@@ -359,7 +359,7 @@ function epic_get_registration_validation_rules() {
                      $stmt = db()->getConnection()->prepare("SELECT id FROM epic_users WHERE email = ?");
                      $stmt->execute([$email]);
                      if ($stmt->fetch()) {
-                         return 'Email sudah terdaftar';
+                         return 'Email ini sudah terdaftar. Jika Anda lupa password, silakan gunakan fitur Lupa Password';
                      }
                  } catch (Exception $e) {
                      error_log('Email validation error: ' . $e->getMessage());
@@ -422,7 +422,7 @@ function epic_get_registration_validation_rules() {
                      $stmt = db()->getConnection()->prepare("SELECT id FROM epic_users WHERE phone = ?");
                      $stmt->execute([$phone]);
                      if ($stmt->fetch()) {
-                         return 'Nomor WhatsApp sudah terdaftar';
+                         return 'Nomor telepon ini sudah terdaftar';
                      }
                  } catch (Exception $e) {
                      error_log('Phone validation error: ' . $e->getMessage());
