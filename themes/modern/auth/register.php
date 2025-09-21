@@ -238,7 +238,7 @@ if ($referral_code) {
         .input-focus:focus {
             border-color: var(--gold-400);
             box-shadow: 0 0 0 3px rgba(207, 168, 78, 0.15);
-            background: var(--surface-3);
+            background: white;
         }
         
         .btn-primary {
@@ -250,25 +250,7 @@ if ($referral_code) {
             font-weight: 600;
         }
         
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-        
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(207, 168, 78, 0.4);
-        }
+
         
         .floating-shapes {
             position: absolute;
@@ -574,7 +556,7 @@ if ($referral_code) {
                                required 
                                minlength="2"
                                maxlength="100"
-                               class="w-full pl-10 pr-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
+                               class="w-full pl-10 pr-4 py-3 bg-white border border-ink-600 rounded-lg text-black placeholder-gray-500 input-focus transition-all duration-300"
                                placeholder="Masukkan Nama Anda"
                                value="<?= htmlspecialchars($_POST['name'] ?? '') ?>">
                     </div>
@@ -606,7 +588,7 @@ if ($referral_code) {
                                id="email" 
                                name="email" 
                                required 
-                               class="w-full pl-10 pr-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
+                               class="w-full pl-10 pr-4 py-3 bg-white border border-ink-600 rounded-lg text-black placeholder-gray-500 input-focus transition-all duration-300"
                                placeholder="Masukkan email Anda"
                                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
                         <div id="emailValidation" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -642,7 +624,7 @@ if ($referral_code) {
                         <input type="tel" 
                                id="phone" 
                                name="phone" 
-                               class="w-full pl-10 pr-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
+                               class="w-full pl-10 pr-4 py-3 bg-white border border-ink-600 rounded-lg text-black placeholder-gray-500 input-focus transition-all duration-300"
                                placeholder="Masukkan nomor whatsapp aktif"
                                value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
                         <div id="whatsappValidation" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -698,7 +680,7 @@ if ($referral_code) {
                                name="password" 
                                required 
                                minlength="6"
-                               class="w-full pl-10 pr-12 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
+                               class="w-full pl-10 pr-12 py-3 bg-white border border-ink-600 rounded-lg text-black placeholder-gray-500 input-focus transition-all duration-300"
                                placeholder="Minimal 6 karakter, harus ada huruf dan angka"
                                oninput="checkPasswordStrength()">
                         <button type="button" 
@@ -745,7 +727,7 @@ if ($referral_code) {
                                id="confirm_password" 
                                name="confirm_password" 
                                required 
-                               class="w-full pl-10 pr-12 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
+                               class="w-full pl-10 pr-12 py-3 bg-white border border-ink-600 rounded-lg text-black placeholder-gray-500 input-focus transition-all duration-300"
                                placeholder="Konfirmasi ulang password Anda"
                                oninput="checkPasswordMatch()">
                         <button type="button" 
@@ -783,7 +765,7 @@ if ($referral_code) {
                            id="terms" 
                            name="terms" 
                            required
-                           class="w-4 h-4 mt-1 text-blue-600 bg-white bg-opacity-10 border border-white border-opacity-20 rounded focus:ring-blue-500 focus:ring-2">
+                           class="w-4 h-4 mt-1 text-blue-600 bg-white border border-ink-600 rounded focus:ring-blue-500 focus:ring-2">
                     <label for="terms" class="ml-3 text-sm text-white text-opacity-90 leading-relaxed">
                         Saya setuju dengan 
                         <a href="#" onclick="openModal('termsModal')" class="text-blue-300 hover:text-blue-200 underline cursor-pointer">Ketentuan Layanan</a> 
@@ -934,10 +916,10 @@ if ($referral_code) {
         <!-- Footer Links -->
         <div class="text-center mt-8">
             <div class="flex justify-center space-x-6 text-sm text-white">
-                <a href="<?= epic_url() ?>" class="hover:text-ink-100 transition-colors">Home</a>
-                <a href="<?= epic_url('about') ?>" class="hover:text-ink-100 transition-colors">About</a>
-                <a href="<?= epic_url('contact') ?>" class="hover:text-ink-100 transition-colors">Contact</a>
-                <a href="<?= epic_url('privacy') ?>" class="hover:text-ink-100 transition-colors">Privacy</a>
+                <a href="<?= epic_url() ?>">Home</a>
+                <a href="<?= epic_url('about') ?>">About</a>
+                <a href="<?= epic_url('contact') ?>">Contact</a>
+                <a href="<?= epic_url('privacy') ?>">Privacy</a>
             </div>
             <p class="mt-4 text-xs text-white text-opacity-80">
                 © <?= date('Y') ?> EPIC HUB - Bisnis Emas Perak Indonesia. All rights reserved.

@@ -21,6 +21,11 @@ $redirect = $_GET['redirect'] ?? 'dashboard';
 if (isset($_GET['message']) && $_GET['message'] === 'account_restricted') {
     $error = 'Your account has been suspended or restricted. Please contact support for assistance.';
 }
+
+// Handle email confirmation success message
+if (isset($_GET['confirmed']) && $_GET['confirmed'] === '1') {
+    $success = 'Email Anda telah berhasil dikonfirmasi! Silakan login dengan akun Anda.';
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -126,7 +131,7 @@ if (isset($_GET['message']) && $_GET['message'] === 'account_restricted') {
         .input-focus:focus {
             border-color: var(--gold-400);
             box-shadow: 0 0 0 3px rgba(207, 168, 78, 0.15);
-            background: var(--surface-3);
+            background: white;
         }
         
         /* Loading Animation Overlay */
@@ -307,12 +312,12 @@ if (isset($_GET['message']) && $_GET['message'] === 'account_restricted') {
         /* Ensure input text is white */
         input[type="email"],
         input[type="password"] {
-            color: #ffffff !important;
+            color:rgb(0, 0, 0) !important;
         }
         
         input[type="email"]:focus,
         input[type="password"]:focus {
-            color: #ffffff !important;
+            color:rgb(0, 0, 0) !important;
         }
         
         /* Placeholder styling */
@@ -525,7 +530,7 @@ if (isset($_GET['message']) && $_GET['message'] === 'account_restricted') {
                     </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-white text-opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
                             </svg>
                         </div>
@@ -533,7 +538,7 @@ if (isset($_GET['message']) && $_GET['message'] === 'account_restricted') {
                                id="email" 
                                name="email" 
                                required 
-                               class="w-full pl-10 pr-4 py-3 bg-surface-2 border border-ink-600 rounded-lg text-ink-100 placeholder-ink-400 input-focus transition-all duration-300"
+                               class="w-full pl-10 pr-4 py-3 bg-white border border-ink-600 rounded-lg text-black placeholder-gray-500 input-focus transition-all duration-300"
                                placeholder="Masukkan email terdaftar"
                                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
                     </div>
@@ -546,7 +551,7 @@ if (isset($_GET['message']) && $_GET['message'] === 'account_restricted') {
                     </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-white text-opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                             </svg>
                         </div>
@@ -554,12 +559,12 @@ if (isset($_GET['message']) && $_GET['message'] === 'account_restricted') {
                                id="password" 
                                name="password" 
                                required 
-                               class="w-full pl-10 pr-12 py-3 bg-surface-2 border border-ink-600 rounded-lg text-ink-100 placeholder-ink-400 input-focus transition-all duration-300"
+                               class="w-full pl-10 pr-12 py-3 bg-white border border-ink-600 rounded-lg text-black placeholder-gray-500 input-focus transition-all duration-300"
                                placeholder="Masukkan password">
                         <button type="button" 
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center"
                                 onclick="togglePassword()">
-                            <svg id="eyeIcon" class="w-5 h-5 text-white text-opacity-50 hover:text-opacity-80 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg id="eyeIcon" class="w-5 h-5 text-gray-600 hover:text-gray-800 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                             </svg>
@@ -573,7 +578,7 @@ if (isset($_GET['message']) && $_GET['message'] === 'account_restricted') {
                         <input type="checkbox" 
                                id="remember" 
                                name="remember" 
-                               class="w-4 h-4 text-gold-500 bg-surface-2 border-ink-600 rounded focus:ring-gold-400 focus:ring-2">
+                               class="w-4 h-4 text-gold-500 bg-white border-ink-600 rounded focus:ring-gold-400 focus:ring-2">
                         <label for="remember" class="ml-2 text-sm text-white">
                             Ingatkan Saya
                         </label>

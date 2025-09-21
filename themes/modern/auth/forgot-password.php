@@ -179,7 +179,7 @@ $token = $_GET['token'] ?? '';
         .input-focus:focus {
             border-color: var(--gold-400);
             box-shadow: 0 0 0 3px rgba(207, 168, 78, 0.15);
-            background: var(--surface-3);
+            background: white;
         }
         
         .btn-primary {
@@ -412,7 +412,7 @@ $token = $_GET['token'] ?? '';
                                    id="email" 
                                    name="email" 
                                    required 
-                                   class="w-full pl-10 pr-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
+                                   class="w-full pl-10 pr-4 py-3 bg-white border border-ink-600 rounded-lg text-black placeholder-gray-500 input-focus transition-all duration-300"
                                    placeholder="Masukkan email Anda yang terdaftar"
                                    value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
                         </div>
@@ -439,10 +439,10 @@ $token = $_GET['token'] ?? '';
                         </svg>
                     </div>
                     
-                    <h2 class="text-2xl font-semibold text-white mb-4">Check Your Email</h2>
+                    <h2 class="text-2xl font-semibold text-white mb-4">Email Terkirim</h2>
                     <p class="text-white text-opacity-80 mb-6 leading-relaxed">
-                        We've sent password reset instructions to your email address. 
-                        Please check your inbox and follow the link to reset your password.
+                        Petunjuk untuk melakukan reset password telah dikirim melalui email anda. 
+                        Silakan cek inbox email Anda dan ikuti petunjuk untuk reset password.
                     </p>
                     
                     <div class="bg-blue-500 bg-opacity-20 border border-blue-500 border-opacity-30 rounded-lg p-4 mb-6">
@@ -451,11 +451,11 @@ $token = $_GET['token'] ?? '';
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             <div class="text-blue-300 text-sm text-left">
-                                <p class="font-medium mb-1">Didn't receive the email?</p>
+                                <p class="font-medium mb-1">Tidak menerima email?</p>
                                 <ul class="text-xs space-y-1 text-blue-200">
-                                    <li>• Check your spam/junk folder</li>
-                                    <li>• Make sure the email address is correct</li>
-                                    <li>• Wait a few minutes for delivery</li>
+                                    <li>• Cek folder spam/junk email Anda</li>
+                                    <li>• Pastikan alamat email sudah benar</li>
+                                    <li>• Tunggu beberapa menit untuk pengiriman</li>
                                 </ul>
                             </div>
                         </div>
@@ -469,7 +469,7 @@ $token = $_GET['token'] ?? '';
                             <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                             </svg>
-                            Resend Email
+                            Kirim Ulang Email
                         </button>
                     </form>
                 </div>
@@ -518,7 +518,7 @@ $token = $_GET['token'] ?? '';
                                    name="password" 
                                    required 
                                    minlength="8"
-                                   class="w-full pl-10 pr-12 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
+                                   class="w-full pl-10 pr-12 py-3 bg-white border border-ink-600 rounded-lg text-black placeholder-gray-500 input-focus transition-all duration-300"
                                    placeholder="Enter new password"
                                    oninput="checkPasswordStrength()">
                             <button type="button" 
@@ -554,7 +554,7 @@ $token = $_GET['token'] ?? '';
                                    id="confirm_password" 
                                    name="confirm_password" 
                                    required 
-                                   class="w-full pl-10 pr-12 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-white placeholder-white placeholder-opacity-50 input-focus transition-all duration-300"
+                                   class="w-full pl-10 pr-12 py-3 bg-white border border-ink-600 rounded-lg text-black placeholder-gray-500 input-focus transition-all duration-300"
                                    placeholder="Confirm new password"
                                    oninput="checkPasswordMatch()">
                             <button type="button" 

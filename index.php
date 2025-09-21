@@ -233,6 +233,48 @@ function epic_route_logout() {
 }
 
 function epic_route_forgot_password() {
+    $data = [
+        'page_title' => 'Reset Password - EPIC Hub',
+        'error' => null,
+        'success' => null,
+        'step' => 'request'
+    ];
+    
+    // Handle POST request
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $email = trim($_POST['email'] ?? '');
+        
+        // Validasi format email
+        if (empty($email)) {
+            $data['error'] = 'Email harus diisi';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $data['error'] = 'Perbaiki penulisan email dengan benar';
+        } else {
+            try {
+                // Cek apakah email terdaftar di database
+                $user = epic_get_user_by_email($email);
+                
+                if (!$user) {
+                    $data['error'] = 'Maaf email Anda belum terdaftar di sistem kami';
+                } else {
+                    // Kirim email reset password
+                    $result = epic_send_reset_email($email);
+                    
+                    if ($result) {
+                        $data['step'] = 'sent';
+                        $data['success'] = 'Petunjuk untuk melakukan reset password telah dikirim melalui email anda';
+                        $data['email'] = $email;
+                    } else {
+                        $data['error'] = 'Gagal mengirim email reset password. Silakan coba lagi.';
+                    }
+                }
+            } catch (Exception $e) {
+                $data['error'] = 'Terjadi kesalahan sistem. Silakan coba lagi.';
+                error_log('Forgot password error: ' . $e->getMessage());
+            }
+        }
+    }
+    
     require_once EPIC_THEME_DIR . '/modern/auth/forgot-password.php';
 }
 
