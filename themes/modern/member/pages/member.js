@@ -183,7 +183,7 @@ function memberApp() {
         initMobileHandlers() {
             // Handle mobile menu toggle
             document.addEventListener('click', (e) => {
-                if (e.target.matches('.mobile-menu-toggle') || e.target.closest('.mobile-menu-toggle')) {
+                if (e.target.matches('.mobile-menu-btn') || e.target.closest('.mobile-menu-btn')) {
                     this.sidebarOpen = !this.sidebarOpen;
                 }
             });

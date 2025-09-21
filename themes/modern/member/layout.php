@@ -100,16 +100,36 @@ extract($layout_data);
     <!-- Alpine.js cloak style -->
     <style>
         [x-cloak] { display: none !important; }
+        
+        /* Ensure main content area has proper layout for footer */
+        .admin-main {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .admin-content {
+            flex: 1;
+        }
+        
+        /* Footer positioning */
+        .member-footer {
+            margin-top: auto;
+            flex-shrink: 0;
+        }
     </style>
     
     <?php if (isset($inline_css)): ?>
         <style><?= $inline_css ?></style>
     <?php endif; ?>
 </head>
-<body class="<?= $body_class ?>" x-data="memberApp()" x-init="init()" x-cloak>
+<body class="<?= $body_class ?> has-sidebar" x-data="memberApp()" x-init="init()" x-cloak :class="{ 'sidebar-collapsed': sidebarCollapsed }"
     <div class="admin-layout">
         <!-- Sidebar -->
         <?php include __DIR__ . '/components/sidebar.php'; ?>
+        
+        <!-- Mobile Overlay -->
+        <div class="sidebar-overlay" x-show="mobileMenuOpen" x-transition.opacity @click="mobileMenuOpen = false"></div>
         
         <!-- Main Content -->
         <main class="admin-main">
@@ -129,6 +149,9 @@ extract($layout_data);
                     </div>
                 <?php endif; ?>
             </div>
+            
+            <!-- Footer -->
+            <?php include __DIR__ . '/components/footer.php'; ?>
         </main>
     </div>
     
@@ -145,6 +168,74 @@ extract($layout_data);
     <!-- Initialize Feather Icons -->
     <script>
         feather.replace();
+        
+        // Alpine.js Member App Data
+        function memberApp() {
+            return {
+                sidebarCollapsed: localStorage.getItem('memberSidebarCollapsed') === 'true',
+                mobileMenuOpen: false,
+                
+                // Watch for mobile menu changes
+                $watch: {
+                    mobileMenuOpen() {
+                        this.updateBodyClass();
+                    }
+                },
+                
+                init() {
+                    // Apply initial state
+                    this.updateBodyClass();
+                    
+                    // Listen for storage changes (sync across tabs)
+                    window.addEventListener('storage', (e) => {
+                        if (e.key === 'memberSidebarCollapsed') {
+                            this.sidebarCollapsed = e.newValue === 'true';
+                            this.updateBodyClass();
+                        }
+                    });
+                    
+                    // Handle window resize for mobile
+                    window.addEventListener('resize', () => {
+                        if (window.innerWidth > 768) {
+                            this.mobileMenuOpen = false;
+                        }
+                    });
+                    
+                    // Close mobile menu when clicking outside
+                    document.addEventListener('click', (e) => {
+                        if (window.innerWidth <= 768 && this.mobileMenuOpen) {
+                            const sidebar = document.getElementById('memberSidebar');
+                            const mobileToggle = document.querySelector('.mobile-menu-btn');
+                            if (!sidebar?.contains(e.target) && !mobileToggle?.contains(e.target)) {
+                                this.mobileMenuOpen = false;
+                            }
+                        }
+                    });
+                },
+                
+                toggleSidebar() {
+                    this.sidebarCollapsed = !this.sidebarCollapsed;
+                    localStorage.setItem('memberSidebarCollapsed', this.sidebarCollapsed);
+                    this.updateBodyClass();
+                },
+                
+                updateBodyClass() {
+                    // Update body class for CSS transitions
+                    if (this.sidebarCollapsed) {
+                        document.body.classList.add('sidebar-collapsed');
+                    } else {
+                        document.body.classList.remove('sidebar-collapsed');
+                    }
+                    
+                    // Update mobile menu class
+                    if (this.mobileMenuOpen) {
+                        document.body.classList.add('sidebar-mobile-open');
+                    } else {
+                        document.body.classList.remove('sidebar-mobile-open');
+                    }
+                }
+            }
+        }
     </script>
 </body>
 </html>

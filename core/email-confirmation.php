@@ -193,7 +193,12 @@ function epic_send_welcome_email($user) {
             ]
         ];
         
-        $result = epic_send_email($email_data);
+        $result = epic_send_email(
+            $email_data['to'], 
+            $email_data['subject'], 
+            epic_render_email_template($email_data['template'], $email_data['data']),
+            epic_setting('site_name')
+        );
         
         if ($result['success']) {
             epic_log_activity($user['id'], 'welcome_email_sent', 'Welcome email sent to ' . $user['email']);

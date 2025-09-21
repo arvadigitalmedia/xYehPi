@@ -8,12 +8,8 @@ if (!defined('EPIC_INIT')) {
     die('Direct access not allowed');
 }
 
-// Include form fields helper
-require_once EPIC_ROOT . '/form-fields-helper.php';
-
-// Get dynamic form fields for profile
-$profile_fields = get_form_fields('profile');
-$profile_field_values = get_user_form_field_values($user['id'], 'profile');
+// Include form fields helper (kept for potential future use)
+// require_once EPIC_ROOT . '/form-fields-helper.php';
 
 // Data sudah disiapkan di profile.php
 ?>
@@ -196,36 +192,7 @@ $profile_field_values = get_user_form_field_values($user['id'], 'profile');
             </div>
         </div>
         
-        <!-- Dynamic Profile Fields -->
-        <?php if (!empty($profile_fields)): ?>
-            <div class="profile-option-card">
-                <div class="option-card-header">
-                    <div class="option-icon-container">
-                        <div class="option-icon">
-                            <i data-feather="edit-3" width="20" height="20"></i>
-                        </div>
-                    </div>
-                    <div class="option-content">
-                        <div class="option-title">Informasi Tambahan</div>
-                        <div class="option-description">Field tambahan untuk melengkapi profil</div>
-                    </div>
-                </div>
-                
-                <div class="option-card-body">
-                    <?php foreach ($profile_fields as $field): ?>
-                        <div class="form-group-compact">
-                            <label class="form-label-compact <?= $field['is_required'] ? 'required' : '' ?>">
-                                <?= htmlspecialchars($field['label']) ?>
-                            </label>
-                            <?php 
-                            $field_value = $profile_field_values[$field['name']]['value'] ?? '';
-                            echo render_profile_field($field, $field_value);
-                            ?>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        <?php endif; ?>
+
         
         <!-- Card Social Media (EPIC/EPIS only) -->
         <?php if (in_array($access_level, ['epic', 'epis'])): ?>

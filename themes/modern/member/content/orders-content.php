@@ -11,31 +11,52 @@ if (!defined('EPIC_INIT')) {
 // Data sudah disiapkan di orders.php
 ?>
 
-<!-- Orders Filter and Search -->
+<!-- Orders Filter and Search - Modern Card Style -->
 <div class="orders-filter-section">
-    <div class="filter-search-container">
-        <div class="search-box">
-            <div class="search-input-container">
-                <i data-feather="search" width="18" height="18"></i>
-                <input type="text" class="search-input" placeholder="Cari berdasarkan nama produk atau nomor order..." id="orderSearch">
+    <div class="filter-search-card">
+        <div class="filter-card-header">
+            <div class="filter-title">
+                <i data-feather="filter" width="20" height="20"></i>
+                <span>Filter & Pencarian</span>
             </div>
         </div>
         
-        <div class="filter-controls">
-            <div class="filter-tabs">
-                <button class="filter-tab active" data-filter="all">Semua</button>
-                <button class="filter-tab" data-filter="completed">Selesai</button>
-                <button class="filter-tab" data-filter="pending">Pending</button>
-                <button class="filter-tab" data-filter="cancelled">Dibatalkan</button>
+        <div class="filter-card-body">
+            <div class="search-section">
+                <div class="search-input-container">
+                    <i data-feather="search" width="18" height="18" class="search-icon"></i>
+                    <input type="text" class="search-input-modern" placeholder="Cari berdasarkan nama produk atau nomor order..." id="orderSearch">
+                </div>
             </div>
             
-            <div class="sort-dropdown">
-                <select class="sort-select" id="orderSort">
-                    <option value="date_desc">Terbaru</option>
-                    <option value="date_asc">Terlama</option>
-                    <option value="amount_desc">Harga Tertinggi</option>
-                    <option value="amount_asc">Harga Terendah</option>
-                </select>
+            <div class="filter-controls-modern">
+                <div class="filter-tabs-modern">
+                    <button class="filter-tab-modern active" data-filter="all">
+                        <i data-feather="list" width="16" height="16"></i>
+                        <span>Semua</span>
+                    </button>
+                    <button class="filter-tab-modern" data-filter="completed">
+                        <i data-feather="check-circle" width="16" height="16"></i>
+                        <span>Selesai</span>
+                    </button>
+                    <button class="filter-tab-modern" data-filter="pending">
+                        <i data-feather="clock" width="16" height="16"></i>
+                        <span>Pending</span>
+                    </button>
+                    <button class="filter-tab-modern" data-filter="cancelled">
+                        <i data-feather="x-circle" width="16" height="16"></i>
+                        <span>Dibatalkan</span>
+                    </button>
+                </div>
+                
+                <div class="sort-dropdown-modern">
+                    <select class="sort-select-modern" id="orderSort">
+                        <option value="date_desc">Terbaru</option>
+                        <option value="date_asc">Terlama</option>
+                        <option value="amount_desc">Harga Tertinggi</option>
+                        <option value="amount_asc">Harga Terendah</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>

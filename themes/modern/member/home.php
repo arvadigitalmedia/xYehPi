@@ -8,6 +8,9 @@ if (!defined('EPIC_INIT')) {
     die('Direct access not allowed');
 }
 
+// Include layout system
+require_once __DIR__ . '/components/page-layout.php';
+
 // Initialize data
 $user = $user ?? epic_current_user();
 $access_level = $access_level ?? epic_get_member_access_level($user);
@@ -137,6 +140,237 @@ require_once __DIR__ . '/content/home-content.php';
     transform: translate(50%, -50%);
 }
 
+/* ===== WELCOME SECTION & CARD FAMILY STYLES ===== */
+/* Base Welcome Section with Dark Gold Theme */
+.welcome-section {
+    background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
+    border: 1px solid var(--ink-700);
+    color: var(--ink-100);
+    padding: var(--spacing-8);
+    border-radius: var(--radius-2xl);
+    margin-bottom: var(--spacing-8);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.welcome-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: var(--gradient-gold-subtle);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+}
+
+/* ===== WELCOME CARD FAMILY - SHARED STYLES ===== */
+/* Base card styles yang digunakan oleh semua card dalam Welcome family */
+.welcome-card-base,
+.combined-info-card {
+    background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
+    border: 1px solid var(--ink-600);
+    border-radius: var(--radius-lg);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-fast);
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Shared top accent border untuk semua card dalam Welcome family */
+.welcome-card-base::before,
+.combined-info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-gold);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    opacity: 0.8;
+    transition: opacity var(--transition-fast);
+}
+
+/* Shared hover effects untuk Welcome card family */
+.welcome-card-base:hover,
+.combined-info-card:hover {
+    border-color: var(--gold-400);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(216, 183, 74, 0.15);
+}
+
+.welcome-card-base:hover::before,
+.combined-info-card:hover::before {
+    opacity: 1;
+}
+
+
+
+/* ===== WELCOME UPGRADE SECTION ===== */
+.welcome-upgrade-section {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(216, 183, 74, 0.05) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    margin-top: var(--spacing-4);
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-upgrade-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--warning) 0%, var(--gold-400) 50%, var(--warning) 100%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.upgrade-benefits {
+    margin-bottom: var(--spacing-4);
+}
+
+.upgrade-benefits-title {
+    color: var(--gold-300);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    margin: 0 0 var(--spacing-3) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.upgrade-benefits-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-2);
+}
+
+.upgrade-benefits-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    color: var(--ink-200);
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-1) 0;
+}
+
+.upgrade-benefits-list li i {
+    color: var(--success);
+    flex-shrink: 0;
+}
+
+.upgrade-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+}
+
+.upgrade-actions .btn {
+    flex: 1;
+    min-width: 140px;
+}
+
+
+
+/* ===== COMBINED INFO CARD - WELCOME FAMILY MEMBER ===== */
+.combined-info-card {
+    margin-bottom: var(--spacing-6);
+}
+
+.combined-card-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+
+.epis-supervisor-column,
+.referral-link-column {
+    padding: var(--spacing-5);
+    position: relative;
+}
+
+.epis-supervisor-column {
+    border-right: 1px solid var(--ink-600);
+}
+
+/* ===== WELCOME FAMILY RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .welcome-section,
+    .upgrade-prompt,
+    .combined-info-card {
+        margin-left: calc(-1 * var(--spacing-4));
+        margin-right: calc(-1 * var(--spacing-4));
+        border-radius: var(--radius-md);
+    }
+    
+    .combined-card-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .epis-supervisor-column {
+        border-right: none;
+        border-bottom: 1px solid var(--ink-600);
+    }
+    
+    .upgrade-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .upgrade-icon {
+        align-self: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-section,
+    .upgrade-prompt,
+    .combined-info-card {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .upgrade-prompt {
+        padding: var(--spacing-4);
+    }
+    
+    .epis-supervisor-column,
+    .referral-link-column {
+        padding: var(--spacing-4);
+    }
+}
+
+/* ===== WELCOME FAMILY LOCKED STATE ===== */
+.welcome-card-base.locked,
+.upgrade-prompt.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.welcome-card-base.locked::before,
+.upgrade-prompt.locked::before {
+    background: linear-gradient(90deg, var(--ink-500) 0%, var(--ink-400) 50%, var(--ink-500) 100%);
+}
+
+.welcome-card-base.locked:hover,
+.upgrade-prompt.locked:hover {
+    transform: none;
+    border-color: var(--ink-600);
+    box-shadow: var(--shadow-md);
+}
+
 .welcome-content {
     display: flex;
     justify-content: space-between;
@@ -170,76 +404,7 @@ require_once __DIR__ . '/content/home-content.php';
     margin-top: var(--spacing-6);
 }
 
-/* Activity Items */
-.activity-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-4);
-    padding: var(--spacing-4);
-    background: var(--surface-3);
-    border: 1px solid var(--ink-700);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--spacing-3);
-    transition: all var(--transition-fast);
-}
 
-.activity-item:hover {
-    background: var(--surface-4);
-    border-color: var(--gold-400);
-    transform: translateX(2px);
-}
-
-.activity-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--gradient-gold);
-    color: var(--ink-900);
-}
-
-.activity-icon.success {
-    background: linear-gradient(135deg, var(--success), var(--success-dark));
-    color: white;
-}
-
-.activity-icon.warning {
-    background: linear-gradient(135deg, var(--warning), var(--warning-dark));
-    color: white;
-}
-
-.activity-content {
-    flex: 1;
-}
-
-.activity-text {
-    color: var(--ink-100);
-    font-size: var(--font-size-sm);
-    line-height: 1.5;
-}
-
-.activity-text strong {
-    color: var(--gold-300);
-    font-weight: var(--font-weight-semibold);
-}
-
-.activity-time {
-    font-size: var(--font-size-xs);
-    color: var(--ink-400);
-    margin-top: var(--spacing-1);
-}
-
-.activity-amount {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
-    color: var(--success);
-    background: rgba(16, 185, 129, 0.1);
-    padding: var(--spacing-2) var(--spacing-3);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--success);
-}
 
 /* Empty State */
 .empty-state {
@@ -500,11 +665,7 @@ require_once __DIR__ . '/content/home-content.php';
         justify-content: center;
     }
     
-    .activity-item {
-        flex-direction: column;
-        text-align: center;
-        gap: var(--spacing-3);
-    }
+
 }
 
 @media (max-width: 480px) {
@@ -520,9 +681,7 @@ require_once __DIR__ . '/content/home-content.php';
         grid-template-columns: 1fr;
     }
     
-    .activity-item {
-        padding: var(--spacing-3);
-    }
+
     
     /* Referral Section Mobile */
     .referral-link-section {
@@ -1047,308 +1206,212 @@ require_once __DIR__ . '/content/home-content.php';
      }
  }
  
- /* Activity Section Styles */
- .activity-section {
-     margin-bottom: var(--spacing-6);
- }
- 
- .activity-container {
-     display: flex;
-     flex-direction: column;
-     gap: var(--spacing-3);
-     max-width: 100%;
-     overflow: hidden;
- }
- 
- .activity-card {
-     background: var(--surface-2);
-     border: 1px solid var(--ink-600);
-     border-radius: var(--radius-md);
-     padding: var(--spacing-4);
-     display: flex;
-     align-items: center;
-     gap: var(--spacing-3);
-     transition: all var(--transition-fast);
-     max-width: 100%;
-     box-sizing: border-box;
- }
- 
- .activity-card:hover {
-     border-color: var(--gold-400);
-     transform: translateY(-1px);
- }
- 
- /* Quick Actions Styles */
- .quick-actions-section {
-     margin-bottom: var(--spacing-6);
- }
- 
- .quick-actions-grid {
-     display: grid;
-     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-     gap: var(--spacing-4);
-     margin-bottom: var(--spacing-4);
-     max-width: 100%;
- }
- 
- .quick-action-card {
-     background: var(--surface-2);
-     border: 1px solid var(--ink-600);
-     border-radius: var(--radius-md);
-     padding: var(--spacing-4);
-     display: flex;
-     align-items: center;
-     gap: var(--spacing-3);
-     text-decoration: none;
-     color: inherit;
-     transition: all var(--transition-fast);
-     max-width: 100%;
-     box-sizing: border-box;
- }
- 
- .quick-action-card:hover {
-     border-color: var(--gold-400);
-     transform: translateY(-1px);
- }
- 
- .quick-actions-secondary {
-     display: flex;
-     gap: var(--spacing-3);
-     flex-wrap: wrap;
-     max-width: 100%;
- }
- 
- .quick-action-secondary {
-     background: var(--surface-3);
-     border: 1px solid var(--ink-600);
-     border-radius: var(--radius-sm);
-     padding: var(--spacing-2) var(--spacing-3);
-     display: flex;
-     align-items: center;
-     gap: var(--spacing-2);
-     text-decoration: none;
-     color: var(--ink-200);
-     font-size: var(--font-size-sm);
-     transition: all var(--transition-fast);
-     flex: 1;
-     min-width: 0;
-     box-sizing: border-box;
- }
- 
- .quick-action-secondary:hover {
-     background: var(--surface-2);
-     border-color: var(--gold-400);
- }
- 
- /* Responsive adjustments */
- @media (max-width: 768px) {
-     .quick-actions-grid {
-         grid-template-columns: 1fr;
-     }
-     
-     .quick-actions-secondary {
-         flex-direction: column;
-     }
-     
-     .quick-action-secondary {
-         flex: none;
-         width: 100%;
-     }
-     
-     .activity-card,
-     .quick-action-card {
-         padding: var(--spacing-3);
-     }
- }
- 
- @media (max-width: 480px) {
-     .activity-section,
-     .quick-actions-section {
-         margin-left: calc(-1 * var(--spacing-4));
-         margin-right: calc(-1 * var(--spacing-4));
-     }
-     
-     .activity-card,
-     .quick-action-card {
-         border-radius: 0;
-         border-left: none;
-         border-right: none;
-     }
- }
-</style>
 
-<script>
-/**
- * Copy referral link to clipboard with enhanced UX
- */
-function copyReferralLink() {
-    const input = document.getElementById('referralLinkInput');
-    const button = document.querySelector('.referral-copy-btn');
-    const copyText = button.querySelector('.copy-text');
-    const copyIcon = button.querySelector('[data-feather="copy"]');
-    
-    if (!input || !button) {
-        showCopyError();
-        return;
-    }
-    
-    // Get the text to copy
-    const textToCopy = input.value;
-    
-    if (!textToCopy) {
-        showCopyError();
-        return;
-    }
-    
-    // Try modern clipboard API first
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(textToCopy)
-            .then(() => {
-                showCopySuccess(button, copyText, copyIcon);
-            })
-            .catch(() => {
-                // Fallback to manual selection method
-                fallbackCopy(input, button, copyText, copyIcon);
-            });
-    } else {
-        // Fallback for older browsers or non-secure contexts
-        fallbackCopy(input, button, copyText, copyIcon);
-    }
+ 
+
+
+/* ===== UPGRADE PROMPT OPTIMIZATION ===== */
+.upgrade-prompt {
+    background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
+    border: 1px solid var(--ink-600);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    margin-bottom: var(--spacing-6);
+    position: relative;
+    overflow: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
-/**
- * Fallback copy method using selection and execCommand
- */
-function fallbackCopy(input, button, copyText, copyIcon) {
-    try {
-        // Focus and select the input
-        input.focus();
-        input.select();
-        input.setSelectionRange(0, 99999); // For mobile devices
-        
-        // Try to copy using execCommand
-        const successful = document.execCommand('copy');
-        
-        if (successful) {
-            showCopySuccess(button, copyText, copyIcon);
-        } else {
-            // If execCommand fails, show manual copy instruction
-            showManualCopyInstruction(input.value);
-        }
-    } catch (err) {
-        console.error('Fallback copy failed:', err);
-        showManualCopyInstruction(input.value);
-    }
+.upgrade-prompt::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--warning) 0%, var(--gold-400) 50%, var(--warning) 100%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
-/**
- * Show manual copy instruction when all methods fail
- */
-function showManualCopyInstruction(text) {
-    // Create a temporary modal or alert for manual copy
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        align-items: center;
+.upgrade-content {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-4);
+    position: relative;
+    z-index: 1;
+}
+
+.upgrade-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 2px solid rgba(245, 158, 11, 0.3);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--warning);
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+}
+
+.upgrade-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.upgrade-text h3 {
+    color: var(--gold-300);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    margin: 0 0 var(--spacing-2) 0;
+    line-height: 1.3;
+}
+
+.upgrade-desc {
+    font-size: var(--font-size-base);
+    color: var(--ink-200);
+    margin: 0 0 var(--spacing-4) 0;
+    line-height: 1.5;
+}
+
+.upgrade-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--spacing-5) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.upgrade-feature {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-size: var(--font-size-sm);
+    color: var(--ink-200);
+}
+
+.upgrade-feature::before {
+    content: '✓';
+    color: var(--warning);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-base);
+}
+
+.upgrade-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+}
+
+/* ===== SECTION CONSISTENCY OPTIMIZATION ===== */
+
+/* Consistent section styling */
+.upgrade-prompt {
+    background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
+    border: 1px solid var(--ink-600);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    margin-bottom: var(--spacing-6);
+    position: relative;
+    overflow: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Section headers consistency */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-5);
+    position: relative;
+    z-index: 1;
+}
+
+.section-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--gold-300);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.section-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--ink-300);
+    margin: var(--spacing-1) 0 0 0;
+    line-height: 1.4;
+}
+
+
+
+.pill-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+    border: 1px solid var(--warning);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ===== RESPONSE CONSISTENCY ===== */
+@media (max-width: 768px) {
+    .upgrade-content {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-4);
+    }
+    
+    .upgrade-icon {
+        align-self: center;
+    }
+    
+    .upgrade-actions {
         justify-content: center;
-        z-index: 10000;
-    `;
-    
-    modal.innerHTML = `
-        <div style="
-            background: var(--surface-2);
-            padding: 2rem;
-            border-radius: 12px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-            color: var(--ink-100);
-        ">
-            <h3 style="margin-bottom: 1rem; color: var(--gold-300);">Salin Link Manual</h3>
-            <p style="margin-bottom: 1rem;">Silakan salin link berikut secara manual:</p>
-            <div style="
-                background: var(--surface-4);
-                padding: 1rem;
-                border-radius: 8px;
-                margin-bottom: 1rem;
-                word-break: break-all;
-                font-family: monospace;
-                border: 1px solid var(--ink-600);
-            ">${text}</div>
-            <button onclick="this.parentElement.parentElement.remove()" style="
-                background: var(--gradient-gold);
-                border: none;
-                padding: 0.5rem 1rem;
-                border-radius: 6px;
-                color: var(--ink-900);
-                font-weight: bold;
-                cursor: pointer;
-            ">Tutup</button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Auto remove after 10 seconds
-    setTimeout(() => {
-        if (modal.parentElement) {
-            modal.remove();
-        }
-    }, 10000);
-}
-
-/**
- * Show copy success feedback
- */
-function showCopySuccess(button, copyText, copyIcon) {
-    // Add copied class for styling
-    button.classList.add('copied');
-    
-    // Change text and icon
-    copyText.textContent = 'Tersalin!';
-    copyIcon.setAttribute('data-feather', 'check');
-    
-    // Refresh feather icons
-    if (typeof feather !== 'undefined') {
-        feather.replace();
+        width: 100%;
     }
     
-    // Reset after 2 seconds
-    setTimeout(() => {
-        button.classList.remove('copied');
-        copyText.textContent = 'Salin';
-        copyIcon.setAttribute('data-feather', 'copy');
-        
-        if (typeof feather !== 'undefined') {
-            feather.replace();
-        }
-    }, 2000);
-}
-
-/**
- * Show copy error feedback
- */
-function showCopyError() {
-    // Try to get the link value for manual copy
-    const input = document.getElementById('referralLinkInput');
-    if (input && input.value) {
-        showManualCopyInstruction(input.value);
+    .upgrade-actions .btn {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .upgrade-prompt {
+        padding: var(--spacing-4);
+    }
+    
+    .section-header {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-2);
     }
 }
 
-
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Refresh feather icons for referral section
-    if (typeof feather !== 'undefined') {
-        feather.replace();
+@media (max-width: 480px) {
+    .upgrade-prompt {
+        margin-left: calc(-1 * var(--spacing-4));
+        margin-right: calc(-1 * var(--spacing-4));
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        padding: var(--spacing-4);
     }
-});
-</script>
+    
+    .upgrade-features {
+        gap: var(--spacing-3);
+    }
+    
+    .upgrade-actions {
+        flex-direction: column;
+    }
+    
+    .upgrade-actions .btn {
+        width: 100%;
+    }
+}

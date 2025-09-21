@@ -59,12 +59,8 @@ function epic_send_email_mailketing($to, $subject, $message, $from_name = null, 
     
     // Log aktivitas
     if (function_exists('epic_log_activity') && isset($_SESSION['user_id'])) {
-        epic_log_activity($_SESSION['user_id'], 'mailketing_send_attempt', [
-            'to' => $to,
-            'subject' => $subject,
-            'from_name' => $from_name,
-            'from_email' => $from_email
-        ]);
+        epic_log_activity($_SESSION['user_id'], 'mailketing_send_attempt', 
+            "Mailketing send attempt to: {$to}, subject: {$subject}");
     }
     
     try {
@@ -119,12 +115,9 @@ function epic_send_email_mailketing($to, $subject, $message, $from_name = null, 
         
         // Log response
         if (function_exists('epic_log_activity') && isset($_SESSION['user_id'])) {
-            epic_log_activity($_SESSION['user_id'], 'mailketing_send_response', [
-                'to' => $to,
-                'http_code' => $http_code,
-                'success' => isset($result['success']) ? $result['success'] : false,
-                'response' => $result
-            ]);
+            $success_status = isset($result['success']) ? ($result['success'] ? 'success' : 'failed') : 'unknown';
+            epic_log_activity($_SESSION['user_id'], 'mailketing_send_response', 
+                "Mailketing response to: {$to}, HTTP: {$http_code}, Status: {$success_status}");
         }
         
         // Check API response - Mailketing menggunakan format berbeda

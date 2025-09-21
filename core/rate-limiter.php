@@ -7,8 +7,31 @@
  * @version 1.0.0
  */
 
+// Conditional type declaration for IDE support
+if (!class_exists('Redis') && !extension_loaded('redis')) {
+    /**
+     * Mock Redis class for IDE type hinting when Redis extension is not available
+     * This is only for IDE support and will not be used at runtime
+     */
+    class Redis {
+        public function connect($host, $port) { return false; }
+        public function auth($password) { return false; }
+        public function get($key) { return false; }
+        public function set($key, $value, $ttl = null) { return false; }
+        public function incr($key) { return false; }
+        public function expire($key, $ttl) { return false; }
+        public function del($key) { return false; }
+        public function close() { return false; }
+        public function ping() { return false; }
+        public function zRemRangeByScore($key, $min, $max) { return false; }
+        public function zCard($key) { return false; }
+        public function zRange($key, $start, $stop, $withscores = false) { return false; }
+        public function zAdd($key, $score, $member) { return false; }
+    }
+}
+
 class EpicRateLimiter {
-    /** @var Redis|null */
+    /** @var Redis|null Redis instance when available */
     private $redis = null;
     /** @var bool */
     private $use_redis = false;
@@ -21,6 +44,12 @@ class EpicRateLimiter {
         
         if ($this->use_redis) {
             try {
+                // Ensure Redis class exists before instantiation
+                if (!class_exists('Redis')) {
+                    throw new Exception('Redis class not available');
+                }
+                
+                /** @var Redis $redis */
                 $this->redis = new Redis();
                 $connection_result = $this->redis->connect(REDIS_HOST, (int)REDIS_PORT);
                 

@@ -44,10 +44,27 @@ if (!defined('EPIC_INIT')) {
             </div>
             <div class="welcome-actions-new">
                 <?php if ($access_level === 'free'): ?>
-                    <a href="<?= epic_url('upgrade') ?>" class="btn btn-primary">
-                        <i data-feather="arrow-up" width="16" height="16" class="icon-light"></i>
-                        Upgrade
-                    </a>
+                    <div class="welcome-upgrade-section">
+                        <div class="upgrade-benefits">
+                            <h4 class="upgrade-benefits-title">Upgrade ke EPIC Account</h4>
+                            <ul class="upgrade-benefits-list">
+                                <li><i data-feather="check" width="14" height="14"></i> Sistem Referral Aktif</li>
+                                <li><i data-feather="check" width="14" height="14"></i> Komisi & Bonus Tracking</li>
+                                <li><i data-feather="check" width="14" height="14"></i> Analytics Lengkap</li>
+                                <li><i data-feather="check" width="14" height="14"></i> Priority Support</li>
+                            </ul>
+                        </div>
+                        <div class="upgrade-actions">
+                            <a href="<?= epic_url('upgrade') ?>" class="btn btn-warning btn-lg">
+                                <i data-feather="star" width="16" height="16" class="icon-light"></i>
+                                Upgrade Sekarang
+                            </a>
+                            <a href="<?= epic_url('pricing') ?>" class="btn btn-secondary">
+                                <i data-feather="info" width="16" height="16" class="icon-light"></i>
+                                Lihat Paket
+                            </a>
+                        </div>
+                    </div>
                 <?php else: ?>
                     <a href="<?= epic_url('dashboard/member/profile') ?>" class="btn btn-secondary">
                         <i data-feather="settings" width="16" height="16" class="icon-light"></i>
@@ -283,223 +300,5 @@ if (!defined('EPIC_INIT')) {
     </div>
 </div>
 
-<!-- Upgrade Prompt for Free Users -->
-<?php if ($access_level === 'free'): ?>
-    <div class="upgrade-prompt">
-        <div class="upgrade-content">
-            <div class="upgrade-icon">
-                <i data-feather="star" width="24" height="24"></i>
-            </div>
-            <div class="upgrade-text">
-                <h3 class="upgrade-title">Upgrade ke EPIC Account</h3>
-                <p class="upgrade-desc">
-                    Dapatkan akses ke semua fitur premium dan mulai earning dengan sistem referral!
-                </p>
-                <ul class="upgrade-features">
-                    <li class="upgrade-feature">Sistem Referral Aktif</li>
-                    <li class="upgrade-feature">Komisi & Bonus Tracking</li>
-                    <li class="upgrade-feature">Landing Page Premium</li>
-                    <li class="upgrade-feature">Analytics Lengkap</li>
-                    <li class="upgrade-feature">Priority Support</li>
-                </ul>
-                <div class="upgrade-actions">
-                    <a href="<?= epic_url('upgrade') ?>" class="btn btn-warning btn-lg">
-                        <i data-feather="arrow-up" width="16" height="16"></i>
-                        Upgrade Sekarang
-                    </a>
-                    <a href="<?= epic_url('pricing') ?>" class="btn btn-secondary">
-                        Lihat Paket
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
-
-<!-- Recent Activity -->
-<div class="activity-section">
-    <div class="section-header">
-        <h3 class="section-title">Aktivitas Terbaru</h3>
-        <p class="section-subtitle">Riwayat aktivitas dan transaksi terkini</p>
-    </div>
-    
-    <div class="activity-container">
-        <?php if (!empty($recent_activities)): ?>
-            <?php foreach ($recent_activities as $activity): ?>
-                <?php 
-                // Skip commission activities for free users
-                if ($access_level === 'free' && in_array($activity['type'], ['commission', 'referral'])) {
-                    continue;
-                }
-                ?>
-                <div class="activity-card">
-                    <div class="activity-icon-container">
-                        <div class="activity-icon activity-icon-<?= $activity['status'] ?>">
-                            <i data-feather="<?= $activity['icon'] ?>" width="20" height="20"></i>
-                        </div>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-header">
-                            <div class="activity-title"><?= htmlspecialchars($activity['title']) ?></div>
-                            <div class="activity-time">
-                                <i data-feather="clock" width="14" height="14"></i>
-                                <span><?= epic_format_relative_time($activity['time']) ?></span>
-                            </div>
-                        </div>
-                        <div class="activity-description"><?= htmlspecialchars($activity['description']) ?></div>
-                        <?php if ($activity['amount'] > 0): ?>
-                            <div class="activity-amount">
-                                <span class="amount-label">Jumlah:</span>
-                                <span class="amount-value">+Rp <?= number_format($activity['amount'], 0, ',', '.') ?></span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    <div class="activity-status">
-                        <span class="pill-<?= $activity['status'] ?>"><?= ucfirst($activity['status']) ?></span>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="activity-empty-state">
-                <div class="empty-state-icon">
-                    <i data-feather="activity" width="48" height="48"></i>
-                </div>
-                <div class="empty-state-content">
-                    <h4 class="empty-state-title">Belum Ada Aktivitas</h4>
-                    <p class="empty-state-text">
-                        Aktivitas Anda akan muncul di sini setelah Anda mulai menggunakan platform.
-                    </p>
-                </div>
-            </div>
-        <?php endif; ?>
-    </div>
-</div>
-
-<!-- Quick Actions -->
-<div class="quick-actions-section">
-    <div class="section-header">
-        <h3 class="section-title">Quick Actions</h3>
-        <p class="section-subtitle">Akses cepat ke fitur utama</p>
-    </div>
-    
-    <div class="quick-actions-grid">
-        <a href="<?= epic_url('dashboard/member/profile') ?>" class="quick-action-card">
-            <div class="quick-action-icon">
-                <i data-feather="user" width="24" height="24"></i>
-            </div>
-            <div class="quick-action-content">
-                <div class="quick-action-title">Edit Profil</div>
-                <div class="quick-action-desc">Kelola informasi akun Anda</div>
-            </div>
-            <div class="quick-action-arrow">
-                <i data-feather="arrow-right" width="16" height="16"></i>
-            </div>
-        </a>
-        
-        <?php if (epic_member_can_access('prospects', $user)): ?>
-            <a href="<?= epic_url('dashboard/member/prospects') ?>" class="quick-action-card">
-                <div class="quick-action-icon">
-                    <i data-feather="users" width="24" height="24"></i>
-                </div>
-                <div class="quick-action-content">
-                    <div class="quick-action-title">Kelola Prospek</div>
-                    <div class="quick-action-desc">Manajemen prospek dan leads</div>
-                </div>
-                <div class="quick-action-arrow">
-                    <i data-feather="arrow-right" width="16" height="16"></i>
-                </div>
-            </a>
-        <?php else: ?>
-            <div class="quick-action-card quick-action-locked">
-                <div class="quick-action-icon">
-                    <i data-feather="lock" width="24" height="24"></i>
-                </div>
-                <div class="quick-action-content">
-                    <div class="quick-action-title">Kelola Prospek</div>
-                    <div class="quick-action-desc">Upgrade untuk akses</div>
-                </div>
-                <div class="quick-action-badge">
-                    <span class="pill-warning">Premium</span>
-                </div>
-            </div>
-        <?php endif; ?>
-        
-        <?php if (epic_member_can_access('bonus', $user)): ?>
-            <a href="<?= epic_url('dashboard/member/bonus') ?>" class="quick-action-card">
-                <div class="quick-action-icon">
-                    <i data-feather="dollar-sign" width="24" height="24"></i>
-                </div>
-                <div class="quick-action-content">
-                    <div class="quick-action-title">Bonus Cash</div>
-                    <div class="quick-action-desc">Lihat komisi dan bonus Anda</div>
-                </div>
-                <div class="quick-action-arrow">
-                    <i data-feather="arrow-right" width="16" height="16"></i>
-                </div>
-            </a>
-        <?php else: ?>
-            <div class="quick-action-card quick-action-locked">
-                <div class="quick-action-icon">
-                    <i data-feather="lock" width="24" height="24"></i>
-                </div>
-                <div class="quick-action-content">
-                    <div class="quick-action-title">Bonus Cash</div>
-                    <div class="quick-action-desc">Upgrade untuk akses</div>
-                </div>
-                <div class="quick-action-badge">
-                    <span class="pill-warning">Premium</span>
-                </div>
-            </div>
-        <?php endif; ?>
-        
-        <a href="<?= epic_url('dashboard/member/products') ?>" class="quick-action-card">
-            <div class="quick-action-icon">
-                <i data-feather="package" width="24" height="24"></i>
-            </div>
-            <div class="quick-action-content">
-                <div class="quick-action-title">Akses Produk</div>
-                <div class="quick-action-desc">Produk yang dapat Anda akses</div>
-            </div>
-            <div class="quick-action-arrow">
-                <i data-feather="arrow-right" width="16" height="16"></i>
-            </div>
-        </a>
-    </div>
-    
-    <!-- Secondary Actions Row -->
-    <div class="quick-actions-secondary">
-        <a href="<?= epic_url('dashboard/member/orders') ?>" class="quick-action-secondary">
-            <div class="quick-action-icon-sm">
-                <i data-feather="shopping-cart" width="18" height="18"></i>
-            </div>
-            <span>History Order</span>
-            <i data-feather="external-link" width="14" height="14"></i>
-        </a>
-        
-        <?php if ($access_level === 'free'): ?>
-            <a href="<?= epic_url('upgrade') ?>" class="quick-action-secondary quick-action-upgrade">
-                <div class="quick-action-icon-sm">
-                    <i data-feather="star" width="18" height="18"></i>
-                </div>
-                <span>Upgrade Account</span>
-                <i data-feather="arrow-up-right" width="14" height="14"></i>
-            </a>
-        <?php else: ?>
-            <a href="<?= epic_url('dashboard/member/analytics') ?>" class="quick-action-secondary">
-                <div class="quick-action-icon-sm">
-                    <i data-feather="bar-chart-2" width="18" height="18"></i>
-                </div>
-                <span>Analytics</span>
-                <i data-feather="external-link" width="14" height="14"></i>
-            </a>
-        <?php endif; ?>
-        
-        <a href="<?= epic_url('support') ?>" class="quick-action-secondary">
-            <div class="quick-action-icon-sm">
-                <i data-feather="help-circle" width="18" height="18"></i>
-            </div>
-            <span>Bantuan</span>
-            <i data-feather="external-link" width="14" height="14"></i>
-        </a>
-    </div>
-</div>
+<!-- Spacing untuk footer -->
+<div style="margin-bottom: var(--spacing-8);"></div>

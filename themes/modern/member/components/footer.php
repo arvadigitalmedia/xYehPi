@@ -10,25 +10,39 @@ if (!defined('EPIC_INIT')) {
 
 $site_name = epic_setting('site_name', 'EPIC Hub');
 $current_year = date('Y');
+$app_version = '2.0.0';
 ?>
 
 <footer class="member-footer">
     <div class="footer-content">
         <div class="footer-left">
             <p class="footer-text">
-                © <?= $current_year ?> <?= htmlspecialchars($site_name) ?>. All rights reserved.
+                &copy; <?= $current_year ?> <?= htmlspecialchars($site_name) ?>. All rights reserved.
+            </p>
+            <p class="footer-version">
+                Version <?= $app_version ?>
             </p>
         </div>
         
         <div class="footer-right">
             <div class="footer-links">
-                <a href="<?= epic_url('privacy') ?>" class="footer-link">Privacy Policy</a>
-                <a href="<?= epic_url('terms') ?>" class="footer-link">Terms of Service</a>
-                <a href="<?= epic_url('support') ?>" class="footer-link">Support</a>
+                <a href="<?= epic_url('help') ?>" class="footer-link">
+                    <i data-feather="help-circle" width="14" height="14"></i>
+                    <span>Help</span>
+                </a>
+                <a href="<?= epic_url('docs') ?>" class="footer-link">
+                    <i data-feather="book-open" width="14" height="14"></i>
+                    <span>Documentation</span>
+                </a>
+                <a href="<?= epic_url('support') ?>" class="footer-link">
+                    <i data-feather="message-circle" width="14" height="14"></i>
+                    <span>Support</span>
+                </a>
             </div>
             
-            <div class="footer-version">
-                <span class="version-text">v2.0.0</span>
+            <div class="footer-status">
+                <div class="status-indicator status-online" title="System Online"></div>
+                <span class="status-text">System Online</span>
             </div>
         </div>
     </div>
@@ -37,9 +51,9 @@ $current_year = date('Y');
 <style>
 /* Footer Styles */
 .member-footer {
-    background: #f8fafc;
-    border-top: 1px solid #e2e8f0;
-    padding: 1.5rem 0;
+    background: var(--surface-2, #f8fafc);
+    border-top: 1px solid var(--ink-700, #e2e8f0);
+    padding: var(--spacing-4, 1rem) var(--spacing-6, 1.5rem);
     margin-top: auto;
 }
 
@@ -47,54 +61,75 @@ $current_year = date('Y');
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2rem;
     max-width: 100%;
 }
 
 .footer-left {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1, 0.25rem);
 }
 
 .footer-text {
+    color: var(--ink-300, #64748b);
+    font-size: var(--font-size-sm, 0.875rem);
     margin: 0;
-    color: #64748b;
-    font-size: 0.875rem;
+}
+
+.footer-version {
+    color: var(--ink-400, #94a3b8);
+    font-size: var(--font-size-xs, 0.75rem);
+    margin: 0;
 }
 
 .footer-right {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: var(--spacing-6, 1.5rem);
 }
 
 .footer-links {
     display: flex;
-    gap: 1.5rem;
+    align-items: center;
+    gap: var(--spacing-4, 1rem);
 }
 
 .footer-link {
-    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2, 0.5rem);
+    color: var(--ink-400, #64748b);
     text-decoration: none;
-    font-size: 0.875rem;
-    transition: color 0.2s;
+    font-size: var(--font-size-sm, 0.875rem);
+    transition: color var(--transition-fast, 0.2s);
 }
 
 .footer-link:hover {
-    color: #334155;
+    color: var(--ink-200, #334155);
 }
 
-.footer-version {
+.footer-status {
     display: flex;
     align-items: center;
+    gap: var(--spacing-2, 0.5rem);
 }
 
-.version-text {
-    color: #94a3b8;
-    font-size: 0.75rem;
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success, #22c55e);
+}
+
+.status-indicator.status-online {
+    background: var(--success, #22c55e);
+    box-shadow: 0 0 0 2px var(--success-light, rgba(34, 197, 94, 0.2));
+}
+
+.status-text {
+    color: var(--ink-400, #64748b);
+    font-size: var(--font-size-xs, 0.75rem);
     font-weight: 500;
-    padding: 0.25rem 0.5rem;
-    background: #e2e8f0;
-    border-radius: 0.375rem;
 }
 
 /* Mobile Responsive */

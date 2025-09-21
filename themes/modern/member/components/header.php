@@ -30,7 +30,7 @@ $page_title = $page_titles[$current_page] ?? 'Member Area';
         <!-- Left Section -->
         <div class="header-left">
             <!-- Mobile Menu Toggle -->
-            <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">
+            <button class="mobile-menu-btn" @click="mobileMenuOpen = !mobileMenuOpen">
                 <i data-feather="menu" width="20" height="20"></i>
             </button>
             
@@ -192,13 +192,14 @@ $page_title = $page_titles[$current_page] ?? 'Member Area';
 
 .mobile-menu-btn {
     display: none;
-    background: rgba(212, 175, 55, 0.08);
-    border: 1px solid #D4AF37;
+    background: rgba(212, 175, 55, 0.1);
     color: #D4AF37;
-    cursor: pointer;
-    padding: 0.5rem;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    padding: 0.75rem;
     border-radius: 0.5rem;
     transition: all 0.2s;
+    cursor: pointer;
+    z-index: 1002;
 }
 
 .mobile-menu-btn:hover {
@@ -779,14 +780,16 @@ $page_title = $page_titles[$current_page] ?? 'Member Area';
     }
     
     .mobile-menu-btn {
-        display: block;
+        display: block !important;
+        position: relative;
+        z-index: 1002;
     }
     
     .page-title {
         font-size: 1.25rem;
     }
     
-    .quick-stats {
+    .quick-stats-horizontal {
         display: none;
     }
     

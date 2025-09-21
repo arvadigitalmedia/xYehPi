@@ -90,7 +90,7 @@ $dashboard_member_submenu = [
                 <span class="sidebar-nav-text">Dashboard Member</span>
                 <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
             </div>
-            <div class="sidebar-submenu <?= shouldExpandSubmenu($dashboard_member_submenu, $current_url) ? 'show' : '' ?>">
+            <div class="sidebar-submenu <?= shouldExpandSubmenu($dashboard_member_submenu, $current_url) ? 'expanded' : '' ?>">
                 <?php foreach ($dashboard_member_submenu as $item): ?>
                     <a href="<?= epic_url($item['path']) ?>" class="sidebar-submenu-item <?= isMenuActive($item['path'], $current_url) ? 'active' : '' ?>">
                         <span class="sidebar-submenu-text"><?= $item['text'] ?></span>
@@ -106,7 +106,7 @@ $dashboard_member_submenu = [
                 <span class="sidebar-nav-text">Manage</span>
                 <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
             </div>
-            <div class="sidebar-submenu <?= shouldExpandSubmenu($manage_submenu, $current_url) ? 'show' : '' ?>">
+            <div class="sidebar-submenu <?= shouldExpandSubmenu($manage_submenu, $current_url) ? 'expanded' : '' ?>">
                 <?php foreach ($manage_submenu as $item): ?>
                     <a href="<?= epic_url($item['path']) ?>" class="sidebar-submenu-item <?= isMenuActive($item['path'], $current_url) ? 'active' : '' ?>">
                         <span class="sidebar-submenu-text"><?= $item['text'] ?></span>
@@ -122,7 +122,7 @@ $dashboard_member_submenu = [
                 <span class="sidebar-nav-text">Integrasi</span>
                 <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
             </div>
-            <div class="sidebar-submenu <?= shouldExpandSubmenu($integrasi_submenu, $current_url) ? 'show' : '' ?>">
+            <div class="sidebar-submenu <?= shouldExpandSubmenu($integrasi_submenu, $current_url) ? 'expanded' : '' ?>">
                 <?php foreach ($integrasi_submenu as $item): ?>
                     <a href="<?= epic_url($item['path']) ?>" class="sidebar-submenu-item <?= isMenuActive($item['path'], $current_url) ? 'active' : '' ?>">
                         <span class="sidebar-submenu-text"><?= $item['text'] ?></span>
@@ -165,3 +165,65 @@ $dashboard_member_submenu = [
         <i data-feather="chevron-right" class="collapse-icon-right" style="display: none;"></i>
     </button>
 </aside>
+
+<script>
+// Toggle submenu function - menggunakan class .expanded untuk konsistensi dengan CSS
+function toggleSubmenu(element) {
+    const parent = element;
+    const submenu = parent.nextElementSibling;
+    const arrow = parent.querySelector('.sidebar-nav-arrow');
+    
+    if (submenu && submenu.classList.contains('sidebar-submenu')) {
+        // Close other submenus
+        document.querySelectorAll('.sidebar-submenu.expanded').forEach(menu => {
+            if (menu !== submenu) {
+                menu.classList.remove('expanded');
+                const parentElement = menu.previousElementSibling;
+                if (parentElement) {
+                    parentElement.classList.remove('expanded');
+                    const parentArrow = parentElement.querySelector('.sidebar-nav-arrow');
+                    if (parentArrow) {
+                        parentArrow.style.transform = 'rotate(0deg)';
+                    }
+                }
+            }
+        });
+        
+        // Toggle current submenu
+        submenu.classList.toggle('expanded');
+        parent.classList.toggle('expanded');
+        
+        // Animate arrow
+        if (arrow) {
+            arrow.style.transform = submenu.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+    }
+}
+
+// Toggle sidebar function
+function toggleSidebar() {
+    const sidebar = document.getElementById('admin-sidebar');
+    const leftIcon = document.querySelector('.collapse-icon-left');
+    const rightIcon = document.querySelector('.collapse-icon-right');
+    
+    if (sidebar) {
+        if (sidebar.classList.contains('collapsed')) {
+            sidebar.classList.remove('collapsed');
+            if (leftIcon) leftIcon.style.display = 'block';
+            if (rightIcon) rightIcon.style.display = 'none';
+        } else {
+            sidebar.classList.add('collapsed');
+            if (leftIcon) leftIcon.style.display = 'none';
+            if (rightIcon) rightIcon.style.display = 'block';
+            
+            // Close all submenus when sidebar is collapsed
+            document.querySelectorAll('.sidebar-nav-parent').forEach(p => {
+                p.classList.remove('expanded');
+            });
+            document.querySelectorAll('.sidebar-submenu').forEach(s => {
+                s.classList.remove('expanded');
+            });
+        }
+    }
+}
+</script>

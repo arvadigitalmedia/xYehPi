@@ -1,8 +1,8 @@
 /**
  * EPIC Hub Member Layout System
- * Consistent styling untuk semua halaman member area
+ * Consistent styling untuk semua halaman member area dengan sidebar minimize support
  * 
- * @version 1.0.0
+ * @version 2.0.0
  * @author EPIC Hub Team
  */
 
@@ -16,6 +16,10 @@
   --epic-space-xl: 1.5rem;     /* 24px */
   --epic-space-2xl: 2rem;      /* 32px */
   --epic-space-3xl: 3rem;      /* 48px */
+  
+  /* Sidebar Layout */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 70px;
   
   /* Typography Scale */
   --epic-text-xs: 0.75rem;     /* 12px */
@@ -49,6 +53,55 @@
   --epic-transition-fast: 150ms ease-in-out;
   --epic-transition-normal: 250ms ease-in-out;
   --epic-transition-slow: 350ms ease-in-out;
+}
+
+/* ===== LAYOUT SYSTEM ===== */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.admin-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.has-sidebar.sidebar-collapsed .admin-main {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
+.admin-content {
+  flex: 1;
+  padding: var(--epic-space-2xl);
+  overflow-x: auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Content Container */
+.content-container {
+  max-width: 100%;
+  margin: 0 auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Responsive Layout Adjustments */
+@media (max-width: 768px) {
+  .admin-main {
+    margin-left: 0;
+  }
+  
+  .has-sidebar.sidebar-collapsed .admin-main {
+    margin-left: 0;
+  }
+  
+  .admin-content {
+    padding: var(--epic-space-lg);
+  }
 }
 
 /* ===== PAGE HEADER COMPONENT ===== */

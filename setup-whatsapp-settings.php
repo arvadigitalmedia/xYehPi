@@ -63,7 +63,7 @@ try {
         'starsender_registration_referral_message' => 'Halo [sponsor_name]! 🎉\n\nAda prospek baru yang mendaftar melalui link referral Anda!\n\n👤 Nama: [user_name]\n📧 Email: [user_email]\n📱 Phone: [user_phone]\n📅 Tanggal: [user_join_date]\n🏷️ Level: [user_level]\n\nSelamat! Terus promosikan link referral Anda untuk mendapatkan lebih banyak prospek.\n\nTerima kasih!',
         
         'starsender_registration_image' => '',
-        'starsender_registration_button' => ''
+        'starsender_registration_button' => '',
         
         // Upgrade messages
         'starsender_upgrade_user_message' => 'Selamat [user_name]! 🎉

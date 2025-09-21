@@ -111,6 +111,11 @@ if (file_exists(EPIC_CORE_DIR . '/csrf-protection.php')) {
     require_once EPIC_CORE_DIR . '/csrf-protection.php';
 }
 
+// Load function aliases for backward compatibility (AFTER core functions)
+if (file_exists(EPIC_CORE_DIR . '/function-aliases.php')) {
+    require_once EPIC_CORE_DIR . '/function-aliases.php';
+}
+
 // Load additional core files if they exist
 if (file_exists(EPIC_CORE_DIR . '/auth.php')) {
     require_once EPIC_CORE_DIR . '/auth.php';
@@ -371,6 +376,68 @@ function epic_set_old($data) {
 
 function epic_clear_old() {
     unset($_SESSION['epic_old']);
+}
+
+/**
+ * Get configuration value with dot notation support
+ * @param string $key Configuration key (e.g., 'api.rate_limit')
+ * @param mixed $default Default value if key not found
+ * @return mixed Configuration value
+ */
+function epic_config($key, $default = null) {
+    // Handle dot notation (e.g., 'api.rate_limit')
+    if (strpos($key, '.') !== false) {
+        $parts = explode('.', $key);
+        $config_key = strtoupper(implode('_', $parts));
+        
+        // Try to get from constants first
+        if (defined($config_key)) {
+            return constant($config_key);
+        }
+        
+        // Try with EPIC_ prefix
+        $epic_key = 'EPIC_' . $config_key;
+        if (defined($epic_key)) {
+            return constant($epic_key);
+        }
+        
+        // Try to get from database settings
+        try {
+            $setting_key = str_replace('.', '_', $key);
+            $value = epic_setting($setting_key, $default);
+            if ($value !== $default) {
+                return $value;
+            }
+        } catch (Exception $e) {
+            // Ignore database errors during config lookup
+        }
+    } else {
+        // Simple key lookup
+        $config_key = strtoupper($key);
+        
+        // Try to get from constants first
+        if (defined($config_key)) {
+            return constant($config_key);
+        }
+        
+        // Try with EPIC_ prefix
+        $epic_key = 'EPIC_' . $config_key;
+        if (defined($epic_key)) {
+            return constant($epic_key);
+        }
+        
+        // Try to get from database settings
+        try {
+            $value = epic_setting($key, $default);
+            if ($value !== $default) {
+                return $value;
+            }
+        } catch (Exception $e) {
+            // Ignore database errors during config lookup
+        }
+    }
+    
+    return $default;
 }
 
 // Check if application needs installation or migration
