@@ -32,11 +32,18 @@ $manage_submenu = [
     ['path' => '/admin/manage/epis', 'text' => 'EPIS Accounts'],
     ['path' => '/admin/manage/order', 'text' => 'Order'],
     ['path' => '/admin/manage/product', 'text' => 'Product'],
-    ['path' => '/admin/manage/landing-page-manager', 'text' => 'Landing Page Manager'],
     ['path' => '/admin/event-scheduling', 'text' => 'Event Scheduling'],
     ['path' => '/admin/manage/payout', 'text' => 'Payout'],
     ['path' => '/admin/manage/finance', 'text' => 'Finance'],
     ['path' => '/admin/manage/update-price', 'text' => 'Update Price']
+];
+
+// Landing Pages submenu
+$landing_pages_submenu = [
+    ['path' => '/admin/manage/landing-page-manager', 'text' => 'Landing Page Manager'],
+    ['path' => '/admin/manage/landing-page-manager/create', 'text' => 'Buat Landing Page'],
+    ['path' => '/admin/manage/landing-page-manager/analytics', 'text' => 'Analytics & Reports'],
+    ['path' => '/admin/manage/landing-page-manager/settings', 'text' => 'Settings']
 ];
 
 // Settings submenu removed - now using direct link to general settings
@@ -115,7 +122,23 @@ $dashboard_member_submenu = [
             </div>
         </div>
         
-        <!-- 5. Integrasi -->
+        <!-- 5. Landing Pages -->
+        <div class="sidebar-nav-group">
+            <div class="sidebar-nav-item sidebar-nav-parent <?= shouldExpandSubmenu($landing_pages_submenu, $current_url) ? 'expanded' : '' ?>" onclick="toggleSubmenu(this)">
+                <i data-feather="layout" class="sidebar-nav-icon"></i>
+                <span class="sidebar-nav-text">Landing Pages</span>
+                <i data-feather="chevron-down" class="sidebar-nav-arrow"></i>
+            </div>
+            <div class="sidebar-submenu <?= shouldExpandSubmenu($landing_pages_submenu, $current_url) ? 'expanded' : '' ?>">
+                <?php foreach ($landing_pages_submenu as $item): ?>
+                    <a href="<?= epic_url($item['path']) ?>" class="sidebar-submenu-item <?= isMenuActive($item['path'], $current_url) ? 'active' : '' ?>">
+                        <span class="sidebar-submenu-text"><?= $item['text'] ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        
+        <!-- 6. Integrasi -->
         <div class="sidebar-nav-group">
             <div class="sidebar-nav-item sidebar-nav-parent <?= shouldExpandSubmenu($integrasi_submenu, $current_url) ? 'expanded' : '' ?>" onclick="toggleSubmenu(this)">
                 <i data-feather="zap" class="sidebar-nav-icon"></i>

@@ -1,7 +1,7 @@
 <?php
 /**
- * Landing Page Manager Content
- * Template untuk konten landing page manager
+ * Member Landing Pages Content
+ * Template untuk konten landing pages member
  */
 
 if (!defined('EPIC_INIT')) {
@@ -51,11 +51,11 @@ extract($data);
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="mb-0"><?= number_format($stats['active_pages']) ?></h4>
-                        <p class="mb-0">Active Pages</p>
+                        <h4 class="mb-0"><?= number_format($stats['total_views']) ?></h4>
+                        <p class="mb-0">Total Views</p>
                     </div>
                     <div class="align-self-center">
-                        <i class="fas fa-check-circle fa-2x"></i>
+                        <i class="fas fa-eye fa-2x"></i>
                     </div>
                 </div>
             </div>
@@ -66,11 +66,11 @@ extract($data);
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="mb-0"><?= number_format($stats['total_visits']) ?></h4>
-                        <p class="mb-0">Total Visits</p>
+                        <h4 class="mb-0"><?= number_format($stats['total_conversions']) ?></h4>
+                        <p class="mb-0">Conversions</p>
                     </div>
                     <div class="align-self-center">
-                        <i class="fas fa-eye fa-2x"></i>
+                        <i class="fas fa-chart-line fa-2x"></i>
                     </div>
                 </div>
             </div>
@@ -81,11 +81,11 @@ extract($data);
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="mb-0"><?= $stats['conversion_rate'] ?>%</h4>
+                        <h4 class="mb-0"><?= $stats['avg_conversion_rate'] ?>%</h4>
                         <p class="mb-0">Conversion Rate</p>
                     </div>
                     <div class="align-self-center">
-                        <i class="fas fa-chart-line fa-2x"></i>
+                        <i class="fas fa-percentage fa-2x"></i>
                     </div>
                 </div>
             </div>
@@ -93,38 +93,73 @@ extract($data);
     </div>
 </div>
 
-<!-- Search and Add Form -->
-<div class="card mb-3">
+<!-- Account Limits Info -->
+<div class="card mb-4">
     <div class="card-body">
-        <form method="GET" action="">
-            <div class="row">
-                <div class="col-md-10">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="search" 
-                               value="<?= htmlspecialchars($search) ?>" 
-                               placeholder="Cari landing page berdasarkan judul, slug, atau deskripsi...">
-                        <button type="submit" class="btn btn-secondary">
-                            <i class="fas fa-search"></i> Cari
-                        </button>
-                        <?php if (!empty($search)): ?>
-                        <a href="?" class="btn btn-outline-secondary">
-                            <i class="fas fa-times"></i> Reset
-                        </a>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <div class="col-md-2 text-end">
-                    <a href="<?= epic_url('admin/manage/landing-page-manager-add') ?>" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Tambah Landing Page
-                    </a>
+        <div class="row">
+            <div class="col-md-8">
+                <h5 class="card-title">
+                    <i class="fas fa-info-circle text-info me-2"></i>
+                    Informasi Akun <?= strtoupper($access_level) ?>
+                </h5>
+                <p class="card-text">
+                    Anda dapat membuat maksimal <strong><?= $user_limits['max_pages'] ?> landing page</strong>. 
+                    Saat ini Anda telah menggunakan <strong><?= $stats['total_pages'] ?></strong> dari 
+                    <strong><?= $user_limits['max_pages'] ?></strong> slot yang tersedia.
+                </p>
+                <?php if ($user_limits['analytics']): ?>
+                <p class="text-success mb-0">
+                    <i class="fas fa-check me-1"></i> Analytics tersedia untuk akun Anda
+                </p>
+                <?php else: ?>
+                <p class="text-warning mb-0">
+                    <i class="fas fa-times me-1"></i> Analytics tidak tersedia untuk akun Free
+                </p>
+                <?php endif; ?>
+            </div>
+            <div class="col-md-4 text-end">
+                <?php if ($stats['total_pages'] < $user_limits['max_pages']): ?>
+                <a href="<?= epic_url('dashboard/member/landing-pages/create') ?>" class="btn btn-success">
+                    <i class="fas fa-plus me-2"></i>Buat Landing Page
+                </a>
+                <?php else: ?>
+                <button class="btn btn-secondary" disabled>
+                    <i class="fas fa-lock me-2"></i>Limit Tercapai
+                </button>
+                <?php endif; ?>
+            </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="mt-3">
+            <div class="d-flex justify-content-between mb-1">
+                <small class="text-muted">Penggunaan Slot</small>
+                <small class="text-muted"><?= $stats['total_pages'] ?>/<?= $user_limits['max_pages'] ?></small>
+            </div>
+            <div class="progress">
+                <?php 
+                $usage_percentage = ($stats['total_pages'] / $user_limits['max_pages']) * 100;
+                $progress_class = $usage_percentage >= 90 ? 'bg-danger' : ($usage_percentage >= 70 ? 'bg-warning' : 'bg-success');
+                ?>
+                <div class="progress-bar <?= $progress_class ?>" 
+                     role="progressbar" 
+                     style="width: <?= min(100, $usage_percentage) ?>%"
+                     aria-valuenow="<?= $stats['total_pages'] ?>" 
+                     aria-valuemin="0" 
+                     aria-valuemax="<?= $user_limits['max_pages'] ?>">
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<!-- Landing Pages Table -->
+<!-- Landing Pages List -->
 <div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-list me-2"></i>Landing Pages Saya
+        </h5>
+    </div>
     <div class="card-body">
         <?php if (!empty($landing_pages)): ?>
         <div class="table-responsive">
@@ -132,94 +167,109 @@ extract($data);
                 <thead class="table-light">
                     <tr>
                         <th>Landing Page</th>
-                        <th>Owner</th>
                         <th>Status</th>
-                        <th>Visits</th>
+                        <?php if ($user_limits['analytics']): ?>
+                        <th>Views</th>
+                        <th>Conversions</th>
+                        <th>Revenue</th>
+                        <?php endif; ?>
                         <th>Created</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($landing_pages as $landing): ?>
+                    <?php foreach ($landing_pages as $page): ?>
                     <tr>
                         <td>
                             <div>
                                 <h6 class="mb-1">
                                     <a href="#" class="text-decoration-none toggle-info" 
-                                       data-target="info-<?= $landing['id'] ?>">
-                                        <?= htmlspecialchars($landing['page_title']) ?>
+                                       data-target="info-<?= $page['id'] ?>">
+                                        <?= htmlspecialchars($page['page_title']) ?>
                                     </a>
                                 </h6>
                                 <small class="text-muted">
-                                    /<?= htmlspecialchars($landing['page_slug']) ?>
+                                    /<?= htmlspecialchars($page['page_slug']) ?>
                                 </small>
                             </div>
-                            <div id="info-<?= $landing['id'] ?>" class="mt-2 collapse">
+                            <div id="info-<?= $page['id'] ?>" class="mt-2 collapse">
                                 <div class="card card-body bg-light">
                                     <small>
                                         <strong>URL:</strong> 
-                                        <a href="<?= epic_url('landing/' . $landing['page_slug']) ?>" 
+                                        <a href="<?= epic_url('landing/' . $page['page_slug']) ?>" 
                                            target="_blank" class="text-decoration-none">
-                                            <?= epic_url('landing/' . $landing['page_slug']) ?>
+                                            <?= epic_url('landing/' . $page['page_slug']) ?>
                                         </a><br>
                                         <strong>Description:</strong> 
-                                        <?= htmlspecialchars($landing['page_description'] ?: 'No description') ?><br>
-                                        <strong>Template:</strong> 
-                                        <?= htmlspecialchars($landing['template_name'] ?: 'Default') ?>
+                                        <?= htmlspecialchars($page['page_description'] ?: 'No description') ?><br>
+                                        <strong>Referral URL:</strong>
+                                        <div class="input-group input-group-sm mt-1">
+                                            <input type="text" class="form-control" 
+                                                   value="<?= epic_url('landing/' . $page['page_slug'] . '?ref=' . $user['referral_code']) ?>" 
+                                                   readonly id="url-<?= $page['id'] ?>">
+                                            <button class="btn btn-outline-secondary copy-url" 
+                                                    data-url="<?= epic_url('landing/' . $page['page_slug'] . '?ref=' . $user['referral_code']) ?>"
+                                                    title="Copy URL">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
                                     </small>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <div>
-                                <small class="fw-bold"><?= htmlspecialchars($landing['user_name'] ?: 'Unknown') ?></small><br>
-                                <small class="text-muted"><?= htmlspecialchars($landing['user_email'] ?: '') ?></small>
-                            </div>
-                        </td>
-                        <td>
-                            <?php if ($landing['is_active']): ?>
+                            <?php if ($page['is_active']): ?>
                                 <span class="badge bg-success">Active</span>
                             <?php else: ?>
                                 <span class="badge bg-danger">Inactive</span>
                             <?php endif; ?>
                         </td>
+                        <?php if ($user_limits['analytics']): ?>
                         <td>
-                            <span class="badge bg-info"><?= number_format($landing['visit_count'] ?? 0) ?></span>
+                            <span class="badge bg-info"><?= number_format($page['views']) ?></span>
                         </td>
                         <td>
-                            <small><?= $landing['created_date'] ?></small>
+                            <span class="badge bg-success"><?= number_format($page['conversions']) ?></span>
+                            <small class="text-muted d-block"><?= $page['conversion_rate'] ?>%</small>
+                        </td>
+                        <td>
+                            <span class="text-success fw-bold">Rp <?= number_format($page['revenue']) ?></span>
+                        </td>
+                        <?php endif; ?>
+                        <td>
+                            <small><?= $page['created_date'] ?></small>
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm" role="group">
                                 <!-- Preview -->
-                                <a href="<?= epic_url('landing/' . $landing['page_slug']) ?>" 
+                                <a href="<?= epic_url('landing/' . $page['page_slug']) ?>" 
                                    target="_blank" class="btn btn-outline-primary" title="Preview">
                                     <i class="fas fa-external-link-alt"></i>
                                 </a>
                                 
                                 <!-- Edit -->
-                                <a href="<?= epic_url('admin/manage/landing-page-manager-add?edit=' . $landing['id']) ?>" 
+                                <a href="<?= epic_url('dashboard/member/landing-pages/edit/' . $page['id']) ?>" 
                                    class="btn btn-outline-success" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 
                                 <!-- Toggle Status -->
-                                <?php if ($landing['is_active']): ?>
+                                <?php if ($page['is_active']): ?>
                                 <button type="button" class="btn btn-outline-warning toggle-status" 
-                                        data-id="<?= $landing['id'] ?>" data-status="0" title="Deactivate">
+                                        data-id="<?= $page['id'] ?>" data-status="0" title="Deactivate">
                                     <i class="fas fa-pause"></i>
                                 </button>
                                 <?php else: ?>
                                 <button type="button" class="btn btn-outline-info toggle-status" 
-                                        data-id="<?= $landing['id'] ?>" data-status="1" title="Activate">
+                                        data-id="<?= $page['id'] ?>" data-status="1" title="Activate">
                                     <i class="fas fa-play"></i>
                                 </button>
                                 <?php endif; ?>
                                 
                                 <!-- Delete -->
                                 <button type="button" class="btn btn-outline-danger delete-landing" 
-                                        data-id="<?= $landing['id'] ?>" 
-                                        data-title="<?= htmlspecialchars($landing['page_title']) ?>" 
+                                        data-id="<?= $page['id'] ?>" 
+                                        data-title="<?= htmlspecialchars($page['page_title']) ?>" 
                                         title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -231,79 +281,23 @@ extract($data);
             </table>
         </div>
         
-        <!-- Pagination -->
-        <?php if ($total_pages > 1): ?>
-        <nav aria-label="Landing pages pagination" class="mt-3">
-            <ul class="pagination justify-content-center">
-                <?php
-                $base_url = '?' . http_build_query(array_merge($_GET, ['page' => '']));
-                $base_url = rtrim($base_url, '=');
-                
-                // Previous button
-                if ($page > 1): ?>
-                <li class="page-item">
-                    <a class="page-link" href="<?= $base_url . ($page - 1) ?>">Previous</a>
-                </li>
-                <?php endif; ?>
-                
-                <?php
-                // Page numbers
-                $start_page = max(1, $page - 2);
-                $end_page = min($total_pages, $page + 2);
-                
-                if ($start_page > 1): ?>
-                <li class="page-item">
-                    <a class="page-link" href="<?= $base_url ?>1">1</a>
-                </li>
-                <?php if ($start_page > 2): ?>
-                <li class="page-item disabled">
-                    <span class="page-link">...</span>
-                </li>
-                <?php endif; ?>
-                <?php endif; ?>
-                
-                <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
-                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                    <a class="page-link" href="<?= $base_url . $i ?>"><?= $i ?></a>
-                </li>
-                <?php endfor; ?>
-                
-                <?php if ($end_page < $total_pages): ?>
-                <?php if ($end_page < $total_pages - 1): ?>
-                <li class="page-item disabled">
-                    <span class="page-link">...</span>
-                </li>
-                <?php endif; ?>
-                <li class="page-item">
-                    <a class="page-link" href="<?= $base_url . $total_pages ?>"><?= $total_pages ?></a>
-                </li>
-                <?php endif; ?>
-                
-                <!-- Next button -->
-                <?php if ($page < $total_pages): ?>
-                <li class="page-item">
-                    <a class="page-link" href="<?= $base_url . ($page + 1) ?>">Next</a>
-                </li>
-                <?php endif; ?>
-            </ul>
-        </nav>
-        <?php endif; ?>
-        
         <?php else: ?>
         <!-- Empty State -->
         <div class="text-center py-5">
             <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
             <h5 class="text-muted">Belum ada landing page</h5>
             <p class="text-muted">
-                <?php if (!empty($search)): ?>
-                    Tidak ditemukan landing page dengan kata kunci "<?= htmlspecialchars($search) ?>"
-                    <br><a href="?" class="btn btn-sm btn-outline-secondary mt-2">Reset Pencarian</a>
-                <?php else: ?>
-                    Mulai buat landing page pertama Anda
-                    <br><a href="<?= epic_url('admin/manage/landing-page-manager-add') ?>" 
-                           class="btn btn-success mt-2">Buat Landing Page</a>
-                <?php endif; ?>
+                Mulai buat landing page pertama Anda untuk meningkatkan konversi
             </p>
+            <?php if ($stats['total_pages'] < $user_limits['max_pages']): ?>
+            <a href="<?= epic_url('dashboard/member/landing-pages/create') ?>" class="btn btn-success mt-2">
+                <i class="fas fa-plus me-2"></i>Buat Landing Page Pertama
+            </a>
+            <?php else: ?>
+            <p class="text-warning mt-2">
+                <i class="fas fa-lock me-1"></i>Limit landing page telah tercapai
+            </p>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
     </div>
@@ -350,6 +344,26 @@ document.addEventListener('DOMContentLoaded', function() {
             const target = document.getElementById(targetId);
             const collapse = new bootstrap.Collapse(target);
             collapse.toggle();
+        });
+    });
+    
+    // Copy URL functionality
+    document.querySelectorAll('.copy-url').forEach(function(element) {
+        element.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            navigator.clipboard.writeText(url).then(function() {
+                // Show success feedback
+                const originalIcon = element.innerHTML;
+                element.innerHTML = '<i class="fas fa-check"></i>';
+                element.classList.add('btn-success');
+                element.classList.remove('btn-outline-secondary');
+                
+                setTimeout(function() {
+                    element.innerHTML = originalIcon;
+                    element.classList.remove('btn-success');
+                    element.classList.add('btn-outline-secondary');
+                }, 2000);
+            });
         });
     });
     

@@ -113,6 +113,11 @@ try {
             break;
             
         default:
+            // Check if this is a landing page request before 404
+            if (epic_route_landing_page($segments)) {
+                // Landing page found and handled
+                break;
+            }
             epic_route_404();
             break;
     }

@@ -14,82 +14,89 @@ require_once __DIR__ . '/layout-helper.php';
 // Check admin access sudah dilakukan di layout helper
 $user = epic_current_user();
 
-// Handle landing page actions
 $success = '';
 $error = '';
 
-if (isset($_GET['activate']) && is_numeric($_GET['activate'])) {
-    $page_id = (int)$_GET['activate'];
-    try {
-        db()->update('landing_pages', [
-            'is_active' => 1,
-            'updated_at' => date('Y-m-d H:i:s')
-        ], 'id = ?', [$page_id]);
-        $success = "Landing page berhasil diaktifkan!";
-    } catch (Exception $e) {
-        error_log('Activate landing page error: ' . $e->getMessage());
-        $error = "Terjadi kesalahan saat mengaktifkan landing page.";
-    }
-}
-
-if (isset($_GET['deactivate']) && is_numeric($_GET['deactivate'])) {
-    $page_id = (int)$_GET['deactivate'];
-    try {
-        db()->update('landing_pages', [
-            'is_active' => 0,
-            'updated_at' => date('Y-m-d H:i:s')
-        ], 'id = ?', [$page_id]);
-        $success = "Landing page berhasil dinonaktifkan!";
-    } catch (Exception $e) {
-        error_log('Deactivate landing page error: ' . $e->getMessage());
-        $error = "Terjadi kesalahan saat menonaktifkan landing page.";
-    }
-}
-
-if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-    $page_id = (int)$_GET['delete'];
-    try {
-        // Get landing page info first
-        $landing_page = db()->selectOne(
-            "SELECT * FROM " . db()->table('landing_pages') . " WHERE id = ?",
-            [$page_id]
-        );
-        
-        if ($landing_page) {
-            // Delete image file if exists
-            if (!empty($landing_page['page_image'])) {
-                $image_path = __DIR__ . '/../../../../uploads/landing-pages/' . $landing_page['page_image'];
-                if (file_exists($image_path)) {
-                    unlink($image_path);
+// Handle landing page actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+    
+    switch ($action) {
+        case 'delete':
+            $page_id = (int)($_POST['page_id'] ?? 0);
+            if ($page_id > 0) {
+                try {
+                    db()->delete('landing_pages', 'id = ?', [$page_id]);
+                    epic_log_activity($user['id'], 'delete_landing_page', "Landing page ID: {$page_id} deleted", 'landing_page', $page_id);
+                    $success = 'Landing page berhasil dihapus.';
+                } catch (Exception $e) {
+                    error_log('Delete landing page error: ' . $e->getMessage());
+                    $error = 'Terjadi kesalahan saat menghapus landing page.';
                 }
             }
+            break;
             
-            // Delete from database
-            db()->delete('landing_pages', 'id = ?', [$page_id]);
-            
-            // Log activity
-            epic_log_activity($user['id'], 'delete_landing_page', [
-                'page_id' => $page_id,
-                'page_title' => $landing_page['page_title']
-            ]);
-            
-            $success = "Landing page berhasil dihapus!";
-        } else {
-            $error = "Landing page tidak ditemukan.";
-        }
-    } catch (Exception $e) {
-        error_log('Delete landing page error: ' . $e->getMessage());
-        $error = "Terjadi kesalahan saat menghapus landing page.";
+        case 'toggle_status':
+            $page_id = (int)($_POST['page_id'] ?? 0);
+            $status = (int)($_POST['status'] ?? 0);
+            if ($page_id > 0) {
+                try {
+                    db()->update('landing_pages', ['is_active' => $status], 'id = ?', [$page_id]);
+                    $status_text = $status ? 'diaktifkan' : 'dinonaktifkan';
+                    epic_log_activity($user['id'], 'toggle_landing_page_status', "Landing page ID: {$page_id} {$status_text}", 'landing_page', $page_id);
+                    $success = "Landing page berhasil {$status_text}.";
+                } catch (Exception $e) {
+                    error_log('Toggle landing page status error: ' . $e->getMessage());
+                    $error = 'Terjadi kesalahan saat mengubah status landing page.';
+                }
+            }
+            break;
     }
 }
 
-// Get search and filter parameters
+// Handle GET actions
+if (isset($_GET['action'])) {
+    $action = $_GET['action'];
+    $page_id = (int)($_GET['id'] ?? 0);
+    
+    switch ($action) {
+        case 'delete':
+            if ($page_id > 0) {
+                try {
+                    db()->delete('landing_pages', 'id = ?', [$page_id]);
+                    epic_log_activity($user['id'], 'delete_landing_page', "Landing page ID: {$page_id} deleted", 'landing_page', $page_id);
+                    epic_redirect(epic_url('admin/manage/landing-page-manager?success=' . urlencode('Landing page berhasil dihapus.')));
+                } catch (Exception $e) {
+                    error_log('Delete landing page error: ' . $e->getMessage());
+                    epic_redirect(epic_url('admin/manage/landing-page-manager?error=' . urlencode('Terjadi kesalahan saat menghapus landing page.')));
+                }
+            }
+            break;
+            
+        case 'activate':
+        case 'deactivate':
+            if ($page_id > 0) {
+                $status = ($action === 'activate') ? 1 : 0;
+                try {
+                    db()->update('landing_pages', ['is_active' => $status], 'id = ?', [$page_id]);
+                    $status_text = $status ? 'diaktifkan' : 'dinonaktifkan';
+                    epic_log_activity($user['id'], 'toggle_landing_page_status', "Landing page ID: {$page_id} {$status_text}", 'landing_page', $page_id);
+                    epic_redirect(epic_url('admin/manage/landing-page-manager?success=' . urlencode("Landing page berhasil {$status_text}.")));
+                } catch (Exception $e) {
+                    error_log('Toggle landing page status error: ' . $e->getMessage());
+                    epic_redirect(epic_url('admin/manage/landing-page-manager?error=' . urlencode('Terjadi kesalahan saat mengubah status landing page.')));
+                }
+            }
+            break;
+    }
+}
+
+// Get URL parameters
+$success = $_GET['success'] ?? $success;
+$error = $_GET['error'] ?? $error;
 $search = $_GET['search'] ?? '';
-$status_filter = $_GET['status'] ?? '';
-$method_filter = $_GET['method'] ?? '';
-$user_filter = $_GET['user'] ?? '';
 $page = max(1, (int)($_GET['page'] ?? 1));
-$per_page = 10;
+$per_page = 15;
 $offset = ($page - 1) * $per_page;
 
 // Build query conditions
@@ -97,89 +104,81 @@ $conditions = [];
 $params = [];
 
 if (!empty($search)) {
-    $conditions[] = "(lp.page_title LIKE ? OR lp.page_slug LIKE ? OR u.name LIKE ?)";
+    $conditions[] = "(page_title LIKE ? OR page_slug LIKE ? OR page_description LIKE ?)";
     $params[] = "%{$search}%";
     $params[] = "%{$search}%";
     $params[] = "%{$search}%";
-}
-
-if ($status_filter === 'active') {
-    $conditions[] = "lp.is_active = 1";
-} elseif ($status_filter === 'inactive') {
-    $conditions[] = "lp.is_active = 0";
-}
-
-if (!empty($method_filter)) {
-    $conditions[] = "lp.method = ?";
-    $params[] = $method_filter;
-}
-
-if (!empty($user_filter)) {
-    $conditions[] = "lp.user_id = ?";
-    $params[] = $user_filter;
 }
 
 $where_clause = !empty($conditions) ? 'WHERE ' . implode(' AND ', $conditions) : '';
 
-// Get total count for pagination
-$total_count = db()->selectValue(
-    "SELECT COUNT(*) FROM " . db()->table('landing_pages') . " lp
-     LEFT JOIN " . db()->table('users') . " u ON u.id = lp.user_id
-     {$where_clause}",
-    $params
-);
-
-$total_pages = ceil($total_count / $per_page);
-
-// Get landing pages data
-$landing_pages = db()->select(
-    "SELECT lp.*, u.name as user_name, u.referral_code,
-            (SELECT COUNT(*) FROM " . db()->table('landing_page_visits') . " lpv WHERE lpv.landing_page_id = lp.id) as visit_count
-     FROM " . db()->table('landing_pages') . " lp
-     LEFT JOIN " . db()->table('users') . " u ON u.id = lp.user_id
-     {$where_clause}
-     ORDER BY lp.created_at DESC
-     LIMIT {$per_page} OFFSET {$offset}",
-    $params
-);
+// Get landing pages
+try {
+    $landing_pages = db()->select(
+        "SELECT lp.*, u.name as user_name, u.email as user_email,
+                DATE_FORMAT(lp.created_at, '%d %M %Y') as created_date,
+                DATE_FORMAT(lp.updated_at, '%d %M %Y %H:%i') as updated_date
+         FROM " . db()->table('landing_pages') . " lp 
+         LEFT JOIN " . db()->table('users') . " u ON lp.user_id = u.id 
+         {$where_clause}
+         ORDER BY lp.created_at DESC 
+         LIMIT {$per_page} OFFSET {$offset}",
+        $params
+    );
+    
+    // Get total count for pagination
+    $total_count = db()->selectValue(
+        "SELECT COUNT(*) FROM " . db()->table('landing_pages') . " lp {$where_clause}",
+        $params
+    ) ?: 0;
+    
+    $total_pages = ceil($total_count / $per_page);
+    
+} catch (Exception $e) {
+    error_log('Landing pages query error: ' . $e->getMessage());
+    $landing_pages = [];
+    $total_count = 0;
+    $total_pages = 0;
+}
 
 // Get statistics
-$stats = [
-    'total' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('landing_pages')),
-    'active' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('landing_pages') . " WHERE is_active = 1"),
-    'total_visits' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('landing_page_visits')),
-    'iframe_method' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('landing_pages') . " WHERE method = 1")
-];
-
-// Get all users for filter dropdown
-$users = db()->select(
-    "SELECT id, name FROM " . db()->table('users') . " WHERE status = 'active' ORDER BY name ASC"
-);
+try {
+    $stats = [
+        'total_pages' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('landing_pages')) ?: 0,
+        'active_pages' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('landing_pages') . " WHERE is_active = 1") ?: 0,
+        'total_visits' => db()->selectValue("SELECT COUNT(*) FROM " . db()->table('landing_page_visits')) ?: 0,
+        'total_users' => db()->selectValue("SELECT COUNT(DISTINCT user_id) FROM " . db()->table('landing_pages')) ?: 0
+    ];
+    
+    $stats['conversion_rate'] = $stats['total_visits'] > 0 ? round(($stats['active_pages'] / $stats['total_visits']) * 100, 1) : 0;
+    
+} catch (Exception $e) {
+    error_log('Landing page stats error: ' . $e->getMessage());
+    $stats = [
+        'total_pages' => 0,
+        'active_pages' => 0,
+        'total_visits' => 0,
+        'total_users' => 0,
+        'conversion_rate' => 0
+    ];
+}
 
 // Prepare data untuk layout
 $layout_data = [
-    'page_title' => 'Landing Page Manager - EPIC Hub Admin',
-    'header_title' => 'Landing Page Manager',
+    'page_title' => 'Landing Page Manager - Admin',
     'current_page' => 'landing-page-manager',
     'breadcrumb' => [
         ['text' => 'Admin', 'url' => epic_url('admin')],
         ['text' => 'Manage', 'url' => epic_url('admin/manage')],
         ['text' => 'Landing Page Manager']
     ],
-    'page_actions' => [
-        epic_link_action('New Landing Page', epic_url('admin/manage/landing-page-manager/add'), 'plus')
-    ],
     'content_file' => __DIR__ . '/content/landing-page-manager-content.php',
-    // Pass variables ke content
+    'user' => $user,
     'success' => $success,
     'error' => $error,
     'landing_pages' => $landing_pages,
     'stats' => $stats,
-    'users' => $users,
     'search' => $search,
-    'status_filter' => $status_filter,
-    'method_filter' => $method_filter,
-    'user_filter' => $user_filter,
     'page' => $page,
     'total_pages' => $total_pages,
     'total_count' => $total_count
